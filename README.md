@@ -26,7 +26,7 @@ control: false
 
 ## Migration from Original Repository
 
-If you're migrating from the [original repository](https://github.com/nervetattoo/simple-thermostat):
+If you're migrating from the [original repository](https://github.com/nervetattoo/simple-thermostat) or any of the older forks:
 
 ### Version 3.0.8 Changes
 
@@ -40,11 +40,37 @@ If you're migrating from the [original repository](https://github.com/nervetatto
 - Replaced paper-font variable fallbacks with explicit px values for consistent sizing across all themes.
 - No configuration changes required.
 
+### Version 3.0.6 Changes
+
+- Refined target temperature sizing before the final 3.0.7 font-size fix.
+- No configuration changes required.
+
+### Version 3.0.5 Changes
+
+- Fixed the updating-state CSS class binding for the target temperature display.
+- No configuration changes required.
+
 ### Version 3.0.4 Changes
 
+- Updated localization handling to use Home Assistant's current `hass.localize` API.
 - Updated for Home Assistant 2026.5.0 compatibility.
 - No configuration changes required.
-- New repository location for updates.
+
+### Version 3.0.3 Changes
+
+- Release and repository maintenance changes.
+- No configuration changes required.
+
+### Version 3.0.2 Changes
+
+- Fixed handling for missing or unavailable climate entities.
+- Added defensive localization handling when Home Assistant language resources are unavailable.
+- No configuration changes required.
+
+### Version 3.0.1 Changes
+
+- Initial compatibility update after forking from the original repository.
+- No configuration changes required.
 
 ### Version 3.0.0 Changes
 
