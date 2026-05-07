@@ -157,6 +157,7 @@ resources:
   - `hvac|fan|preset|swing` _object|bool_: The mode type to control.
     - `_name` _string_: Override the mode type name.
     - `_hide_when_off` _boolean_: Hide the mode row when the entity is off. Defaults to `false`.
+    - `_icons` _boolean_: Set to `false` to hide icons for this mode row only.
     - `{mode}` _string_: Name of the mode to control.
       - `name` _string|bool_: Specify a custom name or set to `false` to show only the icon.
       - `icon` _string|bool_: Specify a custom icon or set to `false` to hide the icon.
@@ -316,6 +317,14 @@ control:
       name: Off
     "on":
       name: On
+
+````md
+Hide icons for only one mode row:
+
+```yaml
+control:
+  fan:
+    _icons: false
 ```
 
 ## Example usage
