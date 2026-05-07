@@ -28,6 +28,12 @@ control: false
 
 If you're migrating from the [original repository](https://github.com/nervetattoo/simple-thermostat) or any of the older forks:
 
+### Version 3.0.10 Changes
+
+- Added locale-aware number formatting for displayed temperatures and sensor values.
+- Number formatting now follows Home Assistant locale preferences, including decimal comma formats where configured.
+- No configuration changes required.
+
 ### Version 3.0.9 Changes
 
 - Added a row-level `_icons` option for mode controls.
