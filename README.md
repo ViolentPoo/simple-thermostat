@@ -50,6 +50,7 @@ If you're migrating from the [original repository](https://github.com/nervetatto
 
 | Version | Changes |
 |---------|---------|
+| 3.0.14 | Fixed error when card is used inside collapsable cards or other custom container cards. |
 | 3.0.13 | Fixed unlisted preset modes (e.g. `away_indefinitely`) being shown when explicit mode config is provided. |
 | 3.0.12 | Added `vane_horizontal` and `vane_vertical` control mode support for climate entities that expose these attributes (e.g. Mitsubishi AC units). |
 | 3.0.11 | Show OFF for unavailable target temperature when heater is off |
