@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.9";
+var version = "3.0.10";
 
 /**
  * @license
@@ -753,14 +753,39 @@ function isEqual(a, b) {
     return !keys.some((key) => (a === null || a === void 0 ? void 0 : a[key]) !== (b === null || b === void 0 ? void 0 : b[key]));
 }
 
-function formatNumber(number, { decimals = 1, fallback = 'N/A' } = {}) {
+function getLanguage(locale) {
+    if (!locale)
+        return undefined;
+    if (locale.number_format === 'system')
+        return undefined;
+    return locale.language;
+}
+function formatNumber(number, { decimals = 1, fallback = 'N/A', locale } = {}) {
     const type = typeof number;
     if (number === null ||
         number === '' ||
         ['boolean', 'undefined'].includes(type)) {
         return fallback;
     }
-    return Number(number).toFixed(decimals);
+    const value = Number(number);
+    if (Number.isNaN(value))
+        return fallback;
+    if (!locale) {
+        return value.toFixed(decimals);
+    }
+    if (locale.number_format === 'decimal_comma') {
+        return value.toFixed(decimals).replace('.', ',');
+    }
+    if (locale.number_format === 'space_comma') {
+        return value.toFixed(decimals).replace('.', ',');
+    }
+    if (locale.number_format === 'comma_decimal') {
+        return value.toFixed(decimals);
+    }
+    return new Intl.NumberFormat(getLanguage(locale), {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+    }).format(value);
 }
 
 function renderHeader({ header, toggleEntityChanged, entity, openEntityPopover, }) {
@@ -911,7 +936,7 @@ function renderTemplated({ context, entityId, template = '{{state.text}}', label
         }, ui: translations, v: variables });
     // Need to define these inside the function to be able to reach local scope
     squirrelly_minExports.filters.define('formatNumber', (str, opts = { decimals: config.decimals }) => {
-        return String(formatNumber(str, opts));
+        return String(formatNumber(str, Object.assign(Object.assign({}, opts), { locale: hass.locale })));
     });
     squirrelly_minExports.filters.define('relativetime', (str, opts = {}) => {
         return `<ha-relative-time fwd-datetime=${str} with-hass></ha-relative-time>`;
@@ -966,7 +991,10 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
         ].join('.');
         let value = localize(state.state, prefix);
         if (typeof decimals === 'number') {
-            value = formatNumber(value, { decimals });
+            value = formatNumber(value, {
+                decimals,
+                locale: hass.locale,
+            });
         }
         valueCell = b `
       <div
@@ -978,7 +1006,12 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
     `;
     }
     else {
-        let value = typeof decimals === 'number' ? formatNumber(state, { decimals }) : state;
+        let value = typeof decimals === 'number'
+            ? formatNumber(state, {
+                decimals,
+                locale: hass.locale,
+            })
+            : state;
         valueCell = b ` <div class="sensor-value">${value}${unit}</div> `;
     }
     if (heading === false) {
@@ -1007,7 +1040,7 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
     const sensorHtml = [
         renderInfoItem({
             hide: _hide.temperature,
-            state: `${formatNumber(current, config)}${unit || ''}`,
+            state: `${formatNumber(current, Object.assign(Object.assign({}, config), { locale: hass.locale }))}${unit || ''}`,
             hass,
             details: {
                 heading: showLabels
@@ -1543,7 +1576,7 @@ class SimpleThermostat extends i$1 {
                 ? 'current--value updating'
                 : 'current--value'}
                 >
-                  ${formatNumber(value, config)}
+                  ${formatNumber(value, Object.assign(Object.assign({}, config), { locale: this._hass.locale }))}
                   ${showUnit
                 ? b `<span class="current--unit">${unit}</span>`
                 : A}
