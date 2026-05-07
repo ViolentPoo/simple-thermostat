@@ -28,82 +28,6 @@ control: false
 
 If you're migrating from the [original repository](https://github.com/nervetattoo/simple-thermostat) or any of the older forks:
 
-### Version 3.0.12 Changes
-
-- Added support for `vane_horizontal` and `vane_vertical` control modes.
-- Enables vane direction controls on climate entities that expose these attributes (e.g. Mitsubishi AC units).
-- No configuration changes required for existing setups.
-
-### Version 3.0.11 Changes
-
-- Show OFF for unavailable target temperature if heater OFF
-- Clarified target temperature sizing documentation.
-- Documented that `--st-font-size-l` controls smaller viewports and `--st-font-size-xl` controls wider viewports.
-- No configuration changes required.
-
-### Version 3.0.10 Changes
-
-- Added locale-aware number formatting for displayed temperatures and sensor values.
-- Number formatting now follows Home Assistant locale preferences, including decimal comma formats where configured.
-- No configuration changes required.
-
-### Version 3.0.9 Changes
-
-- Added a row-level `_icons` option for mode controls.
-- Allows hiding icons for a single mode row, such as `fan`, while keeping icons visible on other rows.
-- No configuration changes required.
-
-### Version 3.0.8 Changes
-
-- Fixed a `version: 3` templated sensor crash when Home Assistant does not expose localization resources for the active UI language.
-- Prevents errors such as `Cannot read properties of undefined (reading 'en')` or `Cannot read properties of undefined (reading 'it')`.
-- No configuration changes required.
-
-### Version 3.0.7 Changes
-
-- Fixed target temperature font size displaying too small on themes that don't define legacy paper-font variables.
-- Replaced paper-font variable fallbacks with explicit px values for consistent sizing across all themes.
-- No configuration changes required.
-
-### Version 3.0.6 Changes
-
-- Refined target temperature sizing before the final 3.0.7 font-size fix.
-- No configuration changes required.
-
-### Version 3.0.5 Changes
-
-- Fixed the updating-state CSS class binding for the target temperature display.
-- No configuration changes required.
-
-### Version 3.0.4 Changes
-
-- Updated localization handling to use Home Assistant's current `hass.localize` API.
-- Updated for Home Assistant 2026.5.0 compatibility.
-- No configuration changes required.
-
-### Version 3.0.3 Changes
-
-- Release and repository maintenance changes.
-- No configuration changes required.
-
-### Version 3.0.2 Changes
-
-- Fixed handling for missing or unavailable climate entities.
-- Added defensive localization handling when Home Assistant language resources are unavailable.
-- No configuration changes required.
-
-### Version 3.0.1 Changes
-
-- Initial compatibility update after forking from the original repository.
-- No configuration changes required.
-
-### Version 3.0.0 Changes
-
-- Updated to Lit 3.x.
-- Updated all dependencies.
-- No configuration changes required.
-- New repository location for updates.
-
 ### Switching to This Fork
 
 **Via HACS:**
@@ -121,6 +45,20 @@ If you're migrating from the [original repository](https://github.com/nervetatto
 1. Download `simple-thermostat.js` from the [latest release](https://github.com/Wheemer/simple-thermostat/releases/latest).
 2. Replace the existing file in your `www` folder.
 3. Clear your browser cache.
+
+## Changelog
+
+| Version | Changes |
+|---------|---------|
+| 3.0.12 | Added `vane_horizontal` and `vane_vertical` control mode support |
+| 3.0.11 | Show OFF for unavailable target temperature when heater is off |
+| 3.0.10 | Locale-aware number formatting for temperatures and sensor values |
+| 3.0.9 | Added row-level `_icons` option for mode controls |
+| 3.0.8 | Fixed `version: 3` templated sensor crash for some HA language configs |
+| 3.0.7 | Fixed target temperature font size on themes without paper-font variables |
+| 3.0.5 | Fixed updating-state CSS class binding for target temperature display |
+| 3.0.4 | Updated localization for Home Assistant 2026.5.0 compatibility |
+| 3.0.0 | Updated to Lit 3.x, updated all dependencies |
 
 ## Requirements
 
