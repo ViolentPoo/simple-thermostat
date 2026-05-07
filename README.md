@@ -28,6 +28,12 @@ control: false
 
 If you're migrating from the [original repository](https://github.com/nervetattoo/simple-thermostat) or any of the older forks:
 
+### Version 3.0.12 Changes
+
+- Added support for `vane_horizontal` and `vane_vertical` control modes.
+- Enables vane direction controls on climate entities that expose these attributes (e.g. Mitsubishi AC units).
+- No configuration changes required for existing setups.
+
 ### Version 3.0.11 Changes
 
 - Show OFF for unavailable target temperature if heater OFF
@@ -173,7 +179,7 @@ resources:
   - `temperature` _boolean_: Defaults to `false`.
   - `state` _boolean_: Defaults to `false`.
 - `control` _object|array_:
-  - `hvac|fan|preset|swing` _object|bool_: The mode type to control.
+  - `hvac|fan|preset|swing|vane_horizontal|vane_vertical` _object|bool_: The mode type to control.
     - `_name` _string_: Override the mode type name.
     - `_hide_when_off` _boolean_: Hide the mode row when the entity is off. Defaults to `false`.
     - `_icons` _boolean_: Set to `false` to hide icons for this mode row only.
@@ -344,6 +350,27 @@ control:
       name: Off
     "on":
       name: On
+```
+
+For climate devices with horizontal and vertical vane controls (e.g. Mitsubishi AC units), enable them like any other mode type:
+
+```yaml
+control:
+  hvac: true
+  fan: true
+  swing: true
+  vane_horizontal: true
+  vane_vertical: true
+```
+
+Custom names and filtered positions are also supported:
+
+```yaml
+control:
+  vane_horizontal:
+    _name: H-Vane
+  vane_vertical:
+    _name: V-Vane
 ```
 
 ## Example usage
