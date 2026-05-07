@@ -324,7 +324,7 @@ ha-switch {
         ${jt({header:this.header,toggleEntityChanged:this.toggleEntityChanged,entity:this.entity,openEntityPopover:this.openEntityPopover})}
         <section class="body">
           ${v}
-          ${Object.entries(e).map(([t,e])=>{const s=["string","number"].includes(typeof e),o=!1!==u&&s;return D`
+          ${Object.entries(e).map(([t,e])=>{const o=["string","number"].includes(typeof e),r=!1!==u&&o;return D`
               <div class="current-wrapper ${p}">
                 <ha-icon-button
                   ?disabled=${null!==d&&e>=d}
@@ -339,8 +339,8 @@ ha-switch {
                   @click=${()=>this.openEntityPopover()}
                   class=${i?"current--value updating":"current--value"}
                 >
-                  ${St(e,Object.assign(Object.assign({},n),{locale:this._hass.locale}))}
-                  ${o?D`<span class="current--unit">${u}</span>`:B}
+                  ${St(e,Object.assign(Object.assign({},n),{fallback:s.state===Ft.OFF?"OFF":n.fallback,locale:this._hass.locale}))}
+                  ${r?D`<span class="current--unit">${u}</span>`:B}
                 </h3>
                 <ha-icon-button
                   ?disabled=${null!==c&&e<=c}

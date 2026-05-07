@@ -1576,7 +1576,9 @@ class SimpleThermostat extends i$1 {
                 ? 'current--value updating'
                 : 'current--value'}
                 >
-                  ${formatNumber(value, Object.assign(Object.assign({}, config), { locale: this._hass.locale }))}
+                  ${formatNumber(value, Object.assign(Object.assign({}, config), { fallback: entity.state === HVAC_MODES.OFF
+                    ? 'OFF'
+                    : config.fallback, locale: this._hass.locale }))}
                   ${showUnit
                 ? b `<span class="current--unit">${unit}</span>`
                 : A}
