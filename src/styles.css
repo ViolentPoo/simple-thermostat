@@ -143,11 +143,11 @@ header {
   align-items: center;
   margin: 0;
   font-weight: 400;
-  line-height: var(--st-font-size-l, 1.1rem);
-  font-size: var(--st-font-size-l, 1.1rem);
+  line-height: var(--st-font-size-l, 20px);
+  font-size: var(--st-font-size-l, 20px);
   @media (--vp-m) {
-    font-size: var(--st-font-size-xl, 1.2rem);
-    line-height: var(--st-font-size-xl, 1.2rem);
+    font-size: var(--st-font-size-xl, 24px);
+    line-height: var(--st-font-size-xl, 24px);
   }
 
   &.updating {
