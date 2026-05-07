@@ -215,13 +215,17 @@ header {
   align-items: center;
   margin: 0;
   font-weight: 400;
-  line-height: var(--st-font-size-l, var(--paper-font-display1_-_font-size));
-  font-size: var(--st-font-size-l, var(--paper-font-display1_-_font-size));
+  line-height: 3rem;
+  line-height: var(--st-font-size-l, 3rem);
+  font-size: 3rem;
+  font-size: var(--st-font-size-l, 3rem);
 }
 @media (min-width: 768px) {
 .current--value {
-    font-size: var(--st-font-size-xl, var(--paper-font-display2_-_font-size));
-    line-height: var(--st-font-size-xl, var(--paper-font-display2_-_font-size));
+    font-size: 4rem;
+    font-size: var(--st-font-size-xl, 4rem);
+    line-height: 4rem;
+    line-height: var(--st-font-size-xl, 4rem);
 }
   }
 .current--value.updating {
