@@ -30,6 +30,7 @@ If you're migrating from the [original repository](https://github.com/nervetatto
 
 ### Version 3.0.11 Changes
 
+- Show OFF for unavailable target temperature if heater OFF
 - Clarified target temperature sizing documentation.
 - Documented that `--st-font-size-l` controls smaller viewports and `--st-font-size-xl` controls wider viewports.
 - No configuration changes required.
