@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.14";
+var version = "3.0.15";
 
 /**
  * @license
@@ -1702,8 +1702,12 @@ __decorate([
     n()
 ], SimpleThermostat.prototype, "_hide", void 0);
 
-customElements.define(name, SimpleThermostat);
-customElements.define(`${name}-editor`, SimpleThermostatEditor);
+if (!customElements.get(name)) {
+    customElements.define(name, SimpleThermostat);
+}
+if (!customElements.get(`${name}-editor`)) {
+    customElements.define(`${name}-editor`, SimpleThermostatEditor);
+}
 console.info(`%c${name}: ${version}`, 'font-weight: bold');
 window.customCards = window.customCards || [];
 window.customCards.push({
