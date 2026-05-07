@@ -439,7 +439,10 @@ export default class SimpleThermostat extends LitElement {
                     ? 'current--value updating'
                     : 'current--value'}
                 >
-                  ${formatNumber(value, { ...config, locale: this._hass.locale })}
+                  ${formatNumber(value, {
+                    ...config,
+                    locale: this._hass.locale,
+                  })}
                   ${showUnit
                     ? html`<span class="current--unit">${unit}</span>`
                     : nothing}
