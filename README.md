@@ -28,6 +28,12 @@ control: false
 
 If you're migrating from the [original repository](https://github.com/nervetattoo/simple-thermostat) or any of the older forks:
 
+### Version 3.0.11 Changes
+
+- Clarified target temperature sizing documentation.
+- Documented that `--st-font-size-l` controls smaller viewports and `--st-font-size-xl` controls wider viewports.
+- No configuration changes required.
+
 ### Version 3.0.10 Changes
 
 - Added locale-aware number formatting for displayed temperatures and sensor values.
@@ -320,6 +326,14 @@ control:
   hvac: true
 ```
 
+Hide icons for only one mode row:
+
+```yaml
+control:
+  fan:
+    _icons: false
+```
+
 Quote `off` and `on` mode keys so YAML does not interpret them as booleans:
 
 ```yaml
@@ -329,14 +343,6 @@ control:
       name: Off
     "on":
       name: On
-
-````md
-Hide icons for only one mode row:
-
-```yaml
-control:
-  fan:
-    _icons: false
 ```
 
 ## Example usage
@@ -388,21 +394,42 @@ cards:
 
 The card uses the following CSS variables:
 
-| Var name                    | Default value                          | Usage                                                |
-| --------------------------- | -------------------------------------- | ---------------------------------------------------- |
-| --st-font-size-xl           | var(--paper-font-display3_-_font-size) | Used for target temperature                          |
-| --st-font-size-l            | var(--paper-font-display2_-_font-size) | Unused at the moment                                 |
-| --st-font-size-m            | var(--paper-font-title_-_font-size)    | Used for target temperature unit                     |
-| --st-font-size-title        | var(--ha-card-header-font-size, 24px)  | Font size for card heading                           |
-| --st-font-size-sensors      | var(--paper-font-subhead_-_font-size)  | Font size for sensors                                |
-| --st-spacing                | 4px                                    | Base unit for spacing                                |
-| --st-mode-active-background | var(--primary-color)                   | Background color for active mode button              |
-| --st-mode-active-color      | var(--text-primary-color, #fff)        | Text color for active mode button                    |
-| --st-mode-background        | #dff4fd                                | Background color for inactive mode button            |
-| --st-toggle-label-color     | var(--text-primary-color)              | Text color for toggle label                          |
-| --st-font-size-toggle-label | var(--paper-font-subhead_-_font-size)  | Font size for toggle label                           |
-| --st-fault-inactive-color   | var(--secondary-background-color)      | Icon color for inactive faults                       |
-| --st-fault-active-color     | var(--accent-color)                    | Icon color for active faults                         |
+| Var name                    | Default value                         | Usage                                                |
+| --------------------------- | ------------------------------------- | ---------------------------------------------------- |
+| --st-font-size-xl           | 24px                                  | Used for target temperature on wider viewports       |
+| --st-font-size-l            | 20px                                  | Used for target temperature on smaller viewports     |
+| --st-font-size-m            | var(--paper-font-title_-_font-size)   | Used for target temperature unit                     |
+| --st-font-size-title        | var(--ha-card-header-font-size, 24px) | Font size for card heading                           |
+| --st-font-size-sensors      | var(--paper-font-subhead_-_font-size) | Font size for sensors                                |
+| --st-spacing                | 4px                                   | Base unit for spacing                                |
+| --st-mode-active-background | var(--primary-color)                  | Background color for active mode button              |
+| --st-mode-active-color      | var(--text-primary-color, #fff)       | Text color for active mode button                    |
+| --st-mode-background        | #dff4fd                               | Background color for inactive mode button            |
+| --st-toggle-label-color     | var(--text-primary-color)             | Text color for toggle label                          |
+| --st-font-size-toggle-label | var(--paper-font-subhead_-_font-size) | Font size for toggle label                           |
+| --st-fault-inactive-color   | var(--secondary-background-color)     | Icon color for inactive faults                       |
+| --st-fault-active-color     | var(--accent-color)                   | Icon color for active faults                         |
+
+### Target temperature sizing
+
+The target temperature uses different variables depending on viewport width:
+
+- `--st-font-size-l` controls the target temperature on smaller viewports.
+- `--st-font-size-xl` controls the target temperature on wider viewports.
+- `--st-font-size-m` controls the unit next to the target temperature.
+
+To force a compact target temperature size on all screen widths, set both `--st-font-size-l` and `--st-font-size-xl`:
+
+```yaml
+type: custom:simple-thermostat
+card_mod:
+  style: |
+    ha-card {
+      --st-font-size-l: 10px;
+      --st-font-size-xl: 10px;
+      --st-font-size-m: 10px;
+    }
+```
 
 These variables can be changed globally in the current theme or on each card via card-mod.
 
@@ -413,6 +440,7 @@ Example that makes everything smaller and more compact except sensors, which are
 ```yaml
 example-theme:
   st-font-size-xl: 24px
+  st-font-size-l: 20px
   st-font-size-m: 20px
   st-font-size-title: 20px
   st-font-size-sensors: 30px
@@ -425,12 +453,14 @@ Same example as above, but applied to a single card.
 
 ```yaml
 type: custom:simple-thermostat
-style: |
-  ha-card {
-    --st-font-size-xl: 24px;
-    --st-font-size-m: 20px;
-    --st-font-size-title: 20px;
-    --st-font-size-sensors: 30px;
-    --st-spacing: 2px;
-  }
+card_mod:
+  style: |
+    ha-card {
+      --st-font-size-xl: 24px;
+      --st-font-size-l: 20px;
+      --st-font-size-m: 20px;
+      --st-font-size-title: 20px;
+      --st-font-size-sensors: 30px;
+      --st-spacing: 2px;
+    }
 ```
