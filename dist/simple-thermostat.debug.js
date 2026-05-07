@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.15";
+var version = "3.0.16";
 
 /**
  * @license
@@ -70,10 +70,14 @@ var css_248z = i$4`:host {
   --st-default-spacing: 4px;
 }
 ha-card {
-  -webkit-font-smoothing: var(--paper-font-body1_-_-webkit-font-smoothing);
-  font-size: var(--paper-font-body1_-_font-size);
-  font-weight: var(--paper-font-body1_-_font-weight);
-  line-height: var(--paper-font-body1_-_line-height);
+  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: var(--ha-font-smoothing, antialiased);
+  font-size: 14px;
+  font-size: var(--ha-font-size-m, 14px);
+  font-weight: 400;
+  font-weight: var(--ha-font-weight-normal, 400);
+  line-height: 1.5;
+  line-height: var(--ha-line-height-normal, 1.5);
 
   padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
 
@@ -108,7 +112,7 @@ ha-card.no-header {
   font-size: 16px;
   font-size: var(
     --st-font-size-toggle-label,
-    var(--paper-font-subhead_-_font-size, 16px)
+    var(--ha-font-size-l, 16px)
   );
 }
 
@@ -135,7 +139,7 @@ ha-card.no-header {
   font-size: 16px;
   font-size: var(
     --st-font-size-sensors,
-    var(--paper-font-subhead_-_font-size, 16px)
+    var(--ha-font-size-l, 16px)
   );
 }
 .sensors.as-list {
@@ -186,14 +190,15 @@ header {
 .header__icon {
   margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
   color: #44739e;
-  color: var(--paper-item-icon-color, #44739e);
+  color: var(--state-icon-color, #44739e);
 }
 .header__title {
   font-size: 24px;
   font-size: var(--st-font-size-title, var(--ha-card-header-font-size, 24px));
   line-height: 24px;
   line-height: var(--st-font-size-title, var(--ha-card-header-font-size, 24px));
-  -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
+  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: var(--ha-font-smoothing, antialiased);
   font-weight: normal;
   margin: 0;
   align-self: left;
@@ -232,7 +237,8 @@ header {
     color: var(--error-color);
   }
 .current--unit {
-  font-size: var(--st-font-size-m, var(--paper-font-title_-_font-size));
+  font-size: 20px;
+  font-size: var(--st-font-size-m, var(--ha-font-size-xl, 20px));
 }
 .thermostat-trigger {
   padding: 0px;
@@ -259,7 +265,7 @@ header {
   font-size: 16px;
   font-size: var(
     --st-font-size-sensors,
-    var(--paper-font-subhead_-_font-size, 16px)
+    var(--ha-font-size-l, 16px)
   );
   font-weight: 300;
   white-space: nowrap;
