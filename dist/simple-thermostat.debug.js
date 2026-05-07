@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.10";
+var version = "3.0.12";
 
 /**
  * @license
@@ -1093,12 +1093,15 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
     if (type === 'hvac') {
         localizePrefix = `component.climate.state._.`;
     }
+    else if (type === 'vane_horizontal' || type === 'vane_vertical') {
+        localizePrefix = '';
+    }
     const maybeRenderName = (name) => {
         if (name === false)
             return null;
         if ((modeOptions === null || modeOptions === void 0 ? void 0 : modeOptions.names) === false)
             return null;
-        return localize(name, localizePrefix);
+        return localizePrefix ? localize(name, localizePrefix) : name;
     };
     const maybeRenderIcon = (icon) => {
         if (!icon)
@@ -1108,7 +1111,17 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
         return b ` <ha-icon class="mode-icon" .icon=${icon}></ha-icon> `;
     };
     const str = type == 'hvac' ? 'operation' : `${type}_mode`;
-    const title = name || localize(`ui.card.climate.${str}`);
+    let defaultTitle;
+    if (type === 'vane_horizontal') {
+        defaultTitle = 'Vane Horizontal';
+    }
+    else if (type === 'vane_vertical') {
+        defaultTitle = 'Vane Vertical';
+    }
+    else {
+        defaultTitle = localize(`ui.card.climate.${str}`);
+    }
+    const title = name || defaultTitle;
     const headings = (_a = modeOptions === null || modeOptions === void 0 ? void 0 : modeOptions.headings) !== null && _a !== void 0 ? _a : true;
     return b `
     <div class="modes ${headings ? 'heading' : ''}">
@@ -1240,12 +1253,20 @@ var MODES;
     MODES["FAN"] = "fan";
     MODES["PRESET"] = "preset";
     MODES["SWING"] = "swing";
+    MODES["VANE_HORIZONTAL"] = "vane_horizontal";
+    MODES["VANE_VERTICAL"] = "vane_vertical";
 })(MODES || (MODES = {}));
 
 const DEBOUNCE_TIMEOUT = 500;
 const STEP_SIZE = 0.5;
 const DECIMALS = 1;
 const MODE_TYPES = Object.values(MODES);
+const MODES_WITH_POSITIONS = [MODES.VANE_HORIZONTAL, MODES.VANE_VERTICAL];
+function getModeOptionsKey(type) {
+    return MODES_WITH_POSITIONS.includes(type)
+        ? `${type}_positions`
+        : `${type}_modes`;
+}
 const DEFAULT_CONTROL = [MODES.HVAC, MODES.PRESET];
 const ICONS = {
     UP: 'hass:chevron-up',
@@ -1266,7 +1287,7 @@ function shouldShowModeControl(modeOption, config) {
     return (_a = config === null || config === void 0 ? void 0 : config[modeOption]) !== null && _a !== void 0 ? _a : true;
 }
 function getModeList(type, attributes, specification = {}) {
-    return attributes[`${type}_modes`]
+    return attributes[getModeOptionsKey(type)]
         .filter((modeOption) => shouldShowModeControl(modeOption, specification))
         .map((modeOption) => {
         const values = typeof specification[modeOption] === 'object'
@@ -1308,10 +1329,18 @@ class SimpleThermostat extends i$1 {
         };
         this.setMode = (type, mode) => {
             if (type && mode) {
-                this._hass.callService('climate', `set_${type}_mode`, {
-                    entity_id: this.config.entity,
-                    [`${type}_mode`]: mode,
-                });
+                if (MODES_WITH_POSITIONS.includes(type)) {
+                    this._hass.callService('climate', `set_${type}`, {
+                        entity_id: this.config.entity,
+                        [`${type}`]: mode,
+                    });
+                }
+                else {
+                    this._hass.callService('climate', `set_${type}_mode`, {
+                        entity_id: this.config.entity,
+                        [`${type}_mode`]: mode,
+                    });
+                }
                 fireEvent(this, 'haptic', 'light');
             }
             else {
@@ -1375,7 +1404,7 @@ class SimpleThermostat extends i$1 {
         else if (!this._updatingValues) {
             this._values = values;
         }
-        const supportedModeType = (type) => MODE_TYPES.includes(type) && attributes[`${type}_modes`];
+        const supportedModeType = (type) => MODE_TYPES.includes(type) && attributes[getModeOptionsKey(type)];
         const buildBasicModes = (items) => {
             return items.filter(supportedModeType).map((type) => ({
                 type,
@@ -1424,7 +1453,10 @@ class SimpleThermostat extends i$1 {
                 });
                 return Object.assign(Object.assign({}, values), { list: sortedList, mode: entity.state });
             }
-            const mode = attributes[`${values.type}_mode`];
+            const modeKey = MODES_WITH_POSITIONS.includes(values.type)
+                ? values.type
+                : `${values.type}_mode`;
+            const mode = attributes[modeKey];
             return Object.assign(Object.assign({}, values), { mode });
         });
         if (this.config.step_size) {

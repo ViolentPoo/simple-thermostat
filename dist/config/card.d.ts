@@ -6,7 +6,9 @@ export declare enum MODES {
     HVAC = "hvac",
     FAN = "fan",
     PRESET = "preset",
-    SWING = "swing"
+    SWING = "swing",
+    VANE_HORIZONTAL = "vane_horizontal",
+    VANE_VERTICAL = "vane_vertical"
 }
 export type ModeValue = {
     name?: string | false;
@@ -35,6 +37,8 @@ type ModeControl = {
     fan: ModeControlValue;
     preset: ModeControlValue;
     swing: ModeControlValue;
+    vane_horizontal: ModeControlValue;
+    vane_vertical: ModeControlValue;
 };
 interface CardConfig {
     entity?: string;
