@@ -28,6 +28,11 @@ control: false
 
 If you're migrating from the [original repository](https://github.com/nervetattoo/simple-thermostat):
 
+### Version 3.0.7 Changes
+- Fixed target temperature font size displaying too small on themes that don't define legacy paper-font variables
+- Replaced paper-font variable fallbacks with explicit px values (20px small viewport, 24px large viewport) for consistent sizing across all themes
+- No configuration changes required
+
 ### Version 3.0.4 Changes
 - Used claude to help bring to HA 2026.5.0 compliance.
 - No configuration changes required - your existing card config will continue to work
