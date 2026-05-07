@@ -8,6 +8,8 @@ export enum MODES {
   FAN = 'fan',
   PRESET = 'preset',
   SWING = 'swing',
+  VANE_HORIZONTAL = 'vane_horizontal',
+  VANE_VERTICAL = 'vane_vertical',
 }
 
 export type ModeValue = {
@@ -39,6 +41,8 @@ type ModeControl = {
   fan: ModeControlValue
   preset: ModeControlValue
   swing: ModeControlValue
+  vane_horizontal: ModeControlValue
+  vane_vertical: ModeControlValue
 }
 
 interface CardConfig {
