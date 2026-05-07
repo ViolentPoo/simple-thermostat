@@ -81,7 +81,10 @@ function shouldShowModeControl(
     return obj.include !== false
   }
 
-  return config?.[modeOption] ?? true
+  const hasExplicitConfig = Object.keys(config).some(
+    (key) => !key.startsWith('_')
+  )
+  return config?.[modeOption] ?? !hasExplicitConfig
 }
 
 function getModeList(
