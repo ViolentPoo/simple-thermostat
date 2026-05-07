@@ -29,7 +29,10 @@ export default function renderSensors({
   const sensorHtml = [
     renderInfoItem({
       hide: _hide.temperature,
-      state: `${formatNumber(current, config)}${unit || ''}`,
+      state: `${formatNumber(current, {
+        ...config,
+        locale: hass.locale,
+      })}${unit || ''}`,
       hass,
       details: {
         heading: showLabels
