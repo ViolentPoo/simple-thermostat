@@ -262,6 +262,8 @@ control:
 
 There is no merging with the default config. If you want `hvac` controls too, include them explicitly:
 
+When any mode options are listed explicitly, unlisted modes are hidden automatically. This prevents unexpected modes (e.g. `away_indefinitely` added by integrations) from appearing in the card:
+
 ```yaml
 control:
   preset:
