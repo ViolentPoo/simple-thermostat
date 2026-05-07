@@ -894,12 +894,12 @@ function wrapSensors(config, content) {
     return b ` <div class="sensors ${classes.join(' ')}">${content}</div> `;
 }
 function renderTemplated({ context, entityId, template = '{{state.text}}', label, hass, variables = {}, config, localize, openEntityPopover, }) {
-    var _a, _b;
+    var _a, _b, _c, _d;
     const { state, attributes } = context;
     const [domain] = entityId.split('.');
     const lang = hass.selectedLanguage || hass.language;
     const trPrefix = 'ui.card.climate.';
-    const translations = Object.entries(hass.resources[lang]).reduce((memo, [key, value]) => {
+    const translations = Object.entries((_b = (_a = hass.resources) === null || _a === void 0 ? void 0 : _a[lang]) !== null && _b !== void 0 ? _b : {}).reduce((memo, [key, value]) => {
         if (key.startsWith(trPrefix))
             memo[key.replace(trPrefix, '')] = value;
         return memo;
@@ -924,7 +924,7 @@ function renderTemplated({ context, entityId, template = '{{state.text}}', label
     });
     const render = (template) => squirrelly_minExports.render(template, data, { useWith: true });
     const value = render(template);
-    if (label === false || ((_b = (_a = config === null || config === void 0 ? void 0 : config.layout) === null || _a === void 0 ? void 0 : _a.sensors) === null || _b === void 0 ? void 0 : _b.labels) === false) {
+    if (label === false || ((_d = (_c = config === null || config === void 0 ? void 0 : config.layout) === null || _c === void 0 ? void 0 : _c.sensors) === null || _d === void 0 ? void 0 : _d.labels) === false) {
         return b `<div class="sensor-value">${o(value)}</div>`;
     }
     const safeLabel = label || '{{friendly_name}}';
