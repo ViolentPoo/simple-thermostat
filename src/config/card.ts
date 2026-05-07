@@ -23,6 +23,7 @@ export type ModeValue = {
 export type ModeControlObject = Record<string, boolean | ModeValue> & {
   _name: string
   _hide_when_off: boolean
+  _icons?: boolean
 }
 
 /**
