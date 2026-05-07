@@ -16,7 +16,7 @@ export default function renderModeType({
   localize,
   setMode,
 }: ModeTypeOptions) {
-  const { type, hide_when_off, mode = 'none', list, name } = options
+  const { type, hide_when_off, mode = 'none', list, name, icons } = options
   if (list.length === 0 || (hide_when_off && state === HVAC_MODES.OFF)) {
     return null
   }
@@ -33,7 +33,7 @@ export default function renderModeType({
   }
   const maybeRenderIcon = (icon: string) => {
     if (!icon) return null
-    if (modeOptions?.icons === false) return null
+    if (modeOptions?.icons === false || icons === false) return null
     return html` <ha-icon class="mode-icon" .icon=${icon}></ha-icon> `
   }
 
