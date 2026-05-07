@@ -49,6 +49,7 @@ export interface ControlMode {
     type: string;
     mode: any;
     name?: string | boolean;
+    icons?: boolean;
     hide_when_off?: boolean;
     list: Array<ControlModeOption>;
 }

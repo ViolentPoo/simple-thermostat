@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.0";
+var version = "3.0.9";
 
 /**
  * @license
@@ -1052,7 +1052,7 @@ var HVAC_MODES;
 
 function renderModeType({ state, mode: options, modeOptions, localize, setMode, }) {
     var _a;
-    const { type, hide_when_off, mode = 'none', list, name } = options;
+    const { type, hide_when_off, mode = 'none', list, name, icons } = options;
     if (list.length === 0 || (hide_when_off && state === HVAC_MODES.OFF)) {
         return null;
     }
@@ -1070,7 +1070,7 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
     const maybeRenderIcon = (icon) => {
         if (!icon)
             return null;
-        if ((modeOptions === null || modeOptions === void 0 ? void 0 : modeOptions.icons) === false)
+        if ((modeOptions === null || modeOptions === void 0 ? void 0 : modeOptions.icons) === false || icons === false)
             return null;
         return b ` <ha-icon class="mode-icon" .icon=${icon}></ha-icon> `;
     };
@@ -1363,10 +1363,11 @@ class SimpleThermostat extends i$1 {
                 controlModes = entries
                     .filter(([type]) => supportedModeType(type))
                     .map(([type, definition]) => {
-                    const { _name, _hide_when_off } = definition, controlField = __rest(definition, ["_name", "_hide_when_off"]);
+                    const { _name, _hide_when_off, _icons } = definition, controlField = __rest(definition, ["_name", "_hide_when_off", "_icons"]);
                     return {
                         type,
                         hide_when_off: _hide_when_off,
+                        icons: _icons,
                         name: _name,
                         list: getModeList(type, attributes, controlField),
                     };
