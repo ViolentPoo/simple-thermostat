@@ -1,11 +1,11 @@
 {
   "name": "simple-thermostat",
-  "version": "3.0.0",
+  "version": "3.0.8",
   "description": "A different take on the thermostat card for Home Assistant Lovelace UI",
   "main": "dist/simple-thermostat.js",
   "type": "module",
-  "repository": "git@github.com:pmbsa/simple-thermostat.git",
-  "author": "Raymond Julin <raymond.julin@gmail.com> (original), pmbsa (maintainer)",
+  "repository": "git@github.com:Wheemer/simple-thermostat.git",
+  "author": "Raymond Julin <raymond.julin@gmail.com> (original), Wheemer (maintainer)",
   "license": "MIT",
   "files": [
     "dist",
