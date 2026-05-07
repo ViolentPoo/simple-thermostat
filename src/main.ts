@@ -441,6 +441,10 @@ export default class SimpleThermostat extends LitElement {
                 >
                   ${formatNumber(value, {
                     ...config,
+                    fallback:
+                      entity.state === HVAC_MODES.OFF
+                        ? 'OFF'
+                        : config.fallback,
                     locale: this._hass.locale,
                   })}
                   ${showUnit
