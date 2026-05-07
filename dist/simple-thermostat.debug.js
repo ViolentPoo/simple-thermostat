@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.12";
+var version = "3.0.13";
 
 /**
  * @license
@@ -1284,7 +1284,8 @@ function shouldShowModeControl(modeOption, config) {
         const obj = config[modeOption];
         return obj.include !== false;
     }
-    return (_a = config === null || config === void 0 ? void 0 : config[modeOption]) !== null && _a !== void 0 ? _a : true;
+    const hasExplicitConfig = Object.keys(config).some((key) => !key.startsWith('_'));
+    return (_a = config === null || config === void 0 ? void 0 : config[modeOption]) !== null && _a !== void 0 ? _a : !hasExplicitConfig;
 }
 function getModeList(type, attributes, specification = {}) {
     return attributes[getModeOptionsKey(type)]
