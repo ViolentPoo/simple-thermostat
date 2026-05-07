@@ -40,6 +40,14 @@ const DECIMALS = 1
 
 const MODE_TYPES: Array<string> = Object.values(MODES)
 
+const MODES_WITH_POSITIONS = [MODES.VANE_HORIZONTAL, MODES.VANE_VERTICAL]
+
+function getModeOptionsKey(type: string): string {
+  return MODES_WITH_POSITIONS.includes(type as MODES)
+    ? `${type}_positions`
+    : `${type}_modes`
+}
+
 const DEFAULT_CONTROL = [MODES.HVAC, MODES.PRESET]
 
 const ICONS = {
@@ -81,7 +89,7 @@ function getModeList(
   attributes: LooseObject,
   specification: Partial<ModeControlObject> = {}
 ) {
-  return attributes[`${type}_modes`]
+  return attributes[getModeOptionsKey(type)]
     .filter((modeOption) => shouldShowModeControl(modeOption, specification))
     .map((modeOption) => {
       const values =
@@ -209,7 +217,7 @@ export default class SimpleThermostat extends LitElement {
     }
 
     const supportedModeType = (type: string) =>
-      MODE_TYPES.includes(type) && attributes[`${type}_modes`]
+      MODE_TYPES.includes(type) && attributes[getModeOptionsKey(type)]
     const buildBasicModes = (items: any) => {
       return items.filter(supportedModeType).map((type: string) => ({
         type,
@@ -260,7 +268,10 @@ export default class SimpleThermostat extends LitElement {
           mode: entity.state,
         } as ControlMode
       }
-      const mode = attributes[`${values.type}_mode`]
+      const modeKey = MODES_WITH_POSITIONS.includes(values.type as MODES)
+        ? values.type
+        : `${values.type}_mode`
+      const mode = attributes[modeKey]
       return { ...values, mode } as ControlMode
     })
 
@@ -505,10 +516,17 @@ export default class SimpleThermostat extends LitElement {
 
   setMode = (type: string, mode: string) => {
     if (type && mode) {
-      this._hass.callService('climate', `set_${type}_mode`, {
-        entity_id: this.config.entity,
-        [`${type}_mode`]: mode,
-      })
+      if (MODES_WITH_POSITIONS.includes(type as MODES)) {
+        this._hass.callService('climate', `set_${type}`, {
+          entity_id: this.config.entity,
+          [`${type}`]: mode,
+        })
+      } else {
+        this._hass.callService('climate', `set_${type}_mode`, {
+          entity_id: this.config.entity,
+          [`${type}_mode`]: mode,
+        })
+      }
       fireEvent(this, 'haptic', 'light')
     } else {
       fireEvent(this, 'haptic', 'failure')
