@@ -24,12 +24,14 @@ export default function renderModeType({
   let localizePrefix = `state_attributes.climate.${type}_mode.`
   if (type === 'hvac') {
     localizePrefix = `component.climate.state._.`
+  } else if (type === 'vane_horizontal' || type === 'vane_vertical') {
+    localizePrefix = ''
   }
 
   const maybeRenderName = (name: string | false) => {
     if (name === false) return null
     if (modeOptions?.names === false) return null
-    return localize(name, localizePrefix)
+    return localizePrefix ? localize(name, localizePrefix) : name
   }
   const maybeRenderIcon = (icon: string) => {
     if (!icon) return null
@@ -38,7 +40,15 @@ export default function renderModeType({
   }
 
   const str = type == 'hvac' ? 'operation' : `${type}_mode`
-  const title = name || localize(`ui.card.climate.${str}`)
+  let defaultTitle: string
+  if (type === 'vane_horizontal') {
+    defaultTitle = 'Vane Horizontal'
+  } else if (type === 'vane_vertical') {
+    defaultTitle = 'Vane Vertical'
+  } else {
+    defaultTitle = localize(`ui.card.climate.${str}`)
+  }
+  const title = name || defaultTitle
   const headings = modeOptions?.headings ?? true
 
   return html`
