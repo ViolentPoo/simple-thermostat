@@ -55,7 +55,10 @@ export default function renderInfoItem({
     ].join('.')
     let value = localize(state.state, prefix)
     if (typeof decimals === 'number') {
-      value = formatNumber(value, { decimals })
+      value = formatNumber(value, {
+        decimals,
+        locale: hass.locale,
+      })
     }
     valueCell = html`
       <div
@@ -67,7 +70,12 @@ export default function renderInfoItem({
     `
   } else {
     let value =
-      typeof decimals === 'number' ? formatNumber(state, { decimals }) : state
+      typeof decimals === 'number'
+        ? formatNumber(state, {
+            decimals,
+            locale: hass.locale,
+          })
+        : state
     valueCell = html` <div class="sensor-value">${value}${unit}</div> `
   }
 
