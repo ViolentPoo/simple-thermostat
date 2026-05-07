@@ -76,7 +76,12 @@ export default function renderTemplated({
   Sqrl.filters.define(
     'formatNumber',
     (str, opts = { decimals: config.decimals }) => {
-      return String(formatNumber(str, opts))
+      return String(
+        formatNumber(str, {
+          ...opts,
+          locale: hass.locale,
+        })
+      )
     }
   )
   Sqrl.filters.define('relativetime', (str, opts = {}) => {
