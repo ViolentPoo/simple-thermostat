@@ -28,6 +28,12 @@ control: false
 
 If you're migrating from the [original repository](https://github.com/nervetattoo/simple-thermostat) or any of the older forks:
 
+### Version 3.0.9 Changes
+
+- Added a row-level `_icons` option for mode controls.
+- Allows hiding icons for a single mode row, such as `fan`, while keeping icons visible on other rows.
+- No configuration changes required.
+
 ### Version 3.0.8 Changes
 
 - Fixed a `version: 3` templated sensor crash when Home Assistant does not expose localization resources for the active UI language.
