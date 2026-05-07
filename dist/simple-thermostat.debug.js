@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.13";
+var version = "3.0.14";
 
 /**
  * @license
@@ -1380,6 +1380,9 @@ class SimpleThermostat extends i$1 {
     set hass(hass) {
         var _a, _b, _c, _d;
         if (!this.config.entity) {
+            return;
+        }
+        if (!(hass === null || hass === void 0 ? void 0 : hass.states)) {
             return;
         }
         const entity = hass.states[this.config.entity];
