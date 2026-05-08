@@ -55,7 +55,7 @@ export default function renderInfoItem({
   }
   if (type === 'relativetime') {
     valueCell = html`
-      <div class="sensor-value">
+      <div class="entity-value">
         <ha-relative-time .datetime=${state} .hass=${hass}></ha-relative-time>
       </div>
     `
@@ -63,7 +63,7 @@ export default function renderInfoItem({
     const [domain] = state.entity_id.split('.')
     if (TOGGLE_DOMAINS.includes(domain)) {
       valueCell = html`
-        <div class="sensor-value">
+        <div class="entity-value">
           <ha-switch
             .checked=${state.state === 'on'}
             @change=${(ev: Event) =>
@@ -92,7 +92,7 @@ export default function renderInfoItem({
       }
       valueCell = html`
         <div
-          class="sensor-value clickable"
+          class="entity-value clickable"
           @click="${() => openEntityPopover(state.entity_id)}"
         >
           ${value} ${unit || state.attributes.unit_of_measurement}
@@ -107,7 +107,7 @@ export default function renderInfoItem({
             locale: hass.locale,
           })
         : state
-    valueCell = html` <div class="sensor-value">${value}${unit}</div> `
+    valueCell = html` <div class="entity-value">${value}${unit}</div> `
   }
 
   if (heading === false) {
@@ -119,7 +119,7 @@ export default function renderInfoItem({
     : html` ${heading}: `
 
   return html`
-    <div class="sensor-heading">${headingResult}</div>
+    <div class="entity-heading">${headingResult}</div>
     ${valueCell}
   `
 }
