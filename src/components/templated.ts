@@ -35,7 +35,7 @@ export function wrapEntities(config, content) {
     showLabels ? 'with-labels' : 'without-labels',
     type === 'list' ? 'as-list' : 'as-table',
   ]
-  return html` <div class="sensors ${classes.join(' ')}">${content}</div> `
+  return html` <div class="entities ${classes.join(' ')}">${content}</div> `
 }
 
 export default function renderTemplated({
@@ -103,7 +103,7 @@ export default function renderTemplated({
     label === false ||
     (config?.layout?.entities ?? config?.layout?.sensors)?.labels === false
   ) {
-    return html`<div class="sensor-value">${unsafeHTML(value)}</div>`
+    return html`<div class="entity-value">${unsafeHTML(value)}</div>`
   }
 
   const safeLabel = label || '{{friendly_name}}'
@@ -112,7 +112,7 @@ export default function renderTemplated({
     : render(safeLabel)
 
   return html`
-    <div class="sensor-heading">${unsafeHTML(heading)}</div>
-    <div class="sensor-value">${unsafeHTML(value)}</div>
+    <div class="entity-heading">${unsafeHTML(heading)}</div>
+    <div class="entity-value">${unsafeHTML(value)}</div>
   `
 }
