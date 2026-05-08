@@ -125,6 +125,22 @@ header {
   margin: 0;
   align-self: left;
 }
+
+.header__toggles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0 var(--st-spacing, var(--st-default-spacing));
+  margin-left: auto;
+}
+
+.header__toggle {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
 .current-wrapper {
   display: flex;
   flex-direction: column;
