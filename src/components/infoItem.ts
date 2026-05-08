@@ -2,6 +2,15 @@ import { html } from 'lit'
 import formatNumber from '../formatNumber'
 import { LooseObject } from '../types'
 
+const TOGGLE_DOMAINS = [
+  'automation',
+  'fan',
+  'humidifier',
+  'input_boolean',
+  'light',
+  'switch',
+]
+
 interface InfoItemDetails extends LooseObject {
   heading?: string | false
   icon?: string
@@ -17,6 +26,12 @@ interface InfoItemOptions {
   localize?
   openEntityPopover?
   details: InfoItemDetails
+}
+
+function toggleEntity(hass, entityId: string, checked: boolean) {
+  hass.callService('homeassistant', checked ? 'turn_on' : 'turn_off', {
+    entity_id: entityId,
+  })
 }
 
 // Preset mode can be  one of: none, eco, away, boost, comfort, home, sleep, activity
@@ -46,14 +61,29 @@ export default function renderInfoItem({
     `
   } else if (typeof state === 'object') {
     const [domain] = state.entity_id.split('.')
-    const prefix = [
-      'component',
-      domain,
-      'state',
-      state.attributes?.device_class ?? '_',
-      '',
-    ].join('.')
-    let value = localize(state.state, prefix)
+    if (TOGGLE_DOMAINS.includes(domain)) {
+      valueCell = html`
+        <div class="sensor-value">
+          <ha-switch
+            .checked=${state.state === 'on'}
+            @change=${(ev: Event) =>
+              toggleEntity(
+                hass,
+                state.entity_id,
+                (ev.target as HTMLInputElement).checked
+              )}
+          ></ha-switch>
+        </div>
+      `
+    } else {
+      const prefix = [
+        'component',
+        domain,
+        'state',
+        state.attributes?.device_class ?? '_',
+        '',
+      ].join('.')
+      let value = localize(state.state, prefix)
     if (typeof decimals === 'number') {
       value = formatNumber(value, {
         decimals,
@@ -61,13 +91,14 @@ export default function renderInfoItem({
       })
     }
     valueCell = html`
-      <div
-        class="sensor-value clickable"
-        @click="${() => openEntityPopover(state.entity_id)}"
-      >
-        ${value} ${unit || state.attributes.unit_of_measurement}
-      </div>
-    `
+        <div
+          class="sensor-value clickable"
+          @click="${() => openEntityPopover(state.entity_id)}"
+        >
+          ${value} ${unit || state.attributes.unit_of_measurement}
+        </div>
+      `
+    }
   } else {
     let value =
       typeof decimals === 'number'
