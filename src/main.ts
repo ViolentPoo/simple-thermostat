@@ -339,7 +339,7 @@ export default class SimpleThermostat extends LitElement {
           context: tempContext,
         })
       }
-      this.entities = [...builtins, ...customSensors]
+      this.entities = [...builtins, ...customEntities]
     } else if (configuredEntities) {
       this.sensors = configuredEntities.map(
         ({ name, entity, attribute, unit = '', ...rest }) => {
