@@ -24,11 +24,12 @@ Sqrl.filters.define('debug', (data) => {
   }
 })
 
-export function wrapSensors(config, content) {
-  const { type, labels: showLabels } = config?.layout?.sensors ?? {
-    type: 'table',
-    labels: true,
-  }
+export function wrapEntities(config, content) {
+  const { type, labels: showLabels } =
+    config?.layout?.entities ?? config?.layout?.sensors ?? {
+      type: 'table',
+      labels: true,
+    }
 
   const classes = [
     showLabels ? 'with-labels' : 'without-labels',
@@ -98,7 +99,10 @@ export default function renderTemplated({
 
   const value = render(template)
 
-  if (label === false || config?.layout?.sensors?.labels === false) {
+  if (
+    label === false ||
+    (config?.layout?.entities ?? config?.layout?.sensors)?.labels === false
+  ) {
     return html`<div class="sensor-value">${unsafeHTML(value)}</div>`
   }
 
