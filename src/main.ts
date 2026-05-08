@@ -135,7 +135,7 @@ export default class SimpleThermostat extends LitElement {
   @property()
   entities: Array<Sensor | PreparedSensor> = []
   @property()
-  showSensors: boolean = true
+  showEntities: boolean = true
   @property()
   name: string | false = ''
   stepSize = STEP_SIZE
@@ -297,7 +297,7 @@ export default class SimpleThermostat extends LitElement {
     const configuredEntities = getConfiguredEntities(this.config)
 
     if (configuredEntities === false) {
-      this.showSensors = false
+      this.showEntities = false
     } else if (this.config.version === 3) {
       this.entities = []
       const customEntities = configuredEntities.map((entity, index) => {
@@ -341,7 +341,7 @@ export default class SimpleThermostat extends LitElement {
       }
       this.entities = [...builtins, ...customEntities]
     } else if (configuredEntities) {
-      this.sensors = configuredEntities.map(
+      this.entities = configuredEntities.map(
         ({ name, entity, attribute, unit = '', ...rest }) => {
           let state
           const names = [name]
@@ -407,9 +407,9 @@ export default class SimpleThermostat extends LitElement {
 
     const classes = [!this.header && 'no-header', action].filter((cx) => !!cx)
 
-    let sensorsHtml
+    let entitiesHtml
     if (this.config.version === 3) {
-      sensorsHtml = this.sensors
+      entitiesHtml = this.entities
         .filter((spec: PreparedSensor) => spec.show !== false)
         .map((spec: PreparedSensor) => {
           return renderTemplated({
@@ -421,15 +421,15 @@ export default class SimpleThermostat extends LitElement {
             openEntityPopover: this.openEntityPopover,
           })
         })
-      sensorsHtml = wrapSensors(this.config, sensorsHtml)
+      entitiesHtml = wrapSensors(this.config, entitiesHtml)
     } else {
-      sensorsHtml = this.showSensors
+      entitiesHtml = this.showEntities
         ? renderSensors({
             _hide: this._hide,
             unit,
             hass: this._hass,
             entity: this.entity,
-            sensors: this.sensors,
+            entities: this.entities,
             config: this.config,
             localize: this.localize,
             openEntityPopover: this.openEntityPopover,
