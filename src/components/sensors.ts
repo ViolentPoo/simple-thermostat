@@ -15,8 +15,12 @@ export default function renderSensors({
 }) {
   const {
     state,
-    attributes: { hvac_action: action, current_temperature: current },
+    attributes: { hvac_action: action, current_temperature: current_entity_temp },
   } = entity
+
+  const current = config.current_temperature_entity
+    ? hass.states[config.current_temperature_entity]?.state
+    : current_entity_temp
 
   const showLabels = config?.layout?.sensors?.labels ?? true
   let stateString = localize(state, 'component.climate.state._.')
