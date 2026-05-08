@@ -73,7 +73,7 @@ const DEFAULT_HIDE = {
 }
 
 function getConfiguredEntities(config: CardConfig) {
-  return config.entities ?? config.sensors
+  return config.entities ?? config.sensors ?? []
 }
 
 function shouldShowModeControl(
