@@ -67,6 +67,10 @@ interface CardConfig {
       icons: boolean
       headings: boolean
     }
+    entities: {
+      type: 'table' | 'list'
+      labels: boolean
+    }
     sensors: {
       type: 'table' | 'list'
       labels: boolean
