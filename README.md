@@ -50,6 +50,7 @@ If you're migrating from the [original repository](https://github.com/nervetatto
 
 | Version | Changes |
 |---------|---------|
+| 3.0.17 | Added `current_temperature_entity` option to override the entity used for current temperature display. |
 | 3.0.16 | Fixed font sizing and styling broken by HA 2025.5 removal of deprecated `--paper-*` CSS variables. |
 | 3.0.15 | Fixed duplicate custom element registration error on Safari and iOS. |
 | 3.0.14 | Fixed error when card is used inside collapsable cards or other custom container cards. |
