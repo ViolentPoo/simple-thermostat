@@ -37,6 +37,7 @@ export type ModeControlObject = Record<string, boolean | ModeValue> & {
  * that are provided in the attributes of the entity.
  *
  */
+export type ModeControlValue = boolean | ModeControlObject
 type ModeControl = {
   hvac: ModeControlValue
   fan: ModeControlValue
