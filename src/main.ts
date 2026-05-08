@@ -24,8 +24,8 @@ import {
   ControlMode,
   ControlModeOption,
   LooseObject,
-  Sensor,
-  PreparedSensor,
+  Entity,
+  PreparedEntity,
   HASS,
   HVAC_MODES,
 } from './types'
@@ -133,7 +133,7 @@ export default class SimpleThermostat extends LitElement {
   @property()
   entity: LooseObject
   @property()
-  entities: Array<Sensor | PreparedSensor> = []
+  entities: Array<Entity | PreparedEntity> = []
   @property()
   showEntities: boolean = true
   @property()
@@ -313,7 +313,7 @@ export default class SimpleThermostat extends LitElement {
           show: entity?.show !== false,
           entityId,
           context,
-        } as PreparedSensor
+        } as PreparedEntity
       })
       const ids = customEntities.map((entity) => entity.id)
       const builtins = []
@@ -363,7 +363,7 @@ export default class SimpleThermostat extends LitElement {
             state,
             entity,
             unit,
-          } as Sensor
+          } as Entity
         }
       )
     }
@@ -410,8 +410,8 @@ export default class SimpleThermostat extends LitElement {
     let entitiesHtml
     if (this.config.version === 3) {
       entitiesHtml = this.entities
-        .filter((spec: PreparedSensor) => spec.show !== false)
-        .map((spec: PreparedSensor) => {
+        .filter((spec: PreparedEntity) => spec.show !== false)
+        .map((spec: PreparedEntity) => {
           return renderTemplated({
             ...spec,
             variables: this.config.variables,
