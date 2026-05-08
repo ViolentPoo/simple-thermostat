@@ -92,6 +92,19 @@ entity: climate.my_room        # Required
 
 ---
 
+## Compact mode
+
+Hide everything except sensors and temperature control:
+
+```yaml
+type: custom:simple-thermostat
+entity: climate.hvac
+layout:
+  step: row
+header: false
+control: false
+```
+
 ## Header
 
 Hide the header entirely:
@@ -346,16 +359,3 @@ my-theme:
 ```
 
 ---
-
-## Compact mode
-
-Hide everything except sensors and temperature control:
-
-```yaml
-type: custom:simple-thermostat
-entity: climate.hvac
-layout:
-  step: row
-header: false
-control: false
-```
