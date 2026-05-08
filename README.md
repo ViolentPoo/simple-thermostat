@@ -12,6 +12,7 @@ A Lovelace thermostat card focused on compact layout, easy interaction, and flex
 
 | Version | Changes |
 |---------|---------|
+| 3.0.19 | Added `header.toggles` support for multiple header toggle switches while keeping existing `header.toggle` configs working. |
 | 3.0.18 | Added `swing_horizontal` and `swing_vertical` control mode support for HA-standard climate entities (e.g. Daikin units). |
 | 3.0.17 | Added `current_temperature_entity` option to override the entity used for current temperature display. |
 | 3.0.16 | Fixed font sizing broken by HA 2025.5 removal of deprecated `--paper-*` CSS variables. |
@@ -124,6 +125,11 @@ header:
   toggle:
     entity: switch.fan
     name: Fan            # Set to true to use the entity's friendly name
+  toggles:
+    - entity: switch.boost
+      name: Boost
+    - entity: switch.eco_mode
+      name: Eco
   faults:
     - entity: binary_sensor.filter_fault
     - entity: binary_sensor.low_battery
@@ -137,7 +143,10 @@ header:
 - `icon` _string|object_: Icon next to the title. Defaults to the current `hvac_action` or state. Can be an object to override per action/state:
   - Per `hvac_action`: `auto`, `cooling`, `fan`, `heating`, `idle`, `"off"`
   - Per state: `auto`, `cool`, `dry`, `fan_only`, `heat`, `heat_cool`, `"off"`
-- `toggle` _object_: Add a toggle switch in the header for a related entity.
+- `toggle` _object_: Add a single toggle switch in the header for a related entity. Existing configs using `toggle` continue to work.
+  - `entity` _string_
+  - `name` _string|true_
+- `toggles` _array_: Add multiple toggle switches in the header. Uses the same options as `toggle`.
   - `entity` _string_
   - `name` _string|true_
 - `faults` _array|false_: Show binary sensor fault indicators in the header.
