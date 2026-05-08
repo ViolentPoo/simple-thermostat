@@ -1,5 +1,5 @@
 import { HeaderConfig } from './header'
-import { LooseObject, ConfigSensor, TemplatedSensor } from '../types'
+import { LooseObject, ConfigEntity, TemplatedEntity } from '../types'
 import { Service } from './service'
 import { Setpoints } from './setpoints'
 
@@ -54,8 +54,8 @@ interface CardConfig {
   current_temperature_entity?: string
   header: false | HeaderConfig
   control?: false | ModeControl | string[]
-  entities?: false | Array<ConfigSensor & TemplatedSensor>
-  sensors?: false | Array<ConfigSensor & TemplatedSensor>
+  entities?: false | Array<ConfigEntity & TemplatedEntity>
+  sensors?: false | Array<ConfigEntity & TemplatedEntity>
   version: 2 | 3
   setpoints?: Setpoints
   decimals?: number
