@@ -446,7 +446,7 @@ export default class SimpleThermostat extends LitElement {
           openEntityPopover: this.openEntityPopover,
         })}
         <section class="body">
-         ${entitiesHtml}
+          ${entitiesHtml}
           ${Object.entries(_values).map(([field, value]) => {
             const hasValue = ['string', 'number'].includes(typeof value)
             const showUnit = unit !== false && hasValue
