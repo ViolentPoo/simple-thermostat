@@ -4,7 +4,7 @@
 
 > An AI assisted community-maintained fork of [simple-thermostat](https://github.com/nervetattoo/simple-thermostat) by [@nervetattoo](https://github.com/nervetattoo), kept up to date with current Home Assistant releases.
 
-A Lovelace thermostat card focused on compact layout, easy interaction, and flexible configuration. Embed relevant sensors, customise controls, and theme to taste.
+A Lovelace thermostat card focused on compact layout, easy interaction, and flexible configuration. Embed relevant entities, customise controls, and theme to taste.
 
 ![Example thermostat](https://github.com/Wheemer/simple-thermostat/raw/master/examples.png)
 
@@ -12,7 +12,7 @@ A Lovelace thermostat card focused on compact layout, easy interaction, and flex
 
 | Version | Changes |
 |---------|---------|
-| 3.0.19 | Added `header.toggles` support for multiple header toggle switches while keeping existing `header.toggle` configs working. |
+| 3.0.19 | Added `header.toggles` support for multiple header toggle switches, added `entities` as the preferred key for extra entity rows, and render toggle-capable extra entities as switches. Existing `header.toggle` and `sensors` configs continue to work. |
 | 3.0.18 | Added `swing_horizontal` and `swing_vertical` control mode support for HA-standard climate entities (e.g. Daikin units). |
 | 3.0.17 | Added `current_temperature_entity` option to override the entity used for current temperature display. |
 | 3.0.16 | Fixed font sizing broken by HA 2025.5 removal of deprecated `--paper-*` CSS variables. |
@@ -79,13 +79,14 @@ entity: climate.my_room        # Required
     - `names` _boolean_
     - `icons` _boolean_
     - `headings` _boolean_
-  - `sensors` _object_:
-    - `type` _list|table_: Sensor layout style.
-    - `labels` _boolean_: Show sensor labels.
+  - `sensors` _object_: Layout options for extra entity rows.
+    - `type` _list|table_: Extra entity layout style.
+    - `labels` _boolean_: Show extra entity labels.
 - `header` _false|object_: See [Header](#header).
 - `setpoints` _false|object_: See [Setpoints](#setpoints).
 - `control` _false|array|object_: See [Control](#control).
-- `sensors` _false|array_: See [Sensors](#sensors).
+- `entities` _false|array_: See [Extra Entities](#extra-entities). Preferred key.
+- `sensors` _false|array_: Legacy alias for `entities`. Existing configs continue to work.
 - `service` _object_: Override the service call used to set temperature.
   - `domain` _string_
   - `service` _string_
@@ -95,7 +96,7 @@ entity: climate.my_room        # Required
 
 ## Compact mode
 
-Hide everything except sensors and temperature control:
+Hide everything except extra entities and temperature control:
 
 ```yaml
 type: custom:simple-thermostat
@@ -269,10 +270,12 @@ control: false
 
 ---
 
-## Sensors
+## Extra Entities
+
+Use `entities` to add extra entity rows below the thermostat controls. The legacy `sensors` key is still supported for existing configs.
 
 ```yaml
-sensors:
+entities:
   - entity: sensor.living_room_humidity
   - entity: sensor.living_room_energy
     name: Energy today
@@ -280,33 +283,51 @@ sensors:
     name: Min temp
   - entity: sensor.last_motion
     type: relativetime
+  - entity: input_boolean.heating_boost
+    name: Boost
 ```
 
-**Sensor options:**
+Toggle-capable domains render as switches automatically. Supported toggle domains are:
 
-- `entity` _string_: Sensor entity id.
+- `automation`
+- `fan`
+- `humidifier`
+- `input_boolean`
+- `light`
+- `switch`
+
+**Entity options:**
+
+- `entity` _string_: Entity id.
 - `name` _string_: Override the friendly name.
 - `icon` _string_: Show an icon instead of a label.
 - `attribute` _string_: Use an attribute instead of state. If no `entity` is given, reads from the main climate entity.
-- `unit` _string_: Unit to display (useful with `attribute`).
+- `unit` _string_: Unit to display, useful with `attribute`.
 - `decimals` _number_: Round numeric value to this many decimal places.
 - `type` _relativetime_: Render value as a relative time string.
 
-Hide sensors entirely:
+Hide extra entities entirely:
 
 ```yaml
-sensors: false
+entities: false
 ```
 
-### Version 3 templated sensors
+Legacy configs using `sensors` continue to work:
 
-Set `version: 3` to enable template-based sensor rows with access to entity state, attributes, variables, and translated UI strings.
+```yaml
+sensors:
+  - entity: sensor.living_room_humidity
+```
+
+### Version 3 Templated Entities
+
+Set `version: 3` to enable template-based entity rows with access to entity state, attributes, variables, and translated UI strings.
 
 ```yaml
 type: custom:simple-thermostat
 entity: climate.living_room
 version: 3
-sensors:
+entities:
   - id: humidity
     entity: sensor.living_room_humidity
     label: Humidity
@@ -315,9 +336,9 @@ sensors:
     show: false         # Hide the built-in state row
 ```
 
-Built-in rows `state` and `temperature` are added automatically unless you define a sensor with the same `id`.
+Built-in rows `state` and `temperature` are added automatically unless you define an entity row with the same `id`.
 
-**Version 3 sensor options:**
+**Version 3 entity options:**
 
 - `id` _string_: Unique id. Use `state` or `temperature` to override built-ins.
 - `entity` _string_: Template context entity. Defaults to main climate entity.
@@ -338,7 +359,7 @@ Built-in rows `state` and `temperature` are added automatically unless you defin
 | `--st-font-size-l` | `20px` | Target temperature, narrow viewports |
 | `--st-font-size-m` | `var(--ha-font-size-xl, 20px)` | Temperature unit |
 | `--st-font-size-title` | `var(--ha-card-header-font-size, 24px)` | Card title |
-| `--st-font-size-sensors` | `var(--ha-font-size-l, 16px)` | Sensors and mode labels |
+| `--st-font-size-sensors` | `var(--ha-font-size-l, 16px)` | Extra entity rows and mode labels |
 | `--st-font-size-toggle-label` | `var(--ha-font-size-l, 16px)` | Header toggle label |
 | `--st-mode-background` | `var(--secondary-background-color)` | Inactive mode button background |
 | `--st-mode-active-background` | `var(--primary-color)` | Active mode button background |
