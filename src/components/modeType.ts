@@ -26,6 +26,8 @@ export default function renderModeType({
     localizePrefix = `component.climate.state._.`
   } else if (type === 'vane_horizontal' || type === 'vane_vertical') {
     localizePrefix = ''
+  } else if (type === 'swing_horizontal' || type === 'swing_vertical') {
+    localizePrefix = `state_attributes.climate.${type}_mode.`
   }
 
   const maybeRenderName = (name: string | false) => {
@@ -45,6 +47,10 @@ export default function renderModeType({
     defaultTitle = 'Vane Horizontal'
   } else if (type === 'vane_vertical') {
     defaultTitle = 'Vane Vertical'
+  } else if (type === 'swing_horizontal') {
+    defaultTitle = localize('ui.card.climate.swing_horizontal_mode') || 'Swing Horizontal'
+  } else if (type === 'swing_vertical') {
+    defaultTitle = localize('ui.card.climate.swing_vertical_mode') || 'Swing Vertical'
   } else {
     defaultTitle = localize(`ui.card.climate.${str}`)
   }
