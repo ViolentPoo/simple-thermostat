@@ -2,7 +2,7 @@ import { HeaderConfig } from './config/header'
 
 export type LooseObject = Record<string, any>
 
-export interface ConfigSensor {
+export interface ConfigEntity {
   entity: string
   id?: string
   name?: string
@@ -15,13 +15,13 @@ export interface ConfigSensor {
   type?: 'relativetime' | 'template'
 }
 
-export interface TemplatedSensor {
+export interface TemplatedEntity {
   template: string
   label?: string | false
   entity?: string
 }
 
-export interface PreparedSensor {
+export interface PreparedEntity {
   id: string
   label: string | false
   entityId: string
@@ -30,7 +30,7 @@ export interface PreparedSensor {
   context: LooseObject
 }
 
-export interface Sensor extends ConfigSensor {
+export interface Entity extends ConfigEntity {
   state: any
 }
 
