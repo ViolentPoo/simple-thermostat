@@ -105,6 +105,8 @@ header: false
 control: false
 ```
 
+---
+
 ## Header
 
 Hide the header entirely:
