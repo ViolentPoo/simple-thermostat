@@ -54,6 +54,7 @@ interface CardConfig {
   current_temperature_entity?: string
   header: false | HeaderConfig
   control?: false | ModeControl | string[]
+  entities?: false | Array<ConfigSensor & TemplatedSensor>
   sensors?: false | Array<ConfigSensor & TemplatedSensor>
   version: 2 | 3
   setpoints?: Setpoints
