@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.16";
+var version = "3.0.17";
 
 /**
  * @license
@@ -358,7 +358,7 @@ const OptionsDecimals = [0, 1];
 const OptionsStepSize = [0.5, 1];
 const OptionsStepLayout = ['column', 'row'];
 const includeDomains = ['climate'];
-const GithubReadMe = 'https://github.com/pmbsa/simple-thermostat/blob/master/README.md';
+const GithubReadMe = 'https://github.com/Wheemer/simple-thermostat/blob/master/README.md';
 const stub = {
     header: {},
     layout: {
@@ -383,7 +383,7 @@ class SimpleThermostatEditor extends i$1 {
         window.open(GithubReadMe);
     }
     render() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2;
         if (!this.hass)
             return b ``;
         return b `
@@ -396,6 +396,14 @@ class SimpleThermostatEditor extends i$1 {
               .value="${this.config.entity}"
               .configValue=${'entity'}
               .includeDomains=${includeDomains}
+              @change="${this.valueChanged}"
+              allow-custom-entity
+            ></ha-entity-picker>
+            <ha-entity-picker
+              label="Current temperature entity (optional)"
+              .hass=${this.hass}
+              .value="${this.config.current_temperature_entity}"
+              .configValue=${'current_temperature_entity'}
               @change="${this.valueChanged}"
               allow-custom-entity
             ></ha-entity-picker>
@@ -432,16 +440,16 @@ class SimpleThermostatEditor extends i$1 {
           ${this.config.header !== false
             ? b `
                 <div class="side-by-side">
-                  <paper-input
+                  <ha-textfield
                     label="Name (optional)"
-                    .value="${(_k = this.config.header) === null || _k === void 0 ? void 0 : _k.name}"
+                    .value="${(_l = (_k = this.config.header) === null || _k === void 0 ? void 0 : _k.name) !== null && _l !== void 0 ? _l : ''}"
                     .configValue="${'header.name'}"
-                    @value-changed="${this.valueChanged}"
-                  ></paper-input>
+                    @input="${this.valueChanged}"
+                  ></ha-textfield>
 
                   <ha-icon-input
                     label="Icon (optional)"
-                    .value="${(_l = this.config.header) === null || _l === void 0 ? void 0 : _l.icon}"
+                    .value="${(_m = this.config.header) === null || _m === void 0 ? void 0 : _m.icon}"
                     .configValue=${'header.icon'}
                     @value-changed=${this.valueChanged}
                   ></ha-icon-input>
@@ -451,88 +459,76 @@ class SimpleThermostatEditor extends i$1 {
                   <ha-entity-picker
                     label="Toggle Entity (optional)"
                     .hass=${this.hass}
-                    .value="${(_p = (_o = (_m = this.config) === null || _m === void 0 ? void 0 : _m.header) === null || _o === void 0 ? void 0 : _o.toggle) === null || _p === void 0 ? void 0 : _p.entity}"
+                    .value="${(_q = (_p = (_o = this.config) === null || _o === void 0 ? void 0 : _o.header) === null || _p === void 0 ? void 0 : _p.toggle) === null || _q === void 0 ? void 0 : _q.entity}"
                     .configValue=${'header.toggle.entity'}
                     @change="${this.valueChanged}"
                     allow-custom-entity
                   ></ha-entity-picker>
 
-                  <paper-input
+                  <ha-textfield
                     label="Toggle entity label"
-                    .value="${(_s = (_r = (_q = this.config) === null || _q === void 0 ? void 0 : _q.header) === null || _r === void 0 ? void 0 : _r.toggle) === null || _s === void 0 ? void 0 : _s.name}"
+                    .value="${(_u = (_t = (_s = (_r = this.config) === null || _r === void 0 ? void 0 : _r.header) === null || _s === void 0 ? void 0 : _s.toggle) === null || _t === void 0 ? void 0 : _t.name) !== null && _u !== void 0 ? _u : ''}"
                     .configValue="${'header.toggle.name'}"
-                    @value-changed="${this.valueChanged}"
-                  ></paper-input>
+                    @input="${this.valueChanged}"
+                  ></ha-textfield>
                 </div>
               `
             : ''}
 
           <div class="side-by-side">
-            <paper-input
+            <ha-textfield
               label="Fallback Text (optional)"
-              .value="${this.config.fallback}"
+              .value="${(_v = this.config.fallback) !== null && _v !== void 0 ? _v : ''}"
               .configValue="${'fallback'}"
-              @value-changed="${this.valueChanged}"
-            ></paper-input>
+              @input="${this.valueChanged}"
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
-            <paper-dropdown-menu
+            <ha-select
               label="Decimals (optional)"
               .configValue=${'decimals'}
-              @value-changed="${this.valueChanged}"
-              class="dropdown"
+              .value="${(_x = (_w = this.config.decimals) === null || _w === void 0 ? void 0 : _w.toString()) !== null && _x !== void 0 ? _x : ''}"
+              @selected="${this.valueChanged}"
+              @closed="${(e) => e.stopPropagation()}"
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsDecimals).indexOf(+this.config.decimals)}
-              >
-                ${Object.values(OptionsDecimals).map((item) => b ` <paper-item>${item}</paper-item> `)}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${Object.values(OptionsDecimals).map((item) => b `<ha-list-item .value="${item.toString()}">${item}</ha-list-item>`)}
+            </ha-select>
 
-            <paper-input
+            <ha-textfield
               label="Unit (optional)"
-              .value="${this.config.unit}"
+              .value="${(_y = this.config.unit) !== null && _y !== void 0 ? _y : ''}"
               .configValue="${'unit'}"
-              @value-changed="${this.valueChanged}"
-            ></paper-input>
+              @input="${this.valueChanged}"
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
-            <paper-dropdown-menu
+            <ha-select
               label="Step Layout (optional)"
               .configValue=${'layout.step'}
-              @value-changed="${this.valueChanged}"
-              class="dropdown"
+              .value="${(_0 = (_z = this.config.layout) === null || _z === void 0 ? void 0 : _z.step) !== null && _0 !== void 0 ? _0 : ''}"
+              @selected="${this.valueChanged}"
+              @closed="${(e) => e.stopPropagation()}"
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsStepLayout).indexOf((_t = this.config.layout) === null || _t === void 0 ? void 0 : _t.step)}
-              >
-                ${Object.values(OptionsStepLayout).map((item) => b ` <paper-item>${item}</paper-item> `)}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${Object.values(OptionsStepLayout).map((item) => b `<ha-list-item .value="${item}">${item}</ha-list-item>`)}
+            </ha-select>
 
-            <paper-dropdown-menu
+            <ha-select
               label="Step Size (optional)"
               .configValue=${'step_size'}
-              @value-changed="${this.valueChanged}"
-              class="dropdown"
+              .value="${(_2 = (_1 = this.config.step_size) === null || _1 === void 0 ? void 0 : _1.toString()) !== null && _2 !== void 0 ? _2 : ''}"
+              @selected="${this.valueChanged}"
+              @closed="${(e) => e.stopPropagation()}"
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsStepSize).indexOf(+this.config.step_size)}
-              >
-                ${Object.values(OptionsStepSize).map((item) => b ` <paper-item>${item}</paper-item> `)}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${Object.values(OptionsStepSize).map((item) => b `<ha-list-item .value="${item.toString()}">${item}</ha-list-item>`)}
+            </ha-select>
           </div>
 
           <div class="side-by-side">
-            <mwc-button @click=${this._openLink}>
+            <ha-button @click=${this._openLink}>
               Configuration Options
-            </mwc-button>
+            </ha-button>
 
             Settings for label, control, sensors, faults and hiding UI elements
             can only be configured in the code editor
@@ -1033,9 +1029,12 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
 }
 
 function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, openEntityPopover, }) {
-    var _a, _b, _c, _d, _e, _f, _g;
-    const { state, attributes: { hvac_action: action, current_temperature: current }, } = entity;
-    const showLabels = (_c = (_b = (_a = config === null || config === void 0 ? void 0 : config.layout) === null || _a === void 0 ? void 0 : _a.sensors) === null || _b === void 0 ? void 0 : _b.labels) !== null && _c !== void 0 ? _c : true;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
+    const { state, attributes: { hvac_action: action, current_temperature: current_entity_temp }, } = entity;
+    const current = config.current_temperature_entity
+        ? (_a = hass.states[config.current_temperature_entity]) === null || _a === void 0 ? void 0 : _a.state
+        : current_entity_temp;
+    const showLabels = (_d = (_c = (_b = config === null || config === void 0 ? void 0 : config.layout) === null || _b === void 0 ? void 0 : _b.sensors) === null || _c === void 0 ? void 0 : _c.labels) !== null && _d !== void 0 ? _d : true;
     let stateString = localize(state, 'component.climate.state._.');
     if (action) {
         stateString = [
@@ -1050,7 +1049,7 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
             hass,
             details: {
                 heading: showLabels
-                    ? (_e = (_d = config === null || config === void 0 ? void 0 : config.label) === null || _d === void 0 ? void 0 : _d.temperature) !== null && _e !== void 0 ? _e : localize('ui.card.climate.currently')
+                    ? (_f = (_e = config === null || config === void 0 ? void 0 : config.label) === null || _e === void 0 ? void 0 : _e.temperature) !== null && _f !== void 0 ? _f : localize('ui.card.climate.currently')
                     : false,
             },
         }),
@@ -1060,7 +1059,7 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
             hass,
             details: {
                 heading: showLabels
-                    ? (_g = (_f = config === null || config === void 0 ? void 0 : config.label) === null || _f === void 0 ? void 0 : _f.state) !== null && _g !== void 0 ? _g : localize('ui.panel.lovelace.editor.card.generic.state')
+                    ? (_h = (_g = config === null || config === void 0 ? void 0 : config.label) === null || _g === void 0 ? void 0 : _g.state) !== null && _h !== void 0 ? _h : localize('ui.panel.lovelace.editor.card.generic.state')
                     : false,
             },
         }),
@@ -1384,7 +1383,7 @@ class SimpleThermostat extends i$1 {
         }
     }
     set hass(hass) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e;
         if (!this.config.entity) {
             return;
         }
@@ -1508,12 +1507,16 @@ class SimpleThermostat extends i$1 {
                 });
             }
             if (!ids.includes('temperature')) {
+                const tempEntityId = (_e = this.config.current_temperature_entity) !== null && _e !== void 0 ? _e : this.config.entity;
+                const tempContext = this.config.current_temperature_entity
+                    ? this._hass.states[this.config.current_temperature_entity]
+                    : this.entity;
                 builtins.push({
                     id: 'temperature',
                     label: '{{ui.currently}}',
                     template: '{{current_temperature|formatNumber}}',
-                    entityId: this.config.entity,
-                    context: this.entity,
+                    entityId: tempEntityId,
+                    context: tempContext,
                 });
             }
             this.sensors = [...builtins, ...customSensors];
