@@ -359,5 +359,3 @@ layout:
 header: false
 control: false
 ```
-
-![Compact configuration](https://github.com/nervetattoo/simple-thermostat/raw/master/simple-thermostat-compact.png)
