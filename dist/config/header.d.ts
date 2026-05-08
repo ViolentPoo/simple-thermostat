@@ -35,12 +35,14 @@ export interface HeaderConfig {
     icon?: Icon;
     faults?: Array<Fault>;
     toggle?: ToggleConfig;
+    toggles?: Array<ToggleConfig>;
 }
 export interface HeaderData {
     name?: Name;
     icon: Icon;
     faults?: Array<Fault>;
     toggle?: Toggle;
+    toggles?: Array<Toggle>;
 }
 export interface Toggle {
     entity: HAState;

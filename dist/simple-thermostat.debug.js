@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.18";
+var version = "3.0.19";
 
 /**
  * @license
@@ -133,40 +133,40 @@ ha-card.no-header {
     display: none;
   }
 
-.sensors {
+.entities {
   display: grid;
   grid-gap: var(--st-spacing, var(--st-default-spacing));
   font-size: 16px;
   font-size: var(
-    --st-font-size-sensors,
-    var(--ha-font-size-l, 16px)
+    --st-font-size-entities,
+    var(--st-font-size-sensors, var(--ha-font-size-l, 16px))
   );
 }
-.sensors.as-list {
+.entities.as-list {
   grid-auto-flow: column;
   grid-template-columns: min-content;
 }
 
-.sensors.as-table.without-labels {
+.entities.as-table.without-labels {
     grid: auto-flow / 100%;
     align-items: start;
     justify-items: start;
     place-items: start;
   }
 
-.sensors.as-table.with-labels {
+.entities.as-table.with-labels {
     grid: auto-flow / auto auto;
     align-items: start;
     justify-items: start;
     place-items: start;
   }
 
-.sensor-value {
+.entity-value {
   display: flex;
   align-items: center;
   padding-bottom: 4px;
 }
-.sensor-heading {
+.entity-heading {
   font-weight: 300;
   padding-right: 8px;
   padding-bottom: 4px;
@@ -175,7 +175,7 @@ ha-card.no-header {
   align-items: center;
   justify-content: flex-end;
 }
-.sensors:empty {
+.entities:empty {
   display: none;
 }
 header {
@@ -203,6 +203,22 @@ header {
   margin: 0;
   align-self: left;
 }
+
+.header__toggles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0 var(--st-spacing, var(--st-default-spacing));
+  margin-left: auto;
+}
+
+.header__toggle {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
 .current-wrapper {
   display: flex;
   flex-direction: column;
@@ -212,6 +228,7 @@ header {
   overflow: hidden;
   flex-wrap: wrap;
 }
+
 .current-wrapper.row {
     flex-direction: row-reverse;
   }
@@ -264,8 +281,8 @@ header {
   place-self: center;
   font-size: 16px;
   font-size: var(
-    --st-font-size-sensors,
-    var(--ha-font-size-l, 16px)
+    --st-font-size-entities,
+    var(--st-font-size-sensors, var(--ha-font-size-l, 16px))
   );
   font-weight: 300;
   white-space: nowrap;
@@ -811,7 +828,7 @@ function renderHeader({ header, toggleEntityChanged, entity, openEntityPopover, 
         ${renderIcon$1(icon)} ${renderName(name)}
       </div>
       ${renderFaults(header.faults, openEntityPopover)}
-      ${renderToggle(header.toggle, openEntityPopover, toggleEntityChanged)}
+      ${renderToggles(header.toggles, openEntityPopover, toggleEntityChanged)}
     </header>
   `;
 }
@@ -840,21 +857,28 @@ function renderFaults(faults, openEntityPopover) {
     });
     return b ` <div class="faults">${faultHtml}</div>`;
 }
-function renderToggle(toggle, openEntityPopover, toggleEntityChanged) {
-    var _a;
-    if (!toggle)
+function renderToggles(toggles, openEntityPopover, toggleEntityChanged) {
+    if (!(toggles === null || toggles === void 0 ? void 0 : toggles.length))
         return A;
     return b `
-    <div style="margin-left: auto;">
-      <span
-        class="clickable toggle-label"
-        @click=${() => openEntityPopover(toggle.entity.entity_id)}
-        >${toggle.label}
-      </span>
-      <ha-switch
-        .checked=${((_a = toggle.entity) === null || _a === void 0 ? void 0 : _a.state) === 'on'}
-        @change=${toggleEntityChanged}
-      ></ha-switch>
+    <div class="header__toggles">
+      ${toggles.map((toggle) => {
+        var _a, _b;
+        const entityId = (_a = toggle.entity) === null || _a === void 0 ? void 0 : _a.entity_id;
+        return b `
+          <div class="header__toggle">
+            <span
+              class="clickable toggle-label"
+              @click=${() => openEntityPopover(entityId)}
+              >${toggle.label}
+            </span>
+            <ha-switch
+              .checked=${((_b = toggle.entity) === null || _b === void 0 ? void 0 : _b.state) === 'on'}
+              @change=${(ev) => toggleEntityChanged(ev, entityId)}
+            ></ha-switch>
+          </div>
+        `;
+    })}
     </div>
   `;
 }
@@ -908,9 +932,9 @@ squirrelly_minExports.filters.define('debug', (data) => {
         return `Not able to read valid JSON object from: ${data}`;
     }
 });
-function wrapSensors(config, content) {
-    var _a, _b;
-    const { type, labels: showLabels } = (_b = (_a = config === null || config === void 0 ? void 0 : config.layout) === null || _a === void 0 ? void 0 : _a.sensors) !== null && _b !== void 0 ? _b : {
+function wrapEntities(config, content) {
+    var _a, _b, _c, _d;
+    const { type, labels: showLabels } = (_d = (_b = (_a = config === null || config === void 0 ? void 0 : config.layout) === null || _a === void 0 ? void 0 : _a.entities) !== null && _b !== void 0 ? _b : (_c = config === null || config === void 0 ? void 0 : config.layout) === null || _c === void 0 ? void 0 : _c.sensors) !== null && _d !== void 0 ? _d : {
         type: 'table',
         labels: true,
     };
@@ -918,10 +942,10 @@ function wrapSensors(config, content) {
         showLabels ? 'with-labels' : 'without-labels',
         type === 'list' ? 'as-list' : 'as-table',
     ];
-    return b ` <div class="sensors ${classes.join(' ')}">${content}</div> `;
+    return b ` <div class="entities ${classes.join(' ')}">${content}</div> `;
 }
 function renderTemplated({ context, entityId, template = '{{state.text}}', label, hass, variables = {}, config, localize, openEntityPopover, }) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f;
     const { state, attributes } = context;
     const [domain] = entityId.split('.');
     const lang = hass.selectedLanguage || hass.language;
@@ -951,19 +975,33 @@ function renderTemplated({ context, entityId, template = '{{state.text}}', label
     });
     const render = (template) => squirrelly_minExports.render(template, data, { useWith: true });
     const value = render(template);
-    if (label === false || ((_d = (_c = config === null || config === void 0 ? void 0 : config.layout) === null || _c === void 0 ? void 0 : _c.sensors) === null || _d === void 0 ? void 0 : _d.labels) === false) {
-        return b `<div class="sensor-value">${o(value)}</div>`;
+    if (label === false ||
+        ((_f = ((_d = (_c = config === null || config === void 0 ? void 0 : config.layout) === null || _c === void 0 ? void 0 : _c.entities) !== null && _d !== void 0 ? _d : (_e = config === null || config === void 0 ? void 0 : config.layout) === null || _e === void 0 ? void 0 : _e.sensors)) === null || _f === void 0 ? void 0 : _f.labels) === false) {
+        return b `<div class="entity-value">${o(value)}</div>`;
     }
     const safeLabel = label || '{{friendly_name}}';
     const heading = safeLabel.match(/^(mdi|hass):.*/)
         ? renderIcon(safeLabel)
         : render(safeLabel);
     return b `
-    <div class="sensor-heading">${o(heading)}</div>
-    <div class="sensor-value">${o(value)}</div>
+    <div class="entity-heading">${o(heading)}</div>
+    <div class="entity-value">${o(value)}</div>
   `;
 }
 
+const TOGGLE_DOMAINS = [
+    'automation',
+    'fan',
+    'humidifier',
+    'input_boolean',
+    'light',
+    'switch',
+];
+function toggleEntity(hass, entityId, checked) {
+    hass.callService('homeassistant', checked ? 'turn_on' : 'turn_off', {
+        entity_id: entityId,
+    });
+}
 // Preset mode can be  one of: none, eco, away, boost, comfort, home, sleep, activity
 // See https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/climate/const.py#L36-L57
 function renderInfoItem({ hide = false, hass, state, details, localize, openEntityPopover, }) {
@@ -977,35 +1015,47 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
     }
     if (type === 'relativetime') {
         valueCell = b `
-      <div class="sensor-value">
+      <div class="entity-value">
         <ha-relative-time .datetime=${state} .hass=${hass}></ha-relative-time>
       </div>
     `;
     }
     else if (typeof state === 'object') {
         const [domain] = state.entity_id.split('.');
-        const prefix = [
-            'component',
-            domain,
-            'state',
-            (_b = (_a = state.attributes) === null || _a === void 0 ? void 0 : _a.device_class) !== null && _b !== void 0 ? _b : '_',
-            '',
-        ].join('.');
-        let value = localize(state.state, prefix);
-        if (typeof decimals === 'number') {
-            value = formatNumber(value, {
-                decimals,
-                locale: hass.locale,
-            });
+        if (TOGGLE_DOMAINS.includes(domain)) {
+            valueCell = b `
+        <div class="entity-value">
+          <ha-switch
+            .checked=${state.state === 'on'}
+            @change=${(ev) => toggleEntity(hass, state.entity_id, ev.target.checked)}
+          ></ha-switch>
+        </div>
+      `;
         }
-        valueCell = b `
-      <div
-        class="sensor-value clickable"
-        @click="${() => openEntityPopover(state.entity_id)}"
-      >
-        ${value} ${unit || state.attributes.unit_of_measurement}
-      </div>
-    `;
+        else {
+            const prefix = [
+                'component',
+                domain,
+                'state',
+                (_b = (_a = state.attributes) === null || _a === void 0 ? void 0 : _a.device_class) !== null && _b !== void 0 ? _b : '_',
+                '',
+            ].join('.');
+            let value = localize(state.state, prefix);
+            if (typeof decimals === 'number') {
+                value = formatNumber(value, {
+                    decimals,
+                    locale: hass.locale,
+                });
+            }
+            valueCell = b `
+        <div
+          class="entity-value clickable"
+          @click="${() => openEntityPopover(state.entity_id)}"
+        >
+          ${value} ${unit || state.attributes.unit_of_measurement}
+        </div>
+      `;
+        }
     }
     else {
         let value = typeof decimals === 'number'
@@ -1014,7 +1064,7 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
                 locale: hass.locale,
             })
             : state;
-        valueCell = b ` <div class="sensor-value">${value}${unit}</div> `;
+        valueCell = b ` <div class="entity-value">${value}${unit}</div> `;
     }
     if (heading === false) {
         return valueCell;
@@ -1023,18 +1073,18 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
         ? b ` <ha-icon icon="${icon}"></ha-icon> `
         : b ` ${heading}: `;
     return b `
-    <div class="sensor-heading">${headingResult}</div>
+    <div class="entity-heading">${headingResult}</div>
     ${valueCell}
   `;
 }
 
-function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, openEntityPopover, }) {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
+function renderEntities({ _hide, entity, unit, hass, entities, config, localize, openEntityPopover, }) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
     const { state, attributes: { hvac_action: action, current_temperature: current_entity_temp }, } = entity;
     const current = config.current_temperature_entity
         ? (_a = hass.states[config.current_temperature_entity]) === null || _a === void 0 ? void 0 : _a.state
         : current_entity_temp;
-    const showLabels = (_d = (_c = (_b = config === null || config === void 0 ? void 0 : config.layout) === null || _b === void 0 ? void 0 : _b.sensors) === null || _c === void 0 ? void 0 : _c.labels) !== null && _d !== void 0 ? _d : true;
+    const showLabels = (_f = (_e = ((_c = (_b = config === null || config === void 0 ? void 0 : config.layout) === null || _b === void 0 ? void 0 : _b.entities) !== null && _c !== void 0 ? _c : (_d = config === null || config === void 0 ? void 0 : config.layout) === null || _d === void 0 ? void 0 : _d.sensors)) === null || _e === void 0 ? void 0 : _e.labels) !== null && _f !== void 0 ? _f : true;
     let stateString = localize(state, 'component.climate.state._.');
     if (action) {
         stateString = [
@@ -1042,14 +1092,14 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
             ` (${stateString})`,
         ].join('');
     }
-    const sensorHtml = [
+    const entityHtml = [
         renderInfoItem({
             hide: _hide.temperature,
             state: `${formatNumber(current, Object.assign(Object.assign({}, config), { locale: hass.locale }))}${unit || ''}`,
             hass,
             details: {
                 heading: showLabels
-                    ? (_f = (_e = config === null || config === void 0 ? void 0 : config.label) === null || _e === void 0 ? void 0 : _e.temperature) !== null && _f !== void 0 ? _f : localize('ui.card.climate.currently')
+                    ? (_h = (_g = config === null || config === void 0 ? void 0 : config.label) === null || _g === void 0 ? void 0 : _g.temperature) !== null && _h !== void 0 ? _h : localize('ui.card.climate.currently')
                     : false,
             },
         }),
@@ -1059,11 +1109,11 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
             hass,
             details: {
                 heading: showLabels
-                    ? (_h = (_g = config === null || config === void 0 ? void 0 : config.label) === null || _g === void 0 ? void 0 : _g.state) !== null && _h !== void 0 ? _h : localize('ui.panel.lovelace.editor.card.generic.state')
+                    ? (_k = (_j = config === null || config === void 0 ? void 0 : config.label) === null || _j === void 0 ? void 0 : _j.state) !== null && _k !== void 0 ? _k : localize('ui.panel.lovelace.editor.card.generic.state')
                     : false,
             },
         }),
-        ...(sensors.map((_a) => {
+        ...(entities.map((_a) => {
             var { name, state } = _a, rest = __rest(_a, ["name", "state"]);
             return renderInfoItem({
                 state,
@@ -1074,7 +1124,7 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
             });
         }) || null),
     ].filter((it) => it !== null);
-    return wrapSensors(config, sensorHtml);
+    return wrapEntities(config, entityHtml);
 }
 
 var HVAC_MODES;
@@ -1190,6 +1240,7 @@ function parseHeaderConfig(config, entity, hass) {
         name,
         icon,
         toggle: (config === null || config === void 0 ? void 0 : config.toggle) ? parseToggle(config.toggle, hass) : null,
+        toggles: parseToggles(config, hass),
         faults: parseFaults(config === null || config === void 0 ? void 0 : config.faults, hass),
     };
 }
@@ -1204,6 +1255,13 @@ function parseToggle(config, hass) {
         label = (_a = config === null || config === void 0 ? void 0 : config.name) !== null && _a !== void 0 ? _a : '';
     }
     return { entity, label };
+}
+function parseToggles(config, hass) {
+    const toggleConfigs = [
+        ...((config === null || config === void 0 ? void 0 : config.toggle) ? [config.toggle] : []),
+        ...(Array.isArray(config === null || config === void 0 ? void 0 : config.toggles) ? config.toggles : []),
+    ];
+    return toggleConfigs.map((toggle) => parseToggle(toggle, hass));
 }
 function parseFaults(config, hass) {
     if (Array.isArray(config)) {
@@ -1294,6 +1352,10 @@ const DEFAULT_HIDE = {
     temperature: false,
     state: false,
 };
+function getConfiguredEntities(config) {
+    var _a, _b;
+    return (_b = (_a = config.entities) !== null && _a !== void 0 ? _a : config.sensors) !== null && _b !== void 0 ? _b : [];
+}
 function shouldShowModeControl(modeOption, config) {
     var _a;
     if (typeof config[modeOption] === 'object') {
@@ -1318,8 +1380,8 @@ class SimpleThermostat extends i$1 {
         super(...arguments);
         this.modes = [];
         this._hass = {};
-        this.sensors = [];
-        this.showSensors = true;
+        this.entities = [];
+        this.showEntities = true;
         this.name = '';
         this.stepSize = STEP_SIZE;
         this._values = {};
@@ -1335,13 +1397,12 @@ class SimpleThermostat extends i$1 {
             const key = `${prefix}${label}`;
             return this._hass.localize(key) || label;
         };
-        this.toggleEntityChanged = (ev) => {
-            var _a, _b, _c, _d;
-            if (!this.header || !((_a = this === null || this === void 0 ? void 0 : this.header) === null || _a === void 0 ? void 0 : _a.toggle))
+        this.toggleEntityChanged = (ev, entityId) => {
+            if (!this.header || !entityId)
                 return;
             const el = ev.target;
             this._hass.callService('homeassistant', el.checked ? 'turn_on' : 'turn_off', {
-                entity_id: (_d = (_c = (_b = this.header) === null || _b === void 0 ? void 0 : _b.toggle) === null || _c === void 0 ? void 0 : _c.entity) === null || _d === void 0 ? void 0 : _d.entity_id,
+                entity_id: entityId,
             });
         };
         this.setMode = (type, mode) => {
@@ -1485,28 +1546,29 @@ class SimpleThermostat extends i$1 {
         if (this.config.hide) {
             this._hide = Object.assign(Object.assign({}, this._hide), this.config.hide);
         }
-        if (this.config.sensors === false) {
-            this.showSensors = false;
+        const configuredEntities = getConfiguredEntities(this.config);
+        if (configuredEntities === false) {
+            this.showEntities = false;
         }
         else if (this.config.version === 3) {
-            this.sensors = [];
-            const customSensors = this.config.sensors.map((sensor, index) => {
+            this.entities = [];
+            const customEntities = configuredEntities.map((entity, index) => {
                 var _a, _b;
-                const entityId = (_a = sensor === null || sensor === void 0 ? void 0 : sensor.entity) !== null && _a !== void 0 ? _a : this.config.entity;
+                const entityId = (_a = entity === null || entity === void 0 ? void 0 : entity.entity) !== null && _a !== void 0 ? _a : this.config.entity;
                 let context = this.entity;
-                if (sensor === null || sensor === void 0 ? void 0 : sensor.entity) {
-                    context = this._hass.states[sensor.entity];
+                if (entity === null || entity === void 0 ? void 0 : entity.entity) {
+                    context = this._hass.states[entity.entity];
                 }
                 return {
-                    id: (_b = sensor === null || sensor === void 0 ? void 0 : sensor.id) !== null && _b !== void 0 ? _b : String(index),
-                    label: sensor === null || sensor === void 0 ? void 0 : sensor.label,
-                    template: sensor.template,
-                    show: (sensor === null || sensor === void 0 ? void 0 : sensor.show) !== false,
+                    id: (_b = entity === null || entity === void 0 ? void 0 : entity.id) !== null && _b !== void 0 ? _b : String(index),
+                    label: entity === null || entity === void 0 ? void 0 : entity.label,
+                    template: entity.template,
+                    show: (entity === null || entity === void 0 ? void 0 : entity.show) !== false,
                     entityId,
                     context,
                 };
             });
-            const ids = customSensors.map((s) => s.id);
+            const ids = customEntities.map((entity) => entity.id);
             const builtins = [];
             if (!ids.includes('state')) {
                 builtins.push({
@@ -1530,10 +1592,10 @@ class SimpleThermostat extends i$1 {
                     context: tempContext,
                 });
             }
-            this.sensors = [...builtins, ...customSensors];
+            this.entities = [...builtins, ...customEntities];
         }
-        else if (this.config.sensors) {
-            this.sensors = this.config.sensors.map((_a) => {
+        else if (configuredEntities) {
+            this.entities = configuredEntities.map((_a) => {
                 var _b;
                 var { name, entity, attribute, unit = '' } = _a, rest = __rest(_a, ["name", "entity", "attribute", "unit"]);
                 let state;
@@ -1578,23 +1640,23 @@ class SimpleThermostat extends i$1 {
         const stepLayout = (_c = (_b = (_a = this.config) === null || _a === void 0 ? void 0 : _a.layout) === null || _b === void 0 ? void 0 : _b.step) !== null && _c !== void 0 ? _c : 'column';
         const row = stepLayout === 'row';
         const classes = [!this.header && 'no-header', action].filter((cx) => !!cx);
-        let sensorsHtml;
+        let entitiesHtml;
         if (this.config.version === 3) {
-            sensorsHtml = this.sensors
+            entitiesHtml = this.entities
                 .filter((spec) => spec.show !== false)
                 .map((spec) => {
                 return renderTemplated(Object.assign(Object.assign({}, spec), { variables: this.config.variables, hass: this._hass, config: this.config, localize: this.localize, openEntityPopover: this.openEntityPopover }));
             });
-            sensorsHtml = wrapSensors(this.config, sensorsHtml);
+            entitiesHtml = wrapEntities(this.config, entitiesHtml);
         }
         else {
-            sensorsHtml = this.showSensors
-                ? renderSensors({
+            entitiesHtml = this.showEntities
+                ? renderEntities({
                     _hide: this._hide,
                     unit,
                     hass: this._hass,
                     entity: this.entity,
-                    sensors: this.sensors,
+                    entities: this.entities,
                     config: this.config,
                     localize: this.localize,
                     openEntityPopover: this.openEntityPopover,
@@ -1611,7 +1673,7 @@ class SimpleThermostat extends i$1 {
             openEntityPopover: this.openEntityPopover,
         })}
         <section class="body">
-          ${sensorsHtml}
+          ${entitiesHtml}
           ${Object.entries(_values).map(([field, value]) => {
             const hasValue = ['string', 'number'].includes(typeof value);
             const showUnit = unit !== false && hasValue;
@@ -1703,10 +1765,10 @@ __decorate([
 ], SimpleThermostat.prototype, "entity", void 0);
 __decorate([
     n()
-], SimpleThermostat.prototype, "sensors", void 0);
+], SimpleThermostat.prototype, "entities", void 0);
 __decorate([
     n()
-], SimpleThermostat.prototype, "showSensors", void 0);
+], SimpleThermostat.prototype, "showEntities", void 0);
 __decorate([
     n()
 ], SimpleThermostat.prototype, "name", void 0);

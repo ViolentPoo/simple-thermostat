@@ -2,7 +2,7 @@ import { LitElement } from 'lit';
 import { HeaderData } from './config/header';
 import { Service } from './config/service';
 import { CardConfig } from './config/card';
-import { ControlMode, LooseObject, Sensor, PreparedSensor, HASS } from './types';
+import { ControlMode, LooseObject, Entity, PreparedEntity, HASS } from './types';
 interface Values {
     [key: string]: number | string;
 }
@@ -14,8 +14,8 @@ export default class SimpleThermostat extends LitElement {
     modes: Array<ControlMode>;
     _hass: HASS;
     entity: LooseObject;
-    sensors: Array<Sensor | PreparedSensor>;
-    showSensors: boolean;
+    entities: Array<Entity | PreparedEntity>;
+    showEntities: boolean;
     name: string | false;
     stepSize: number;
     _values: Values;
@@ -31,7 +31,7 @@ export default class SimpleThermostat extends LitElement {
     set hass(hass: any);
     localize: (label: string, prefix?: string) => any;
     render({ _hide, _values, _updatingValues, config, entity }?: this): import("lit-html").TemplateResult<1>;
-    toggleEntityChanged: (ev: Event) => void;
+    toggleEntityChanged: (ev: Event, entityId?: string) => void;
     setTemperature(change: number, field: string): void;
     setMode: (type: string, mode: string) => void;
     openEntityPopover: (entityId?: any) => void;
