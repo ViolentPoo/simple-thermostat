@@ -3,12 +3,12 @@ import formatNumber from '../formatNumber'
 import renderInfoItem from './infoItem'
 import { wrapSensors } from './templated'
 
-export default function renderSensors({
+export default function renderEntities({
   _hide,
   entity,
   unit,
   hass,
-  sensors,
+  entities,
   config,
   localize,
   openEntityPopover,
@@ -30,7 +30,7 @@ export default function renderSensors({
       ` (${stateString})`,
     ].join('')
   }
-  const sensorHtml = [
+  const entityHtml = [
     renderInfoItem({
       hide: _hide.temperature,
       state: `${formatNumber(current, {
@@ -55,7 +55,7 @@ export default function renderSensors({
           : false,
       },
     }),
-    ...(sensors.map(({ name, state, ...rest }) => {
+    ...(entities.map(({ name, state, ...rest }) => {
       return renderInfoItem({
         state,
         hass,
@@ -69,5 +69,5 @@ export default function renderSensors({
     }) || null),
   ].filter((it) => it !== null)
 
-  return wrapSensors(config, sensorHtml)
+  return wrapSensors(config, entityHtml)
 }
