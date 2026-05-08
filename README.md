@@ -79,9 +79,10 @@ entity: climate.my_room        # Required
     - `names` _boolean_
     - `icons` _boolean_
     - `headings` _boolean_
-  - `sensors` _object_: Layout options for extra entity rows.
+  - `entities` _object_: Layout options for extra entity rows. Preferred key; `sensors` is still supported as a legacy alias.
     - `type` _list|table_: Extra entity layout style.
     - `labels` _boolean_: Show extra entity labels.
+  - `sensors` _object_: Legacy alias for `entities` layout options. Existing configs continue to work.
 - `header` _false|object_: See [Header](#header).
 - `setpoints` _false|object_: See [Setpoints](#setpoints).
 - `control` _false|array|object_: See [Control](#control).
@@ -359,7 +360,7 @@ Built-in rows `state` and `temperature` are added automatically unless you defin
 | `--st-font-size-l` | `20px` | Target temperature, narrow viewports |
 | `--st-font-size-m` | `var(--ha-font-size-xl, 20px)` | Temperature unit |
 | `--st-font-size-title` | `var(--ha-card-header-font-size, 24px)` | Card title |
-| `--st-font-size-sensors` | `var(--ha-font-size-l, 16px)` | Extra entity rows and mode labels |
+| `--st-font-size-entities` | `var(--st-font-size-sensors, var(--ha-font-size-l, 16px))` | Extra entity rows and mode labels. Legacy `--st-font-size-sensors` continues to work. |
 | `--st-font-size-toggle-label` | `var(--ha-font-size-l, 16px)` | Header toggle label |
 | `--st-mode-background` | `var(--secondary-background-color)` | Inactive mode button background |
 | `--st-mode-active-background` | `var(--primary-color)` | Active mode button background |
