@@ -357,5 +357,3 @@ my-theme:
   st-font-size-xl: 18px
   st-spacing: 2px
 ```
-
----
