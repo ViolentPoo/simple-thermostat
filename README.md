@@ -98,6 +98,7 @@ resources:
 - `entity` _string_: The thermostat entity id. **Required**.
 - `header` _false|Header object_: See [header config](#header-config).
 - `setpoints` _false|Setpoints object_: See [setpoints config](#setpoints-config).
+- `current_temperature_entity` _string_: Override the entity used to display the current temperature. Defaults to the main thermostat entity.
 - `layout` _Layout object_:
   - `step` _row|column_: Where to render the setpoint up/down buttons.
   - `mode` _object_: Disable elements for all modes.
@@ -134,7 +135,6 @@ resources:
   - `name` _string_: Sensor name to use instead of the default friendly name.
   - `icon` _string_: Icon to use instead of a name.
   - `attribute` _string_: Attribute to use instead of state. If no entity is provided, the main entity's attributes are used.
-  - `current_temperature_entity` _string_: Override the entity used to display the current temperature. Defaults to the main thermostat entity.
   - `unit` _string_: Unit to display when using an attribute.
   - `decimals` _number_: Round numeric sensor values to a number of decimals.
   - `type` _relativetime_: Special data type for relative time rendering.
