@@ -123,7 +123,7 @@ resources:
   - `temperature` _boolean_: Defaults to `false`.
   - `state` _boolean_: Defaults to `false`.
 - `control` _object|array_:
-  - `hvac|fan|preset|swing|vane_horizontal|vane_vertical` _object|bool_: The mode type to control.
+  - `hvac|fan|preset|swing|swing_horizontal|swing_vertical|vane_horizontal|vane_vertical` _object|bool_: The mode type to control.
     - `_name` _string_: Override the mode type name.
     - `_hide_when_off` _boolean_: Hide the mode row when the entity is off. Defaults to `false`.
     - `_icons` _boolean_: Set to `false` to hide icons for this mode row only.
@@ -298,7 +298,7 @@ control:
       name: On
 ```
 
-For climate devices with horizontal and vertical vane controls (e.g. Mitsubishi AC units), enable them like any other mode type:
+For climate devices with horizontal and vertical vane controls (e.g. Mitsubishi AC units via Intesis), enable them like any other mode type:
 
 ```yaml
 control:
@@ -307,6 +307,17 @@ control:
   swing: true
   vane_horizontal: true
   vane_vertical: true
+```
+
+For HA-standard horizontal and vertical swing (e.g. Daikin units), use `swing_horizontal` and `swing_vertical` instead:
+
+```yaml
+control:
+  hvac: true
+  fan: true
+  swing: true
+  swing_horizontal: true
+  swing_vertical: true
 ```
 
 Custom names and filtered positions are also supported:
