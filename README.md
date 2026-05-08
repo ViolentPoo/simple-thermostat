@@ -6,7 +6,7 @@
 
 A Lovelace thermostat card focused on compact layout, easy interaction, and flexible configuration. Embed relevant sensors, customise controls, and theme to taste.
 
-![Example thermostat](https://github.com/nervetattoo/simple-thermostat/raw/master/thermostat-card.png)
+![Example thermostat](https://github.com/Wheemer/simple-thermostat/raw/master/examples.png)
 
 ## Changelog
 
