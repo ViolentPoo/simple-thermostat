@@ -10,7 +10,7 @@ import styles from './styles.css'
 import formatNumber from './formatNumber'
 import fireEvent from './fireEvent'
 import renderHeader from './components/header'
-import renderTemplated, { wrapSensors } from './components/templated'
+import renderTemplated, { wrapEntities } from './components/templated'
 import renderEntities from './components/entities'
 import renderModeType from './components/modeType'
 
@@ -421,7 +421,7 @@ export default class SimpleThermostat extends LitElement {
             openEntityPopover: this.openEntityPopover,
           })
         })
-      entitiesHtml = wrapSensors(this.config, entitiesHtml)
+      entitiesHtml = wrapEntities(this.config, entitiesHtml)
     } else {
       entitiesHtml = this.showEntities
         ? renderEntities({
