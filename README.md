@@ -364,10 +364,6 @@ cards:
         name: Control the pump
 ```
 
-### Using a separate temperature sensor
-
-Use `current_temperature_entity` to override the current temperature with a reading from a separate sensor entity instead of the one reported by the thermostat.
-
 ## CSS vars for theming
 
 The card uses the following CSS variables:
