@@ -8,6 +8,8 @@ export enum MODES {
   FAN = 'fan',
   PRESET = 'preset',
   SWING = 'swing',
+  SWING_HORIZONTAL = 'swing_horizontal',
+  SWING_VERTICAL = 'swing_vertical',
   VANE_HORIZONTAL = 'vane_horizontal',
   VANE_VERTICAL = 'vane_vertical',
 }
@@ -35,12 +37,13 @@ export type ModeControlObject = Record<string, boolean | ModeValue> & {
  * that are provided in the attributes of the entity.
  *
  */
-export type ModeControlValue = boolean | ModeControlObject
 type ModeControl = {
   hvac: ModeControlValue
   fan: ModeControlValue
   preset: ModeControlValue
   swing: ModeControlValue
+  swing_horizontal: ModeControlValue
+  swing_vertical: ModeControlValue
   vane_horizontal: ModeControlValue
   vane_vertical: ModeControlValue
 }
