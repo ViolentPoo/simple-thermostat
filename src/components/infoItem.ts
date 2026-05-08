@@ -84,13 +84,13 @@ export default function renderInfoItem({
         '',
       ].join('.')
       let value = localize(state.state, prefix)
-    if (typeof decimals === 'number') {
-      value = formatNumber(value, {
-        decimals,
-        locale: hass.locale,
-      })
-    }
-    valueCell = html`
+      if (typeof decimals === 'number') {
+        value = formatNumber(value, {
+          decimals,
+          locale: hass.locale,
+        })
+      }
+      valueCell = html`
         <div
           class="sensor-value clickable"
           @click="${() => openEntityPopover(state.entity_id)}"
