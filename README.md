@@ -365,6 +365,13 @@ Built-in rows `state` and `temperature` are added automatically unless you defin
 | `--st-mode-background` | `var(--secondary-background-color)` | Inactive mode button background |
 | `--st-mode-active-background` | `var(--primary-color)` | Active mode button background |
 | `--st-mode-active-color` | `var(--text-primary-color)` | Active mode button text |
+| `--auto-color` | `green` | Active auto mode background. Supports any CSS color, including `rgba(...)`. |
+| `--heat_cool-color` | `springgreen` | Active heat/cool mode background. Supports any CSS color, including `rgba(...)`. |
+| `--cool-color` | `#2b9af9` | Active cool mode background. Supports any CSS color, including `rgba(...)`. |
+| `--heat-color` | `#ff8100` | Active heat mode background. Supports any CSS color, including `rgba(...)`. |
+| `--off-color` | `#8a8a8a` | Active off mode background. Supports any CSS color, including `rgba(...)`. |
+| `--fan_only-color` | `#8a8a8a` | Active fan-only mode background. Supports any CSS color, including `rgba(...)`. |
+| `--dry-color` | `#efbd07` | Active dry mode background. Supports any CSS color, including `rgba(...)`. |
 | `--st-toggle-label-color` | `var(--primary-text-color)` | Header toggle label color |
 | `--st-fault-inactive-color` | `var(--secondary-background-color)` | Inactive fault icon color |
 | `--st-fault-active-color` | `var(--accent-color)` | Active fault icon color |
@@ -380,6 +387,7 @@ card_mod:
       --st-font-size-xl: 18px;
       --st-font-size-l: 16px;
       --st-spacing: 2px;
+      --cool-color: rgba(43, 154, 249, 0.8);
     }
 ```
 
