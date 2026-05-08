@@ -133,7 +133,7 @@ export default class SimpleThermostat extends LitElement {
   @property()
   entity: LooseObject
   @property()
-  sensors: Array<Sensor | PreparedSensor> = []
+  entities: Array<Sensor | PreparedSensor> = []
   @property()
   showSensors: boolean = true
   @property()
@@ -299,23 +299,23 @@ export default class SimpleThermostat extends LitElement {
     if (configuredEntities === false) {
       this.showSensors = false
     } else if (this.config.version === 3) {
-      this.sensors = []
-      const customSensors = configuredEntities.map((sensor, index) => {
-        const entityId = sensor?.entity ?? this.config.entity
+      this.entities = []
+      const customEntities = configuredEntities.map((entity, index) => {
+        const entityId = entity?.entity ?? this.config.entity
         let context = this.entity
-        if (sensor?.entity) {
-          context = this._hass.states[sensor.entity]
+        if (entity?.entity) {
+          context = this._hass.states[entity.entity]
         }
         return {
-          id: sensor?.id ?? String(index),
-          label: sensor?.label,
-          template: sensor.template,
-          show: sensor?.show !== false,
+          id: entity?.id ?? String(index),
+          label: entity?.label,
+          template: entity.template,
+          show: entity?.show !== false,
           entityId,
           context,
         } as PreparedSensor
       })
-      const ids = customSensors.map((s) => s.id)
+      const ids = customEntities.map((entity) => entity.id)
       const builtins = []
       if (!ids.includes('state')) {
         builtins.push({
@@ -339,7 +339,7 @@ export default class SimpleThermostat extends LitElement {
           context: tempContext,
         })
       }
-      this.sensors = [...builtins, ...customSensors]
+      this.entities = [...builtins, ...customSensors]
     } else if (configuredEntities) {
       this.sensors = configuredEntities.map(
         ({ name, entity, attribute, unit = '', ...rest }) => {
