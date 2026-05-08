@@ -72,6 +72,10 @@ const DEFAULT_HIDE = {
   state: false,
 }
 
+function getConfiguredEntities(config: CardConfig) {
+  return config.entities ?? config.sensors
+}
+
 function shouldShowModeControl(
   modeOption: string,
   config: Partial<ModeControlObject>
@@ -290,11 +294,13 @@ export default class SimpleThermostat extends LitElement {
       this._hide = { ...this._hide, ...this.config.hide }
     }
 
-    if (this.config.sensors === false) {
+    const configuredEntities = getConfiguredEntities(this.config)
+
+    if (configuredEntities === false) {
       this.showSensors = false
     } else if (this.config.version === 3) {
       this.sensors = []
-      const customSensors = this.config.sensors.map((sensor, index) => {
+      const customSensors = configuredEntities.map((sensor, index) => {
         const entityId = sensor?.entity ?? this.config.entity
         let context = this.entity
         if (sensor?.entity) {
@@ -334,8 +340,8 @@ export default class SimpleThermostat extends LitElement {
         })
       }
       this.sensors = [...builtins, ...customSensors]
-    } else if (this.config.sensors) {
-      this.sensors = this.config.sensors.map(
+    } else if (configuredEntities) {
+      this.sensors = configuredEntities.map(
         ({ name, entity, attribute, unit = '', ...rest }) => {
           let state
           const names = [name]
