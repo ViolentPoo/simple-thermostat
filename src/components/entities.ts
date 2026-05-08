@@ -1,7 +1,7 @@
 import { html } from 'lit'
 import formatNumber from '../formatNumber'
 import renderInfoItem from './infoItem'
-import { wrapSensors } from './templated'
+import { wrapEntities } from './templated'
 
 export default function renderEntities({
   _hide,
@@ -22,7 +22,8 @@ export default function renderEntities({
     ? hass.states[config.current_temperature_entity]?.state
     : current_entity_temp
 
-  const showLabels = config?.layout?.sensors?.labels ?? true
+  const showLabels =
+    (config?.layout?.entities ?? config?.layout?.sensors)?.labels ?? true
   let stateString = localize(state, 'component.climate.state._.')
   if (action) {
     stateString = [
@@ -69,5 +70,5 @@ export default function renderEntities({
     }) || null),
   ].filter((it) => it !== null)
 
-  return wrapSensors(config, entityHtml)
+  return wrapEntities(config, entityHtml)
 }
