@@ -40,6 +40,7 @@ export interface HeaderConfig {
   icon?: Icon
   faults?: Array<Fault>
   toggle?: ToggleConfig
+  toggles?: Array<ToggleConfig>
 }
 
 export interface HeaderData {
@@ -47,6 +48,7 @@ export interface HeaderData {
   icon: Icon
   faults?: Array<Fault>
   toggle?: Toggle
+  toggles?: Array<Toggle>
 }
 
 export interface Toggle {
@@ -80,6 +82,7 @@ export default function parseHeaderConfig(
     name,
     icon,
     toggle: config?.toggle ? parseToggle(config.toggle, hass) : null,
+    toggles: parseToggles(config, hass),
     faults: parseFaults(config?.faults, hass),
   }
 }
@@ -95,6 +98,15 @@ function parseToggle(config: ToggleConfig, hass): Toggle {
   }
 
   return { entity, label }
+}
+
+function parseToggles(config: HeaderConfig, hass): Array<Toggle> {
+  const toggleConfigs = [
+    ...(config?.toggle ? [config.toggle] : []),
+    ...(Array.isArray(config?.toggles) ? config.toggles : []),
+  ]
+
+  return toggleConfigs.map((toggle) => parseToggle(toggle, hass))
 }
 
 function parseFaults(config: Array<Fault>, hass: HASS) {
