@@ -37,7 +37,7 @@ export default function renderHeader({
         ${renderIcon(icon)} ${renderName(name)}
       </div>
       ${renderFaults(header.faults, openEntityPopover)}
-      ${renderToggle(header.toggle, openEntityPopover, toggleEntityChanged)}
+      ${renderToggles(header.toggles, openEntityPopover, toggleEntityChanged)}
     </header>
   `
 }
@@ -71,20 +71,27 @@ function renderFaults(faults, openEntityPopover) {
   return html` <div class="faults">${faultHtml}</div>`
 }
 
-function renderToggle(toggle, openEntityPopover, toggleEntityChanged) {
-  if (!toggle) return nothing
+function renderToggles(toggles, openEntityPopover, toggleEntityChanged) {
+  if (!toggles?.length) return nothing
 
   return html`
-    <div style="margin-left: auto;">
-      <span
-        class="clickable toggle-label"
-        @click=${() => openEntityPopover(toggle.entity.entity_id)}
-        >${toggle.label}
-      </span>
-      <ha-switch
-        .checked=${toggle.entity?.state === 'on'}
-        @change=${toggleEntityChanged}
-      ></ha-switch>
+    <div class="header__toggles">
+      ${toggles.map((toggle) => {
+        const entityId = toggle.entity?.entity_id
+        return html`
+          <div class="header__toggle">
+            <span
+              class="clickable toggle-label"
+              @click=${() => openEntityPopover(entityId)}
+              >${toggle.label}
+            </span>
+            <ha-switch
+              .checked=${toggle.entity?.state === 'on'}
+              @change=${(ev: Event) => toggleEntityChanged(ev, entityId)}
+            ></ha-switch>
+          </div>
+        `
+      })}
     </div>
   `
 }
