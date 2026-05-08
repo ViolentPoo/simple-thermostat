@@ -11,7 +11,7 @@ import formatNumber from './formatNumber'
 import fireEvent from './fireEvent'
 import renderHeader from './components/header'
 import renderTemplated, { wrapSensors } from './components/templated'
-import renderSensors from './components/sensors'
+import renderEntities from './components/entities'
 import renderModeType from './components/modeType'
 
 import parseHeader, { HeaderData, MODE_ICONS } from './config/header'
@@ -424,7 +424,7 @@ export default class SimpleThermostat extends LitElement {
       entitiesHtml = wrapSensors(this.config, entitiesHtml)
     } else {
       entitiesHtml = this.showEntities
-        ? renderSensors({
+        ? renderEntities({
             _hide: this._hide,
             unit,
             hass: this._hass,
