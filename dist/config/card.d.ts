@@ -7,6 +7,8 @@ export declare enum MODES {
     FAN = "fan",
     PRESET = "preset",
     SWING = "swing",
+    SWING_HORIZONTAL = "swing_horizontal",
+    SWING_VERTICAL = "swing_vertical",
     VANE_HORIZONTAL = "vane_horizontal",
     VANE_VERTICAL = "vane_vertical"
 }
@@ -37,6 +39,8 @@ type ModeControl = {
     fan: ModeControlValue;
     preset: ModeControlValue;
     swing: ModeControlValue;
+    swing_horizontal: ModeControlValue;
+    swing_vertical: ModeControlValue;
     vane_horizontal: ModeControlValue;
     vane_vertical: ModeControlValue;
 };

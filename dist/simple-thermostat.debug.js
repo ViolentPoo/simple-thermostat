@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.17";
+var version = "3.0.18";
 
 /**
  * @license
@@ -1101,6 +1101,9 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
     else if (type === 'vane_horizontal' || type === 'vane_vertical') {
         localizePrefix = '';
     }
+    else if (type === 'swing_horizontal' || type === 'swing_vertical') {
+        localizePrefix = `state_attributes.climate.${type}_mode.`;
+    }
     const maybeRenderName = (name) => {
         if (name === false)
             return null;
@@ -1122,6 +1125,12 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
     }
     else if (type === 'vane_vertical') {
         defaultTitle = 'Vane Vertical';
+    }
+    else if (type === 'swing_horizontal') {
+        defaultTitle = localize('ui.card.climate.swing_horizontal_mode') || 'Swing Horizontal';
+    }
+    else if (type === 'swing_vertical') {
+        defaultTitle = localize('ui.card.climate.swing_vertical_mode') || 'Swing Vertical';
     }
     else {
         defaultTitle = localize(`ui.card.climate.${str}`);
@@ -1258,6 +1267,8 @@ var MODES;
     MODES["FAN"] = "fan";
     MODES["PRESET"] = "preset";
     MODES["SWING"] = "swing";
+    MODES["SWING_HORIZONTAL"] = "swing_horizontal";
+    MODES["SWING_VERTICAL"] = "swing_vertical";
     MODES["VANE_HORIZONTAL"] = "vane_horizontal";
     MODES["VANE_VERTICAL"] = "vane_vertical";
 })(MODES || (MODES = {}));
