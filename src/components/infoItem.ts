@@ -120,19 +120,6 @@ export default function renderInfoItem({
     ? html`<ha-icon icon="${icon}" title=${tooltip}></ha-icon>`
     : html`${heading}:`
 
-  if (typeof state === 'object') {
-    const [domain] = state.entity_id.split('.')
-    if (TOGGLE_DOMAINS.includes(domain) && icon) {
-      return html`
-        <div class="entity-heading entity-heading--toggle" title=${tooltip}>
-          ${headingResult}
-          ${valueCell}
-        </div>
-        <div class="entity-value"></div>
-      `
-    }
-  }
-
   return html`
     <div class="entity-heading" title=${tooltip}>${headingResult}</div>
     ${valueCell}
