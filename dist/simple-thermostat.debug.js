@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.27";
+var version = "3.0.28";
 
 /**
  * @license
@@ -989,7 +989,13 @@ function renderTemplated({ context, entityId, template = '{{state.text}}', label
         ? renderIcon(safeLabel)
         : render(safeLabel);
     return b `
-    <div class="entity-heading">${o(heading)}</div>
+    <div
+      class="entity-heading clickable"
+      title=${(attributes === null || attributes === void 0 ? void 0 : attributes.friendly_name) || entityId}
+      @click=${openEntityPopover ? () => openEntityPopover(entityId) : null}
+    >
+      ${o(heading)}
+    </div>
     <div class="entity-value">${o(value)}</div>
   `;
 }
@@ -1082,7 +1088,11 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
     }
     const tooltip = heading || ((_c = state === null || state === void 0 ? void 0 : state.attributes) === null || _c === void 0 ? void 0 : _c.friendly_name) || (state === null || state === void 0 ? void 0 : state.entity_id);
     const headingResult = icon
-        ? b ` <ha-icon icon="${icon}" title=${tooltip}></ha-icon> `
+        ? b ` <ha-icon
+      icon="${icon}"
+      title=${tooltip}
+      @click=${entityId ? () => openEntityPopover(entityId) : null}
+    ></ha-icon> `
         : b ` ${heading}: `;
     const entityId = typeof state === 'object' ? state.entity_id : null;
     return b `
