@@ -77,6 +77,7 @@ function getConfiguredEntities(config: CardConfig) {
 }
 
 function shouldShowModeControl(
+  type: string,
   modeOption: string,
   config: Partial<ModeControlObject>
 ) {
@@ -88,7 +89,9 @@ function shouldShowModeControl(
   const hasExplicitConfig = Object.keys(config).some(
     (key) => !key.startsWith('_')
   )
-  return config?.[modeOption] ?? !hasExplicitConfig
+  const hideUnlistedModes = type === MODES.PRESET
+
+  return config?.[modeOption] ?? !(hideUnlistedModes && hasExplicitConfig)
 }
 
 function getModeList(
@@ -97,7 +100,7 @@ function getModeList(
   specification: Partial<ModeControlObject> = {}
 ) {
   return attributes[getModeOptionsKey(type)]
-    .filter((modeOption) => shouldShowModeControl(modeOption, specification))
+    .filter((modeOption) => shouldShowModeControl(type, modeOption, specification))
     .map((modeOption) => {
       const values =
         typeof specification[modeOption] === 'object'
