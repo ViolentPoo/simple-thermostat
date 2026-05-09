@@ -112,7 +112,13 @@ export default function renderTemplated({
     : render(safeLabel)
 
   return html`
-    <div class="entity-heading">${unsafeHTML(heading)}</div>
+    <div
+      class="entity-heading clickable"
+      title=${attributes?.friendly_name || entityId}
+      @click=${openEntityPopover ? () => openEntityPopover(entityId) : null}
+    >
+      ${unsafeHTML(heading)}
+    </div>
     <div class="entity-value">${unsafeHTML(value)}</div>
   `
 }
