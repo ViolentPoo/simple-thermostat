@@ -169,17 +169,17 @@ header {
   align-items: center;
   margin: 0;
   font-weight: 400;
-  line-height: 20px;
-  line-height: var(--st-font-size-l, 20px);
-  font-size: 20px;
-  font-size: var(--st-font-size-l, 20px);
+  line-height: 22px;
+  line-height: var(--st-font-size-l, 22px);
+  font-size: 22px;
+  font-size: var(--st-font-size-l, 22px);
 }
 @media (min-width: 768px) {
 .current--value {
-    font-size: 24px;
-    font-size: var(--st-font-size-xl, 24px);
-    line-height: 24px;
-    line-height: var(--st-font-size-xl, 24px);
+    font-size: 28px;
+    font-size: var(--st-font-size-xl, 28px);
+    line-height: 28px;
+    line-height: var(--st-font-size-xl, 28px);
 }
   }
 .current--value.updating {
