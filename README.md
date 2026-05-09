@@ -6,7 +6,7 @@
 
 A Lovelace thermostat card focused on compact layout, easy interaction, and flexible configuration. Embed relevant entities, customise controls, and theme to taste.
 
-![Example thermostat](https://github.com/Wheemer/simple-thermostat/raw/master/examples.png)
+<img src="https://github.com/Wheemer/simple-thermostat/raw/master/examples.png" alt="Examples" width="620">
 
 ## Changelog
 
