@@ -128,6 +128,7 @@ export default function renderInfoItem({
           ${headingResult}
           ${valueCell}
         </div>
+        <div class="entity-value"></div>
       `
     }
   }
