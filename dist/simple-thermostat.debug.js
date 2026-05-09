@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.30";
+var version = "3.0.31";
 
 /**
  * @license
