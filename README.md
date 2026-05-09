@@ -356,8 +356,8 @@ Built-in rows `state` and `temperature` are added automatically unless you defin
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `--st-spacing` | `4px` | Base spacing unit |
-| `--st-font-size-xl` | `24px` | Target temperature, wide viewports |
-| `--st-font-size-l` | `20px` | Target temperature, narrow viewports |
+| `--st-font-size-xl` | `28px` | Target temperature, wide viewports |
+| `--st-font-size-l` | `22px` | Target temperature, narrow viewports |
 | `--st-font-size-m` | `var(--ha-font-size-xl, 20px)` | Temperature unit |
 | `--st-font-size-title` | `var(--ha-card-header-font-size, 24px)` | Card title |
 | `--st-font-size-entities` | `var(--st-font-size-sensors, var(--ha-font-size-l, 16px))` | Extra entity rows and mode labels. Legacy `--st-font-size-sensors` continues to work. |
