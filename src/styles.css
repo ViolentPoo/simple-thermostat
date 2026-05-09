@@ -90,8 +90,7 @@ ha-card.no-header {
 .entity-value {
   display: flex;
   align-items: center;
-  min-height: calc(var(--st-spacing, var(--st-default-spacing)) * 8);
-  padding-bottom: var(--st-spacing, var(--st-default-spacing));
+  padding-bottom: 4px;
 }
 .entity-heading {
   font-weight: 300;
@@ -256,7 +255,7 @@ header {
   padding: 16px 6px;
 }
 
-.entity-value ha-switch {
+.entities .entity-value ha-switch {
   padding: 0 6px;
 }
 .side-by-side {
