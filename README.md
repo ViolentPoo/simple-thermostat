@@ -46,6 +46,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.32 | Restored the HACS install button in the README installation section. |
 | 3.0.31 | Reorganized the README installation/configuration guidance and updated the examples image. |
 | 3.0.30 | Fixed extra heading whitespace in rendered info item output after restoring direct icon heading clicks. |
 | 3.0.29 | Fixed icon-only extra entity heading clicks by declaring the entity id before binding the icon click handler. |
