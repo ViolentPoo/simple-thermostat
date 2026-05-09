@@ -127,8 +127,8 @@ export default function renderInfoItem({
   const tooltip = heading || state?.attributes?.friendly_name || state?.entity_id
 
   const headingResult = icon
-    ? html`<ha-icon icon="${icon}" title=${tooltip}></ha-icon>`
-    : html`${heading}:`
+    ? html` <ha-icon icon="${icon}" title=${tooltip}></ha-icon> `
+    : html` ${heading}: `
 
   const entityId = typeof state === 'object' ? state.entity_id : null
 
