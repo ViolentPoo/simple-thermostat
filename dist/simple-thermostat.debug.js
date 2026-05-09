@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.33";
+var version = "3.0.34";
 
 /**
  * @license
@@ -209,8 +209,8 @@ header {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  justify-content: flex-end;
-  gap: var(--st-spacing, var(--st-default-spacing));
+  justify-content: center;
+  gap: 0;
   margin-left: auto;
 }
 
@@ -336,7 +336,7 @@ header {
   display: block;
 }
 .header__toggle ha-switch {
-  padding: 2px 6px;
+  padding: 0 6px;
 }
 
 .entities .entity-value ha-switch {
