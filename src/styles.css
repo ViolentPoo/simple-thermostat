@@ -102,10 +102,6 @@ ha-card.no-header {
   justify-content: flex-end;
 }
 
-.entity-heading--toggle {
-  gap: var(--st-spacing, var(--st-default-spacing));
-}
-
 .entities:empty {
   display: none;
 }
