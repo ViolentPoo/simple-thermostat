@@ -111,27 +111,27 @@ export default function renderInfoItem({
   }
 
   if (heading === false) {
-  return valueCell
-}
-
-const headingResult = icon
-  ? html` <ha-icon icon="${icon}"></ha-icon> `
-  : html` ${heading}: `
-
-if (typeof state === 'object') {
-  const [domain] = state.entity_id.split('.')
-  if (TOGGLE_DOMAINS.includes(domain) && icon) {
-    return html`
-      <div class="entity-heading entity-heading--toggle">
-        ${headingResult}
-        ${valueCell}
-      </div>
-    `
+    return valueCell
   }
-}
 
-return html`
-  <div class="entity-heading">${headingResult}</div>
-  ${valueCell}
-`
+  const headingResult = icon
+    ? html` <ha-icon icon="${icon}"></ha-icon> `
+    : html` ${heading}: `
+
+  if (typeof state === 'object') {
+    const [domain] = state.entity_id.split('.')
+    if (TOGGLE_DOMAINS.includes(domain) && icon) {
+      return html`
+        <div class="entity-heading entity-heading--toggle">
+          ${headingResult}
+          ${valueCell}
+        </div>
+      `
+    }
+  }
+
+  return html`
+    <div class="entity-heading">${headingResult}</div>
+    ${valueCell}
+  `
 }
