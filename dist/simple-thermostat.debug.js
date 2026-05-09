@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.23";
+var version = "3.0.24";
 
 /**
  * @license
@@ -1091,6 +1091,7 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
           ${headingResult}
           ${valueCell}
         </div>
+        <div class="entity-value"></div>
       `;
         }
     }
