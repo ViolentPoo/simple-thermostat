@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.35";
+var version = "3.0.36";
 
 /**
  * @license
@@ -804,7 +804,8 @@ function formatNumber(number, { decimals = 1, fallback = 'N/A', locale } = {}) {
     if (locale.number_format === 'space_comma') {
         return value.toFixed(decimals).replace('.', ',');
     }
-    if (locale.number_format === 'comma_decimal') {
+    if (locale.number_format === 'comma_decimal' ||
+        locale.number_format === 'none') {
         return value.toFixed(decimals);
     }
     return new Intl.NumberFormat(getLanguage(locale), {
