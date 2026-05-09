@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.34";
+var version = "3.0.35";
 
 /**
  * @license
@@ -1383,18 +1383,19 @@ function getConfiguredEntities(config) {
     var _a, _b;
     return (_b = (_a = config.entities) !== null && _a !== void 0 ? _a : config.sensors) !== null && _b !== void 0 ? _b : [];
 }
-function shouldShowModeControl(modeOption, config) {
+function shouldShowModeControl(type, modeOption, config) {
     var _a;
     if (typeof config[modeOption] === 'object') {
         const obj = config[modeOption];
         return obj.include !== false;
     }
     const hasExplicitConfig = Object.keys(config).some((key) => !key.startsWith('_'));
-    return (_a = config === null || config === void 0 ? void 0 : config[modeOption]) !== null && _a !== void 0 ? _a : !hasExplicitConfig;
+    const hideUnlistedModes = type === MODES.PRESET;
+    return (_a = config === null || config === void 0 ? void 0 : config[modeOption]) !== null && _a !== void 0 ? _a : !(hideUnlistedModes && hasExplicitConfig);
 }
 function getModeList(type, attributes, specification = {}) {
     return attributes[getModeOptionsKey(type)]
-        .filter((modeOption) => shouldShowModeControl(modeOption, specification))
+        .filter((modeOption) => shouldShowModeControl(type, modeOption, specification))
         .map((modeOption) => {
         const values = typeof specification[modeOption] === 'object'
             ? specification[modeOption]
