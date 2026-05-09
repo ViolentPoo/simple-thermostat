@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.28";
+var version = "3.0.29";
 
 /**
  * @license
@@ -1087,6 +1087,7 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
         return valueCell;
     }
     const tooltip = heading || ((_c = state === null || state === void 0 ? void 0 : state.attributes) === null || _c === void 0 ? void 0 : _c.friendly_name) || (state === null || state === void 0 ? void 0 : state.entity_id);
+    const entityId = typeof state === 'object' ? state.entity_id : null;
     const headingResult = icon
         ? b ` <ha-icon
       icon="${icon}"
@@ -1094,7 +1095,6 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
       @click=${entityId ? () => openEntityPopover(entityId) : null}
     ></ha-icon> `
         : b ` ${heading}: `;
-    const entityId = typeof state === 'object' ? state.entity_id : null;
     return b `
     <div
       class="entity-heading ${entityId ? 'clickable' : ''}"
