@@ -46,6 +46,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.35 | Fixed numeric fan modes being hidden when a fan control row has explicit configuration. |
 | 3.0.34 | Tightened spacing for multiple header toggles so they stack more compactly. |
 | 3.0.33 | Fixed multiple header toggles stretching the thermostat card layout. |
 | 3.0.32 | Restored the HACS install button in the README installation section. |
