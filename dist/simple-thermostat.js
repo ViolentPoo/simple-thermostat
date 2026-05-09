@@ -108,10 +108,6 @@ ha-card.no-header {
   justify-content: flex-end;
 }
 
-.entity-heading--toggle {
-  gap: var(--st-spacing, var(--st-default-spacing));
-}
-
 .entities:empty {
   display: none;
 }
@@ -274,8 +270,7 @@ header {
   padding: 16px 6px;
 }
 
-.entities .entity-value ha-switch,
-.entities .entity-heading--toggle ha-switch {
+.entities .entity-value ha-switch {
   padding: 0 6px;
 }
 .side-by-side {
@@ -483,13 +478,7 @@ header {
         >
           ${l} ${u||i.attributes.unit_of_measurement}
         </div>
-      `}}else{let t="number"==typeof p?jt(i,{decimals:p,locale:e.locale}):i;f=D` <div class="entity-value">${t}${u}</div> `}if(!1===d)return f;const g=d||(null===(l=null==i?void 0:i.attributes)||void 0===l?void 0:l.friendly_name)||(null==i?void 0:i.entity_id),v=h?D`<ha-icon icon="${h}" title=${g}></ha-icon>`:D`${d}:`;if("object"==typeof i){const[t]=i.entity_id.split(".");if(Mt.includes(t)&&h)return D`
-        <div class="entity-heading entity-heading--toggle" title=${g}>
-          ${v}
-          ${f}
-        </div>
-        <div class="entity-value"></div>
-      `}return D`
+      `}}else{let t="number"==typeof p?jt(i,{decimals:p,locale:e.locale}):i;f=D` <div class="entity-value">${t}${u}</div> `}if(!1===d)return f;const g=d||(null===(l=null==i?void 0:i.attributes)||void 0===l?void 0:l.friendly_name)||(null==i?void 0:i.entity_id),v=h?D`<ha-icon icon="${h}" title=${g}></ha-icon>`:D`${d}:`;return D`
     <div class="entity-heading" title=${g}>${v}</div>
     ${f}
   `}var Dt;function Lt({state:t,mode:e,modeOptions:i,localize:n,setMode:s}){var o;const{type:a,hide_when_off:r,mode:l="none",list:c,name:d,icons:h}=e;if(0===c.length||r&&t===Dt.OFF)return null;let u=`state_attributes.climate.${a}_mode.`;"hvac"===a?u="component.climate.state._.":"vane_horizontal"===a||"vane_vertical"===a?u="":"swing_horizontal"!==a&&"swing_vertical"!==a||(u=`state_attributes.climate.${a}_mode.`);const p="hvac"==a?"operation":`${a}_mode`;let f;f="vane_horizontal"===a?"Vane Horizontal":"vane_vertical"===a?"Vane Vertical":"swing_horizontal"===a?n("ui.card.climate.swing_horizontal_mode")||"Swing Horizontal":"swing_vertical"===a?n("ui.card.climate.swing_vertical_mode")||"Swing Vertical":n(`ui.card.climate.${p}`);const g=d||f,v=null===(o=null==i?void 0:i.headings)||void 0===o||o;return D`
@@ -553,4 +542,4 @@ header {
 
         ${this.modes.map(t=>{var e,i,n;return Lt({state:s.state,mode:t,localize:this.localize,modeOptions:null!==(n=null===(i=null===(e=this.config)||void 0===e?void 0:e.layout)||void 0===i?void 0:i.mode)&&void 0!==n?n:{},setMode:this.setMode})})}
       </ha-card>
-    `}setTemperature(t,e){this._updatingValues=!0;const i=this._values[e],n=Number(i)+t,{decimals:s}=this.config;this._values=Object.assign(Object.assign({},this._values),{[e]:+jt(n,{decimals:s})}),this._debouncedSetTemperature(this._values)}getCardSize(){return 3}getUnit(){var t,e,i,n;return["boolean","string"].includes(typeof this.config.unit)?null===(t=this.config)||void 0===t?void 0:t.unit:null!==(n=null===(i=null===(e=this._hass.config)||void 0===e?void 0:e.unit_system)||void 0===i?void 0:i.temperature)&&void 0!==n&&n}}mt([bt()],ae.prototype,"config",void 0),mt([bt()],ae.prototype,"header",void 0),mt([bt()],ae.prototype,"service",void 0),mt([bt()],ae.prototype,"modes",void 0),mt([bt()],ae.prototype,"entity",void 0),mt([bt()],ae.prototype,"entities",void 0),mt([bt()],ae.prototype,"showEntities",void 0),mt([bt()],ae.prototype,"name",void 0),mt([bt({type:Object})],ae.prototype,"_values",void 0),mt([bt()],ae.prototype,"_updatingValues",void 0),mt([bt()],ae.prototype,"_hide",void 0),customElements.get(t)||customElements.define(t,ae),customElements.get(`${t}-editor`)||customElements.define(`${t}-editor`,gt),console.info(`%c${t}: 3.0.24`,"font-weight: bold"),window.customCards=window.customCards||[],window.customCards.push({type:t,name:"Simple Thermostat",preview:!1,description:"A different take on the thermostat card"});
+    `}setTemperature(t,e){this._updatingValues=!0;const i=this._values[e],n=Number(i)+t,{decimals:s}=this.config;this._values=Object.assign(Object.assign({},this._values),{[e]:+jt(n,{decimals:s})}),this._debouncedSetTemperature(this._values)}getCardSize(){return 3}getUnit(){var t,e,i,n;return["boolean","string"].includes(typeof this.config.unit)?null===(t=this.config)||void 0===t?void 0:t.unit:null!==(n=null===(i=null===(e=this._hass.config)||void 0===e?void 0:e.unit_system)||void 0===i?void 0:i.temperature)&&void 0!==n&&n}}mt([bt()],ae.prototype,"config",void 0),mt([bt()],ae.prototype,"header",void 0),mt([bt()],ae.prototype,"service",void 0),mt([bt()],ae.prototype,"modes",void 0),mt([bt()],ae.prototype,"entity",void 0),mt([bt()],ae.prototype,"entities",void 0),mt([bt()],ae.prototype,"showEntities",void 0),mt([bt()],ae.prototype,"name",void 0),mt([bt({type:Object})],ae.prototype,"_values",void 0),mt([bt()],ae.prototype,"_updatingValues",void 0),mt([bt()],ae.prototype,"_hide",void 0),customElements.get(t)||customElements.define(t,ae),customElements.get(`${t}-editor`)||customElements.define(`${t}-editor`,gt),console.info(`%c${t}: 3.0.25`,"font-weight: bold"),window.customCards=window.customCards||[],window.customCards.push({type:t,name:"Simple Thermostat",preview:!1,description:"A different take on the thermostat card"});
