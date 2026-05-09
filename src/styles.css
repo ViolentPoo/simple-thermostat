@@ -256,8 +256,7 @@ header {
   padding: 16px 6px;
 }
 
-.entities .entity-value ha-switch,
-.entities .entity-heading--toggle ha-switch {
+.entities .entity-value ha-switch {
   padding: 0 6px;
 }
 .side-by-side {
