@@ -12,6 +12,7 @@ A Lovelace thermostat card focused on compact layout, easy interaction, and flex
 
 | Version | Changes |
 |---------|---------|
+| 3.0.26 | Used Home Assistant entity formatting for extra entity rows so display precision follows the entity setting when no row-level `decimals` override is set. |
 | 3.0.25 | Restored extra entity toggle rows to the standard table layout while keeping icon tooltips. |
 | 3.0.24 | Fixed icon-only toggle rows preserving table grid structure after adding heading-cell alignment. |
 | 3.0.23 | Added hover tooltips for icon-only extra entity headings so the entity name is visible without labels. |
