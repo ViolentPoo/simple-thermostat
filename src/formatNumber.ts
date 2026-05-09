@@ -43,7 +43,10 @@ function formatNumber(
     return value.toFixed(decimals).replace('.', ',')
   }
 
-  if (locale.number_format === 'comma_decimal') {
+  if (
+    locale.number_format === 'comma_decimal' ||
+    locale.number_format === 'none'
+  ) {
     return value.toFixed(decimals)
   }
 
