@@ -130,8 +130,16 @@ export default function renderInfoItem({
     ? html`<ha-icon icon="${icon}" title=${tooltip}></ha-icon>`
     : html`${heading}:`
 
+  const entityId = typeof state === 'object' ? state.entity_id : null
+
   return html`
-    <div class="entity-heading" title=${tooltip}>${headingResult}</div>
+    <div
+      class="entity-heading ${entityId ? 'clickable' : ''}"
+      title=${tooltip}
+      @click=${entityId ? () => openEntityPopover(entityId) : null}
+    >
+      ${headingResult}
+    </div>
     ${valueCell}
   `
 }
