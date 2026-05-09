@@ -134,7 +134,7 @@ export default function renderInfoItem({
         title=${tooltip}
         @click=${entityId ? () => openEntityPopover(entityId) : null}
       ></ha-icon> `
-    : html` ${heading}: `
+    : ` ${heading}: `
 
   return html`
     <div
