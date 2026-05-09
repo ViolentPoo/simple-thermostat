@@ -83,19 +83,29 @@ export default function renderInfoItem({
         state.attributes?.device_class ?? '_',
         '',
       ].join('.')
-      let value = localize(state.state, prefix)
+      let value =
+        typeof hass.formatEntityState === 'function'
+          ? hass.formatEntityState(state)
+          : localize(state.state, prefix)
+
       if (typeof decimals === 'number') {
-        value = formatNumber(value, {
+        value = formatNumber(state.state, {
           decimals,
           locale: hass.locale,
         })
       }
+      const formattedWithHass =
+        typeof hass.formatEntityState === 'function' &&
+        typeof decimals !== 'number'
+
       valueCell = html`
         <div
           class="entity-value clickable"
           @click="${() => openEntityPopover(state.entity_id)}"
         >
-          ${value} ${unit || state.attributes.unit_of_measurement}
+          ${value}${formattedWithHass
+            ? ''
+            : ` ${unit || state.attributes.unit_of_measurement}`}
         </div>
       `
     }
