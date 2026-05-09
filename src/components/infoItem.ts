@@ -126,15 +126,15 @@ export default function renderInfoItem({
 
   const tooltip = heading || state?.attributes?.friendly_name || state?.entity_id
 
-  const headingResult = icon
+const entityId = typeof state === 'object' ? state.entity_id : null
+
+const headingResult = icon
   ? html` <ha-icon
       icon="${icon}"
       title=${tooltip}
       @click=${entityId ? () => openEntityPopover(entityId) : null}
     ></ha-icon> `
   : html` ${heading}: `
-
-  const entityId = typeof state === 'object' ? state.entity_id : null
 
   return html`
     <div
