@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.26";
+var version = "3.0.27";
 
 /**
  * @license
@@ -1082,10 +1082,17 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
     }
     const tooltip = heading || ((_c = state === null || state === void 0 ? void 0 : state.attributes) === null || _c === void 0 ? void 0 : _c.friendly_name) || (state === null || state === void 0 ? void 0 : state.entity_id);
     const headingResult = icon
-        ? b `<ha-icon icon="${icon}" title=${tooltip}></ha-icon>`
-        : b `${heading}:`;
+        ? b ` <ha-icon icon="${icon}" title=${tooltip}></ha-icon> `
+        : b ` ${heading}: `;
+    const entityId = typeof state === 'object' ? state.entity_id : null;
     return b `
-    <div class="entity-heading" title=${tooltip}>${headingResult}</div>
+    <div
+      class="entity-heading ${entityId ? 'clickable' : ''}"
+      title=${tooltip}
+      @click=${entityId ? () => openEntityPopover(entityId) : null}
+    >
+      ${headingResult}
+    </div>
     ${valueCell}
   `;
 }
