@@ -12,6 +12,7 @@ A Lovelace thermostat card focused on compact layout, easy interaction, and flex
 
 | Version | Changes |
 |---------|---------|
+| 3.0.20 | Increased the default target temperature font size to better match the previous fork default, documented per-mode color CSS variables including `rgba(...)` support, and removed a stale generated `dist/components/sensors.d.ts` declaration. |
 | 3.0.19 | Added `header.toggles` support for multiple header toggle switches, added `entities` as the preferred key for extra entity rows, and render toggle-capable extra entities as switches. Existing `header.toggle` and `sensors` configs continue to work. |
 | 3.0.18 | Added `swing_horizontal` and `swing_vertical` control mode support for HA-standard climate entities (e.g. Daikin units). |
 | 3.0.17 | Added `current_temperature_entity` option to override the entity used for current temperature display. |
