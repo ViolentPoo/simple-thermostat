@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.22";
+var version = "3.0.23";
 
 /**
  * @license
@@ -1015,7 +1015,7 @@ function toggleEntity(hass, entityId, checked) {
 // Preset mode can be  one of: none, eco, away, boost, comfort, home, sleep, activity
 // See https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/climate/const.py#L36-L57
 function renderInfoItem({ hide = false, hass, state, details, localize, openEntityPopover, }) {
-    var _a, _b;
+    var _a, _b, _c;
     if (hide || typeof state === 'undefined')
         return;
     const { type, heading, icon, unit, decimals } = details;
@@ -1079,14 +1079,15 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
     if (heading === false) {
         return valueCell;
     }
+    const tooltip = heading || ((_c = state === null || state === void 0 ? void 0 : state.attributes) === null || _c === void 0 ? void 0 : _c.friendly_name) || (state === null || state === void 0 ? void 0 : state.entity_id);
     const headingResult = icon
-        ? b ` <ha-icon icon="${icon}"></ha-icon> `
-        : b ` ${heading}: `;
+        ? b `<ha-icon icon="${icon}" title=${tooltip}></ha-icon>`
+        : b `${heading}:`;
     if (typeof state === 'object') {
         const [domain] = state.entity_id.split('.');
         if (TOGGLE_DOMAINS.includes(domain) && icon) {
             return b `
-        <div class="entity-heading entity-heading--toggle">
+        <div class="entity-heading entity-heading--toggle" title=${tooltip}>
           ${headingResult}
           ${valueCell}
         </div>
@@ -1094,7 +1095,7 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
         }
     }
     return b `
-    <div class="entity-heading">${headingResult}</div>
+    <div class="entity-heading" title=${tooltip}>${headingResult}</div>
     ${valueCell}
   `;
 }
