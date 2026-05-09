@@ -114,15 +114,19 @@ export default function renderInfoItem({
     return valueCell
   }
 
-  const headingResult = icon
-    ? html` <ha-icon icon="${icon}"></ha-icon> `
-    : html` ${heading}: `
+  const tooltip = heading || state?.attributes?.friendly_name || state?.entity_id
+
+const tooltip = heading || state?.attributes?.friendly_name || state?.entity_id
+
+const headingResult = icon
+  ? html`<ha-icon icon="${icon}" title="${tooltip}"></ha-icon>`
+  : html`${heading}:`
 
   if (typeof state === 'object') {
     const [domain] = state.entity_id.split('.')
     if (TOGGLE_DOMAINS.includes(domain) && icon) {
       return html`
-        <div class="entity-heading entity-heading--toggle">
+        <div class="entity-heading entity-heading--toggle" title=${tooltip}>
           ${headingResult}
           ${valueCell}
         </div>
@@ -131,7 +135,7 @@ export default function renderInfoItem({
   }
 
   return html`
-    <div class="entity-heading">${headingResult}</div>
+    <div class="entity-heading" title=${tooltip}>${headingResult}</div>
     ${valueCell}
   `
 }
