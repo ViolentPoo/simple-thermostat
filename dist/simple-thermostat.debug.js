@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.25";
+var version = "3.0.26";
 
 /**
  * @license
@@ -1045,19 +1045,25 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
                 (_b = (_a = state.attributes) === null || _a === void 0 ? void 0 : _a.device_class) !== null && _b !== void 0 ? _b : '_',
                 '',
             ].join('.');
-            let value = localize(state.state, prefix);
+            let value = typeof hass.formatEntityState === 'function'
+                ? hass.formatEntityState(state)
+                : localize(state.state, prefix);
             if (typeof decimals === 'number') {
-                value = formatNumber(value, {
+                value = formatNumber(state.state, {
                     decimals,
                     locale: hass.locale,
                 });
             }
+            const formattedWithHass = typeof hass.formatEntityState === 'function' &&
+                typeof decimals !== 'number';
             valueCell = b `
         <div
           class="entity-value clickable"
           @click="${() => openEntityPopover(state.entity_id)}"
         >
-          ${value} ${unit || state.attributes.unit_of_measurement}
+          ${value}${formattedWithHass
+                ? ''
+                : ` ${unit || state.attributes.unit_of_measurement}`}
         </div>
       `;
         }
