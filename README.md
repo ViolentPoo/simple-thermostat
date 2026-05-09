@@ -12,6 +12,7 @@ A Lovelace thermostat card focused on compact layout, easy interaction, and flex
 
 | Version | Changes |
 |---------|---------|
+| 3.0.23 | Added hover tooltips for icon-only extra entity headings so the entity name is visible without labels. |
 | 3.0.22 | Fixed icon-only extra entity toggles so the switch aligns beside the icon instead of appearing in a separate value column. |
 | 3.0.21 | Scoped switch padding so extra entity toggles no longer add excessive row spacing while header toggles keep their existing spacing. |
 | 3.0.20 | Increased the default target temperature font size to better match the previous fork default, documented per-mode color CSS variables including `rgba(...)` support, and removed a stale generated `dist/components/sensors.d.ts` declaration. |
