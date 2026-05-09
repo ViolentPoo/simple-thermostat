@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.21";
+var version = "3.0.22";
 
 /**
  * @license
@@ -175,6 +175,11 @@ ha-card.no-header {
   align-items: center;
   justify-content: flex-end;
 }
+
+.entity-heading--toggle {
+  gap: var(--st-spacing, var(--st-default-spacing));
+}
+
 .entities:empty {
   display: none;
 }
@@ -337,7 +342,8 @@ header {
   padding: 16px 6px;
 }
 
-.entities .entity-value ha-switch {
+.entities .entity-value ha-switch,
+.entities .entity-heading--toggle ha-switch {
   padding: 0 6px;
 }
 .side-by-side {
@@ -1076,6 +1082,17 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
     const headingResult = icon
         ? b ` <ha-icon icon="${icon}"></ha-icon> `
         : b ` ${heading}: `;
+    if (typeof state === 'object') {
+        const [domain] = state.entity_id.split('.');
+        if (TOGGLE_DOMAINS.includes(domain) && icon) {
+            return b `
+        <div class="entity-heading entity-heading--toggle">
+          ${headingResult}
+          ${valueCell}
+        </div>
+      `;
+        }
+    }
     return b `
     <div class="entity-heading">${headingResult}</div>
     ${valueCell}
