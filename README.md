@@ -46,6 +46,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.44 | Tightened header toggle switch spacing to better match entity row spacing. |
 | 3.0.43 | Tightened stacked header toggle spacing to better match entity rows. |
 | 3.0.42 | Fixed header toggle icons not rendering when configured. |
 | 3.0.41 | Added support for icons on header toggles. |
