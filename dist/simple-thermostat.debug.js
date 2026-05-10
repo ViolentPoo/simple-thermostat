@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.36";
+var version = "3.0.37";
 
 /**
  * @license
@@ -108,7 +108,7 @@ ha-card.no-header {
 
 .toggle-label {
   color: var(--st-toggle-label-color, var(--primary-text-color));
-  margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+  margin-right: var(--st-spacing, var(--st-default-spacing));
   font-size: 16px;
   font-size: var(
     --st-font-size-toggle-label,
@@ -185,6 +185,7 @@ header {
   align-items: center;
 
   padding: calc(var(--st-spacing, var(--st-default-spacing)) * 6)
+    calc(var(--st-spacing, var(--st-default-spacing)) * 2)
     calc(var(--st-spacing, var(--st-default-spacing)) * 4)
     calc(var(--st-spacing, var(--st-default-spacing)) * 4);
 }
