@@ -46,6 +46,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.37 | Adjusted header toggle alignment and tightened the spacing between toggle labels and switches. |
 | 3.0.36 | Added support for Home Assistant's `none` number format so dot decimals are preserved when selected. |
 | 3.0.35 | Fixed numeric fan modes being hidden when a fan control row has explicit configuration. |
 | 3.0.34 | Tightened spacing for multiple header toggles so they stack more compactly. |
