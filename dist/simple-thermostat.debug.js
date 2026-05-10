@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.40";
+var version = "3.0.41";
 
 /**
  * @license
@@ -871,17 +871,20 @@ function renderToggles(toggles, openEntityPopover, toggleEntityChanged) {
     return b `
     <div class="header__toggles">
       ${toggles.map((toggle) => {
-        var _a, _b;
+        var _a, _b, _c, _d;
         const entityId = (_a = toggle.entity) === null || _a === void 0 ? void 0 : _a.entity_id;
         return b `
           <div class="header__toggle">
             <span
               class="clickable toggle-label"
+              title=${toggle.label || ((_c = (_b = toggle.entity) === null || _b === void 0 ? void 0 : _b.attributes) === null || _c === void 0 ? void 0 : _c.friendly_name)}
               @click=${() => openEntityPopover(entityId)}
-              >${toggle.label}
+              >${toggle.icon
+            ? b `<ha-icon icon="${toggle.icon}"></ha-icon>`
+            : toggle.label}
             </span>
             <ha-switch
-              .checked=${((_b = toggle.entity) === null || _b === void 0 ? void 0 : _b.state) === 'on'}
+              .checked=${((_d = toggle.entity) === null || _d === void 0 ? void 0 : _d.state) === 'on'}
               @change=${(ev) => toggleEntityChanged(ev, entityId)}
             ></ha-switch>
           </div>
@@ -1283,7 +1286,7 @@ function parseToggle(config, hass) {
     else {
         label = (_a = config === null || config === void 0 ? void 0 : config.name) !== null && _a !== void 0 ? _a : '';
     }
-    return { entity, label };
+    return { entity, label, icon: config === null || config === void 0 ? void 0 : config.icon };
 }
 function parseToggles(config, hass) {
     const toggleConfigs = [

@@ -47,10 +47,12 @@ export interface HeaderData {
 export interface Toggle {
     entity: HAState;
     label: string;
+    icon?: string;
 }
 export type ToggleConfig = {
     entity: string;
     name?: string | boolean;
+    icon?: string;
 };
 export default function parseHeaderConfig(config: false | HeaderConfig, entity: any, hass: HASS): false | HeaderData;
 export {};
