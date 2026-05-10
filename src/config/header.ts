@@ -54,7 +54,7 @@ export interface HeaderData {
 export interface Toggle {
   entity: HAState
   label: string
-  icon?: string
+  icon: string | false
 }
 export type ToggleConfig = {
   entity: string
@@ -102,7 +102,7 @@ function parseToggle(config: ToggleConfig, hass): Toggle {
     label = (config?.name as string) ?? ''
   }
 
-  return { entity, label, icon: config?.icon }
+  return { entity, label, icon: config?.icon ?? false }
 }
 
 function parseToggles(config: HeaderConfig, hass): Array<Toggle> {
