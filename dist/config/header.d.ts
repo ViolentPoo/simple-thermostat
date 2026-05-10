@@ -47,7 +47,7 @@ export interface HeaderData {
 export interface Toggle {
     entity: HAState;
     label: string;
-    icon?: string;
+    icon: string | false;
 }
 export type ToggleConfig = {
     entity: string;
