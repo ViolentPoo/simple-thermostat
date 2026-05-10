@@ -182,6 +182,7 @@ header:
   toggle:
     entity: switch.fan
     name: Fan
+    icon: mdi:fan
 ```
 
 Use multiple header toggles:
@@ -192,8 +193,10 @@ header:
   toggles:
     - entity: switch.boost
       name: Boost
+      icon: mdi:rocket-launch
     - entity: switch.eco_mode
       name: Eco
+      icon: mdi:leaf
 ```
 
 Header options:
@@ -212,6 +215,7 @@ Toggle options:
 |--------|------|-------------|
 | `entity` | string | Entity to toggle. |
 | `name` | string or `true` | Toggle label. Use `true` for the entity friendly name. |
+| `icon` | string | Show an icon instead of the text label. |
 
 Fault options:
 
