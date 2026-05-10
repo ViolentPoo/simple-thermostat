@@ -82,8 +82,11 @@ function renderToggles(toggles, openEntityPopover, toggleEntityChanged) {
           <div class="header__toggle">
             <span
               class="clickable toggle-label"
+              title=${toggle.label || toggle.entity?.attributes?.friendly_name}
               @click=${() => openEntityPopover(entityId)}
-              >${toggle.label}
+              >${toggle.icon
+                ? html`<ha-icon icon="${toggle.icon}"></ha-icon>`
+                : toggle.label}
             </span>
             <ha-switch
               .checked=${toggle.entity?.state === 'on'}
