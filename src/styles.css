@@ -39,7 +39,7 @@ ha-card.no-header {
 
 .toggle-label {
   color: var(--st-toggle-label-color, var(--primary-text-color));
-  margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+  margin-right: var(--st-spacing, var(--st-default-spacing));
   font-size: var(
     --st-font-size-toggle-label,
     var(--ha-font-size-l, 16px)
@@ -111,6 +111,7 @@ header {
   align-items: center;
 
   padding: calc(var(--st-spacing, var(--st-default-spacing)) * 6)
+    calc(var(--st-spacing, var(--st-default-spacing)) * 2)
     calc(var(--st-spacing, var(--st-default-spacing)) * 4)
     calc(var(--st-spacing, var(--st-default-spacing)) * 4);
 }
