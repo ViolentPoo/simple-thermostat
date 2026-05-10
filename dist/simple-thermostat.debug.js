@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.39";
+var version = "3.0.40";
 
 /**
  * @license
@@ -164,12 +164,12 @@ ha-card.no-header {
 .entity-value {
   display: flex;
   align-items: center;
-  padding-bottom: 4px;
+  padding-bottom: 0;
 }
 .entity-heading {
   font-weight: 300;
   padding-right: 8px;
-  padding-bottom: 4px;
+  padding-bottom: 0;
   white-space: nowrap;
   display: flex;
   align-items: center;
