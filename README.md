@@ -46,6 +46,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.39 | Corrected entity row and header toggle spacing. |
 | 3.0.38 | Balanced vertical spacing between entity rows and stacked header toggles. |
 | 3.0.37 | Adjusted header toggle alignment and tightened the spacing between toggle labels and switches. |
 | 3.0.36 | Added support for Home Assistant's `none` number format so dot decimals are preserved when selected. |
