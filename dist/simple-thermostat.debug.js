@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.37";
+var version = "3.0.38";
 
 /**
  * @license
@@ -135,7 +135,7 @@ ha-card.no-header {
 
 .entities {
   display: grid;
-  grid-gap: var(--st-spacing, var(--st-default-spacing));
+  grid-gap: calc(var(--st-spacing, var(--st-default-spacing)) / 2);
   font-size: 16px;
   font-size: var(
     --st-font-size-entities,
@@ -211,7 +211,7 @@ header {
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
-  gap: 0;
+  gap: calc(var(--st-spacing, var(--st-default-spacing)) / 2);
   margin-left: auto;
 }
 
