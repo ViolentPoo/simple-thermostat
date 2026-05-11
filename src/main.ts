@@ -107,7 +107,14 @@ function getModeList(
   attributes: LooseObject,
   specification: Partial<ModeControlObject> = {}
 ) {
-  return attributes[getModeOptionsKey(type)]
+  let modeOptions = attributes[getModeOptionsKey(type)]
+  if (type === MODES.DIRECTION && attributes.direction) {
+    modeOptions = ['forward', 'reverse']
+  } else if (type === MODES.OSCILLATING && typeof attributes.oscillating === 'boolean') {
+    modeOptions = [false, true]
+  }
+
+  return modeOptions
     .filter((modeOption) => shouldShowModeControl(type, modeOption, specification))
     .map((modeOption) => {
       const values =
@@ -298,7 +305,9 @@ export default class SimpleThermostat extends LitElement {
       }
       const modeKey = MODES_WITH_POSITIONS.includes(values.type as MODES)
         ? values.type
-        : `${values.type}_mode`
+        : values.type === MODES.DIRECTION || values.type === MODES.OSCILLATING
+          ? values.type
+          : `${values.type}_mode`
       const mode = attributes[modeKey]
       return { ...values, mode } as ControlMode
     })
@@ -566,7 +575,7 @@ export default class SimpleThermostat extends LitElement {
       if (type === MODES.DIRECTION || type === MODES.OSCILLATING) {
         this._hass.callService('fan', `set_${type}`, {
           entity_id: this.config.entity,
-          [type]: mode,
+          [type]: type === MODES.OSCILLATING ? mode === 'true' : mode,
         })
       } else if (type === MODES.MODE) {
         this._hass.callService('humidifier', 'set_mode', {
