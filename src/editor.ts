@@ -23,7 +23,10 @@ const OptionsStepSize = [0.5, 1]
 
 const OptionsStepLayout = ['column', 'row']
 
-const includeDomains = ['climate', 'fan', 'humidifier']
+const SUPPORTED_ENTITY_DOMAINS = ['climate', 'fan', 'humidifier']
+
+const supportedEntityFilter = (stateObj) =>
+  SUPPORTED_ENTITY_DOMAINS.includes(stateObj.entity_id.split('.')[0])
 
 const GithubReadMe =
   'https://github.com/Wheemer/simple-thermostat/blob/master/README.md'
@@ -73,12 +76,12 @@ export default class SimpleThermostatEditor extends LitElement {
               .hass=${this.hass}
               .value="${this.config.entity}"
               .configValue=${'entity'}
-              .includeDomains=${includeDomains}
+              .entityFilter=${supportedEntityFilter}
               @change="${this.valueChanged}"
               allow-custom-entity
             ></ha-entity-picker>
             <ha-entity-picker
-              label="Current temperature entity (optional)"
+              label="Current value entity (optional)"
               .hass=${this.hass}
               .value="${this.config.current_temperature_entity}"
               .configValue=${'current_temperature_entity'}
