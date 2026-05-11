@@ -31,7 +31,13 @@ export const MODE_ICONS = {
   heat_cool: 'hass:autorenew',
   heat: 'hass:fire',
   off: 'hass:power',
-}
+  forward: 'mdi:arrow-right',
+  reverse: 'mdi:arrow-left',
+  true: 'mdi:fan',
+  false: 'mdi:fan-off',
+  normal: 'mdi:water-percent',
+  away: 'mdi:home-export-outline',
+  boost: 'mdi:weather-windy',
 
 type Icon = string | false | LooseObject
 type Name = string | false
