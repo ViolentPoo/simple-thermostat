@@ -86,11 +86,13 @@ function getConfiguredEntities(config: CardConfig) {
 
 function shouldShowModeControl(
   type: string,
-  modeOption: string,
+  modeOption: string | boolean,
   config: Partial<ModeControlObject>
 ) {
-  if (typeof config[modeOption] === 'object') {
-    const obj = config[modeOption] as ModeValue
+  const modeKey = String(modeOption)
+
+  if (typeof config[modeKey] === 'object') {
+    const obj = config[modeKey] as ModeValue
     return obj.include !== false
   }
 
@@ -99,7 +101,7 @@ function shouldShowModeControl(
   )
   const hideUnlistedModes = type === MODES.PRESET
 
-  return config?.[modeOption] ?? !(hideUnlistedModes && hasExplicitConfig)
+  return config?.[modeKey] ?? !(hideUnlistedModes && hasExplicitConfig)
 }
 
 function getModeList(
@@ -114,17 +116,22 @@ function getModeList(
     modeOptions = [false, true]
   }
 
+  if (!Array.isArray(modeOptions)) {
+    return []
+  }
+
   return modeOptions
     .filter((modeOption) => shouldShowModeControl(type, modeOption, specification))
     .map((modeOption) => {
+      const modeKey = String(modeOption)
       const values =
-        typeof specification[modeOption] === 'object'
-          ? specification[modeOption]
+        typeof specification[modeKey] === 'object'
+          ? specification[modeKey]
           : ({} as {})
       return {
         icon: MODE_ICONS[modeOption],
-        value: modeOption,
-        name: modeOption,
+        value: modeKey,
+        name: modeKey,
         ...values,
       }
     })
@@ -252,7 +259,8 @@ export default class SimpleThermostat extends LitElement {
     }
 
     const supportedModeType = (type: string) =>
-      MODE_TYPES.includes(type) && attributes[getModeOptionsKey(type)]
+      MODE_TYPES.includes(type) &&
+      typeof attributes[getModeOptionsKey(type)] !== 'undefined'
     const buildBasicModes = (items: any) => {
       return items.filter(supportedModeType).map((type: string) => ({
         type,
@@ -575,7 +583,7 @@ export default class SimpleThermostat extends LitElement {
       if (type === MODES.DIRECTION || type === MODES.OSCILLATING) {
         this._hass.callService('fan', `set_${type}`, {
           entity_id: this.config.entity,
-          [type]: type === MODES.OSCILLATING ? mode === true : mode,
+          [type]: type === MODES.OSCILLATING ? mode === 'true' : mode,
         })
       } else if (type === MODES.MODE) {
         this._hass.callService('humidifier', 'set_mode', {
