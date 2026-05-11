@@ -28,6 +28,8 @@ export default function renderModeType({
     localizePrefix = ''
   } else if (type === 'swing_horizontal' || type === 'swing_vertical') {
     localizePrefix = `state_attributes.climate.${type}_mode.`
+  } else if (type === 'direction' || type === 'oscillating' || type === 'mode') {
+    localizePrefix = ''
   }
 
   const maybeRenderName = (name: string | false) => {
@@ -51,6 +53,12 @@ export default function renderModeType({
     defaultTitle = localize('ui.card.climate.swing_horizontal_mode') || 'Swing Horizontal'
   } else if (type === 'swing_vertical') {
     defaultTitle = localize('ui.card.climate.swing_vertical_mode') || 'Swing Vertical'
+  } else if (type === 'direction') {
+    defaultTitle = 'Direction'
+  } else if (type === 'oscillating') {
+    defaultTitle = 'Oscillating'
+  } else if (type === 'mode') {
+    defaultTitle = 'Mode'
   } else {
     defaultTitle = localize(`ui.card.climate.${str}`)
   }
