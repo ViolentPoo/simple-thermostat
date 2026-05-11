@@ -219,7 +219,11 @@ export default class SimpleThermostat extends LitElement {
 
     const attributes = entity.attributes
 
-    let values = parseSetpoints(this.config?.setpoints ?? null, attributes)
+    let values = parseSetpoints(
+      this.config?.setpoints ?? null,
+      attributes,
+      entityDomain
+    )
 
     // If we are updating the values, and they are now equal
     // we can safely assume we've been able to update the set points
