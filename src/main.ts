@@ -56,6 +56,7 @@ const DEFAULT_CONTROL = {
   climate: [MODES.HVAC, MODES.PRESET],
   fan: [MODES.PRESET, MODES.DIRECTION, MODES.OSCILLATING],
   humidifier: [MODES.MODE],
+}
 
 const ICONS = {
   UP: 'hass:chevron-up',
@@ -576,11 +577,6 @@ export default class SimpleThermostat extends LitElement {
         this._hass.callService('climate', `set_${type}`, {
           entity_id: this.config.entity,
           [`${type}`]: mode,
-        })
-      } else {
-        this._hass.callService('climate', `set_${type}_mode`, {
-          entity_id: this.config.entity,
-          [`${type}_mode`]: mode,
         })
       } else {
         this._hass.callService('climate', `set_${type}_mode`, {
