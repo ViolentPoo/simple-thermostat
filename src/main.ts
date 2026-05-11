@@ -606,6 +606,12 @@ export default class SimpleThermostat extends LitElement {
     if (['boolean', 'string'].includes(typeof this.config.unit)) {
       return this.config?.unit
     }
+
+    const entityDomain = this.config.entity.split('.')[0]
+    if (entityDomain === 'fan' || entityDomain === 'humidifier') {
+      return '%'
+    }
+
     return this._hass.config?.unit_system?.temperature ?? false
   }
 }
