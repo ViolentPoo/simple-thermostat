@@ -57,6 +57,7 @@ type ModeControl = {
 
 interface CardConfig {
   entity?: string
+  current_value_entity?: string
   current_temperature_entity?: string
   header: false | HeaderConfig
   control?: false | ModeControl | string[]
