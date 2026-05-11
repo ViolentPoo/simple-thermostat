@@ -23,7 +23,7 @@ const OptionsStepSize = [0.5, 1]
 
 const OptionsStepLayout = ['column', 'row']
 
-const includeDomains = ['climate']
+const includeDomains = ['climate', 'fan', 'humidifier']
 
 const GithubReadMe =
   'https://github.com/Wheemer/simple-thermostat/blob/master/README.md'
