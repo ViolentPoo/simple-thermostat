@@ -38,6 +38,7 @@ export const MODE_ICONS = {
   normal: 'mdi:water-percent',
   away: 'mdi:home-export-outline',
   boost: 'mdi:weather-windy',
+}
 
 type Icon = string | false | LooseObject
 type Name = string | false
