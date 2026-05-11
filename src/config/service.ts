@@ -6,11 +6,20 @@ export interface Service {
   }
 }
 
-export default function parseServie(config: false | Service): Service {
+const DEFAULT_SERVICES = {
+  climate: 'set_temperature',
+  fan: 'set_percentage',
+  humidifier: 'set_humidity',
+}
+
+export default function parseServie(
+  config: false | Service,
+  entityDomain = 'climate'
+): Service {
   if (!config) {
     return {
-      domain: 'climate',
-      service: 'set_temperature',
+      domain: entityDomain,
+      service: DEFAULT_SERVICES[entityDomain] ?? 'set_temperature',
     }
   }
   return config
