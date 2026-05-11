@@ -12,6 +12,9 @@ export enum MODES {
   SWING_VERTICAL = 'swing_vertical',
   VANE_HORIZONTAL = 'vane_horizontal',
   VANE_VERTICAL = 'vane_vertical',
+  DIRECTION = 'direction',
+  OSCILLATING = 'oscillating',
+  MODE = 'mode',
 }
 
 export type ModeValue = {
@@ -47,6 +50,9 @@ type ModeControl = {
   swing_vertical: ModeControlValue
   vane_horizontal: ModeControlValue
   vane_vertical: ModeControlValue
+  direction: ModeControlValue
+  oscillating: ModeControlValue
+  mode: ModeControlValue
 }
 
 interface CardConfig {
