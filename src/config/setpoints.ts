@@ -9,7 +9,8 @@ export type Setpoints = Record<string, Setpoint>
 
 export default function parseSetpoints(
   setpoints: Setpoints | false,
-  attributes: any
+  attributes: any,
+  entityDomain = 'climate'
 ) {
   if (setpoints === false) {
     return {}
