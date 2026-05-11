@@ -26,7 +26,7 @@ or:
    https://github.com/Wheemer/simple-thermostat
    ```
 
-4. Choose category **Dashboard**.
+4. Choose type **Dashboard**.
 5. Install **simple-thermostat** from HACS.
 6. Refresh Home Assistant. If the old card is still loading, clear your browser cache.
 
