@@ -27,6 +27,19 @@ export default function parseSetpoints(
       }
     }, {})
   }
+
+  if (entityDomain === 'fan') {
+    return {
+      percentage: attributes.percentage,
+    }
+  }
+
+  if (entityDomain === 'humidifier') {
+    return {
+      humidity: attributes.humidity,
+    }
+  }
+
   const entityType = getEntityType(attributes)
   if (entityType === DUAL) {
     return {
