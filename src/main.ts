@@ -405,9 +405,22 @@ export default class SimpleThermostat extends LitElement {
       attributes: {
         min_temp: minTemp = null,
         max_temp: maxTemp = null,
+        min_humidity: minHumidity = null,
+        max_humidity: maxHumidity = null,
         hvac_action: action,
       },
     } = entity
+
+    const minValue = entityDomain === 'fan'
+      ? 0
+      : entityDomain === 'humidifier'
+        ? minHumidity
+        : minTemp
+    const maxValue = entityDomain === 'fan'
+      ? 100
+      : entityDomain === 'humidifier'
+        ? maxHumidity
+        : maxTemp
 
     const unit = this.getUnit()
 
@@ -462,7 +475,7 @@ export default class SimpleThermostat extends LitElement {
             return html`
               <div class="current-wrapper ${stepLayout}">
                 <ha-icon-button
-                  ?disabled=${maxTemp !== null && value >= maxTemp}
+                  ?disabled=${maxValue !== null && value >= maxValue}
                   class="thermostat-trigger"
                   icon=${row ? ICONS.PLUS : ICONS.UP}
                   @click="${() => this.setTemperature(this.stepSize, field)}"
@@ -489,7 +502,7 @@ export default class SimpleThermostat extends LitElement {
                     : nothing}
                 </h3>
                 <ha-icon-button
-                  ?disabled=${minTemp !== null && value <= minTemp}
+                  ?disabled=${minValue !== null && value <= minValue}
                   class="thermostat-trigger"
                   icon=${row ? ICONS.MINUS : ICONS.DOWN}
                   @click="${() => this.setTemperature(-this.stepSize, field)}"
