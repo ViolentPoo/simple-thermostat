@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.44";
+var version = "3.0.45";
 
 /**
  * @license
@@ -381,7 +381,7 @@ function setValue(obj, path, value) {
 const OptionsDecimals = [0, 1];
 const OptionsStepSize = [0.5, 1];
 const OptionsStepLayout = ['column', 'row'];
-const includeDomains = ['climate'];
+const includeDomains = ['climate', 'fan', 'humidifier'];
 const GithubReadMe = 'https://github.com/Wheemer/simple-thermostat/blob/master/README.md';
 const stub = {
     header: {},
@@ -1186,6 +1186,9 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
     else if (type === 'swing_horizontal' || type === 'swing_vertical') {
         localizePrefix = `state_attributes.climate.${type}_mode.`;
     }
+    else if (type === 'direction' || type === 'oscillating' || type === 'mode') {
+        localizePrefix = '';
+    }
     const maybeRenderName = (name) => {
         if (name === false)
             return null;
@@ -1213,6 +1216,15 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
     }
     else if (type === 'swing_vertical') {
         defaultTitle = localize('ui.card.climate.swing_vertical_mode') || 'Swing Vertical';
+    }
+    else if (type === 'direction') {
+        defaultTitle = 'Direction';
+    }
+    else if (type === 'oscillating') {
+        defaultTitle = 'Oscillating';
+    }
+    else if (type === 'mode') {
+        defaultTitle = 'Mode';
     }
     else {
         defaultTitle = localize(`ui.card.climate.${str}`);
@@ -1250,6 +1262,13 @@ const MODE_ICONS = {
     heat_cool: 'hass:autorenew',
     heat: 'hass:fire',
     off: 'hass:power',
+    forward: 'mdi:arrow-right',
+    reverse: 'mdi:arrow-left',
+    true: 'mdi:fan',
+    false: 'mdi:fan-off',
+    normal: 'mdi:water-percent',
+    away: 'mdi:home-export-outline',
+    boost: 'mdi:weather-windy',
 };
 function parseHeaderConfig(config, entity, hass) {
     if (config === false)
@@ -1316,7 +1335,7 @@ function getEntityType(attributes) {
 }
 
 const DUAL = 'dual';
-function parseSetpoints(setpoints, attributes) {
+function parseSetpoints(setpoints, attributes, entityDomain = 'climate') {
     if (setpoints === false) {
         return {};
     }
@@ -1328,6 +1347,16 @@ function parseSetpoints(setpoints, attributes) {
                 return result;
             return Object.assign(Object.assign({}, result), { [name]: attributes === null || attributes === void 0 ? void 0 : attributes[name] });
         }, {});
+    }
+    if (entityDomain === 'fan') {
+        return {
+            percentage: attributes.percentage,
+        };
+    }
+    if (entityDomain === 'humidifier') {
+        return {
+            humidity: attributes.humidity,
+        };
     }
     const entityType = getEntityType(attributes);
     if (entityType === DUAL) {
@@ -1341,11 +1370,17 @@ function parseSetpoints(setpoints, attributes) {
     };
 }
 
-function parseServie(config) {
+const DEFAULT_SERVICES = {
+    climate: 'set_temperature',
+    fan: 'set_percentage',
+    humidifier: 'set_humidity',
+};
+function parseServie(config, entityDomain = 'climate') {
+    var _a;
     if (!config) {
         return {
-            domain: 'climate',
-            service: 'set_temperature',
+            domain: entityDomain,
+            service: (_a = DEFAULT_SERVICES[entityDomain]) !== null && _a !== void 0 ? _a : 'set_temperature',
         };
     }
     return config;
@@ -1361,6 +1396,9 @@ var MODES;
     MODES["SWING_VERTICAL"] = "swing_vertical";
     MODES["VANE_HORIZONTAL"] = "vane_horizontal";
     MODES["VANE_VERTICAL"] = "vane_vertical";
+    MODES["DIRECTION"] = "direction";
+    MODES["OSCILLATING"] = "oscillating";
+    MODES["MODE"] = "mode";
 })(MODES || (MODES = {}));
 
 const DEBOUNCE_TIMEOUT = 500;
@@ -1369,11 +1407,21 @@ const DECIMALS = 1;
 const MODE_TYPES = Object.values(MODES);
 const MODES_WITH_POSITIONS = [MODES.VANE_HORIZONTAL, MODES.VANE_VERTICAL];
 function getModeOptionsKey(type) {
+    if (type === MODES.DIRECTION)
+        return 'direction';
+    if (type === MODES.OSCILLATING)
+        return 'oscillating';
+    if (type === MODES.MODE)
+        return 'available_modes';
     return MODES_WITH_POSITIONS.includes(type)
         ? `${type}_positions`
         : `${type}_modes`;
 }
-const DEFAULT_CONTROL = [MODES.HVAC, MODES.PRESET];
+const DEFAULT_CONTROL = {
+    climate: [MODES.HVAC, MODES.PRESET],
+    fan: [MODES.PRESET, MODES.DIRECTION, MODES.OSCILLATING],
+    humidifier: [MODES.MODE],
+};
 const ICONS = {
     UP: 'hass:chevron-up',
     DOWN: 'hass:chevron-down',
@@ -1390,22 +1438,35 @@ function getConfiguredEntities(config) {
 }
 function shouldShowModeControl(type, modeOption, config) {
     var _a;
-    if (typeof config[modeOption] === 'object') {
-        const obj = config[modeOption];
+    const modeKey = String(modeOption);
+    if (typeof config[modeKey] === 'object') {
+        const obj = config[modeKey];
         return obj.include !== false;
     }
     const hasExplicitConfig = Object.keys(config).some((key) => !key.startsWith('_'));
     const hideUnlistedModes = type === MODES.PRESET;
-    return (_a = config === null || config === void 0 ? void 0 : config[modeOption]) !== null && _a !== void 0 ? _a : !(hideUnlistedModes && hasExplicitConfig);
+    return (_a = config === null || config === void 0 ? void 0 : config[modeKey]) !== null && _a !== void 0 ? _a : !(hideUnlistedModes && hasExplicitConfig);
 }
 function getModeList(type, attributes, specification = {}) {
-    return attributes[getModeOptionsKey(type)]
+    let modeOptions = attributes[getModeOptionsKey(type)];
+    if (type === MODES.DIRECTION && attributes.direction) {
+        modeOptions = ['forward', 'reverse'];
+    }
+    else if (type === MODES.OSCILLATING &&
+        typeof attributes.oscillating === 'boolean') {
+        modeOptions = [false, true];
+    }
+    if (!Array.isArray(modeOptions)) {
+        return [];
+    }
+    return modeOptions
         .filter((modeOption) => shouldShowModeControl(type, modeOption, specification))
         .map((modeOption) => {
-        const values = typeof specification[modeOption] === 'object'
-            ? specification[modeOption]
+        const modeKey = String(modeOption);
+        const values = typeof specification[modeKey] === 'object'
+            ? specification[modeKey]
             : {};
-        return Object.assign({ icon: MODE_ICONS[modeOption], value: modeOption, name: modeOption }, values);
+        return Object.assign({ icon: MODE_ICONS[modeKey], value: modeKey, name: modeKey }, values);
     });
 }
 class SimpleThermostat extends i$1 {
@@ -1440,7 +1501,19 @@ class SimpleThermostat extends i$1 {
         };
         this.setMode = (type, mode) => {
             if (type && mode) {
-                if (MODES_WITH_POSITIONS.includes(type)) {
+                if (type === MODES.DIRECTION || type === MODES.OSCILLATING) {
+                    this._hass.callService('fan', `set_${type}`, {
+                        entity_id: this.config.entity,
+                        [type]: type === MODES.OSCILLATING ? mode === 'true' : mode,
+                    });
+                }
+                else if (type === MODES.MODE) {
+                    this._hass.callService('humidifier', 'set_mode', {
+                        entity_id: this.config.entity,
+                        mode,
+                    });
+                }
+                else if (MODES_WITH_POSITIONS.includes(type)) {
                     this._hass.callService('climate', `set_${type}`, {
                         entity_id: this.config.entity,
                         [`${type}`]: mode,
@@ -1488,7 +1561,7 @@ class SimpleThermostat extends i$1 {
         }
     }
     set hass(hass) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f, _g;
         if (!this.config.entity) {
             return;
         }
@@ -1503,10 +1576,11 @@ class SimpleThermostat extends i$1 {
         if (this.entity !== entity) {
             this.entity = entity;
         }
+        const entityDomain = this.config.entity.split('.')[0];
         this.header = parseHeaderConfig(this.config.header, entity, hass);
-        this.service = parseServie((_b = (_a = this.config) === null || _a === void 0 ? void 0 : _a.service) !== null && _b !== void 0 ? _b : false);
+        this.service = parseServie((_b = (_a = this.config) === null || _a === void 0 ? void 0 : _a.service) !== null && _b !== void 0 ? _b : false, entityDomain);
         const attributes = entity.attributes;
-        let values = parseSetpoints((_d = (_c = this.config) === null || _c === void 0 ? void 0 : _c.setpoints) !== null && _d !== void 0 ? _d : null, attributes);
+        let values = parseSetpoints((_d = (_c = this.config) === null || _c === void 0 ? void 0 : _c.setpoints) !== null && _d !== void 0 ? _d : null, attributes, entityDomain);
         // If we are updating the values, and they are now equal
         // we can safely assume we've been able to update the set points
         // in HA and remove the updating flag
@@ -1518,7 +1592,8 @@ class SimpleThermostat extends i$1 {
         else if (!this._updatingValues) {
             this._values = values;
         }
-        const supportedModeType = (type) => MODE_TYPES.includes(type) && attributes[getModeOptionsKey(type)];
+        const supportedModeType = (type) => MODE_TYPES.includes(type) &&
+            typeof attributes[getModeOptionsKey(type)] !== 'undefined';
         const buildBasicModes = (items) => {
             return items.filter(supportedModeType).map((type) => ({
                 type,
@@ -1550,11 +1625,11 @@ class SimpleThermostat extends i$1 {
                 });
             }
             else {
-                controlModes = buildBasicModes(DEFAULT_CONTROL);
+                controlModes = buildBasicModes((_e = DEFAULT_CONTROL[entityDomain]) !== null && _e !== void 0 ? _e : DEFAULT_CONTROL.climate);
             }
         }
         else {
-            controlModes = buildBasicModes(DEFAULT_CONTROL);
+            controlModes = buildBasicModes((_f = DEFAULT_CONTROL[entityDomain]) !== null && _f !== void 0 ? _f : DEFAULT_CONTROL.climate);
         }
         // Decorate mode types with active value and set to this.modes
         this.modes = controlModes.map((values) => {
@@ -1569,7 +1644,9 @@ class SimpleThermostat extends i$1 {
             }
             const modeKey = MODES_WITH_POSITIONS.includes(values.type)
                 ? values.type
-                : `${values.type}_mode`;
+                : values.type === MODES.DIRECTION || values.type === MODES.OSCILLATING
+                    ? values.type
+                    : `${values.type}_mode`;
             const mode = attributes[modeKey];
             return Object.assign(Object.assign({}, values), { mode });
         });
@@ -1613,7 +1690,7 @@ class SimpleThermostat extends i$1 {
                 });
             }
             if (!ids.includes('temperature')) {
-                const tempEntityId = (_e = this.config.current_temperature_entity) !== null && _e !== void 0 ? _e : this.config.entity;
+                const tempEntityId = (_g = this.config.current_temperature_entity) !== null && _g !== void 0 ? _g : this.config.entity;
                 const tempContext = this.config.current_temperature_entity
                     ? this._hass.states[this.config.current_temperature_entity]
                     : this.entity;
@@ -1668,7 +1745,17 @@ class SimpleThermostat extends i$1 {
         <hui-warning> Entity not available: ${config.entity} </hui-warning>
       `;
         }
-        const { attributes: { min_temp: minTemp = null, max_temp: maxTemp = null, hvac_action: action, }, } = entity;
+        const { attributes: { min_temp: minTemp = null, max_temp: maxTemp = null, min_humidity: minHumidity = null, max_humidity: maxHumidity = null, hvac_action: action, }, } = entity;
+        const minValue = entityDomain === 'fan'
+            ? 0
+            : entityDomain === 'humidifier'
+                ? minHumidity
+                : minTemp;
+        const maxValue = entityDomain === 'fan'
+            ? 100
+            : entityDomain === 'humidifier'
+                ? maxHumidity
+                : maxTemp;
         const unit = this.getUnit();
         const stepLayout = (_c = (_b = (_a = this.config) === null || _a === void 0 ? void 0 : _a.layout) === null || _b === void 0 ? void 0 : _b.step) !== null && _c !== void 0 ? _c : 'column';
         const row = stepLayout === 'row';
@@ -1713,7 +1800,7 @@ class SimpleThermostat extends i$1 {
             return b `
               <div class="current-wrapper ${stepLayout}">
                 <ha-icon-button
-                  ?disabled=${maxTemp !== null && value >= maxTemp}
+                  ?disabled=${maxValue !== null && value >= maxValue}
                   class="thermostat-trigger"
                   icon=${row ? ICONS.PLUS : ICONS.UP}
                   @click="${() => this.setTemperature(this.stepSize, field)}"
@@ -1735,7 +1822,7 @@ class SimpleThermostat extends i$1 {
                 : A}
                 </h3>
                 <ha-icon-button
-                  ?disabled=${minTemp !== null && value <= minTemp}
+                  ?disabled=${minValue !== null && value <= minValue}
                   class="thermostat-trigger"
                   icon=${row ? ICONS.MINUS : ICONS.DOWN}
                   @click="${() => this.setTemperature(-this.stepSize, field)}"
@@ -1777,6 +1864,10 @@ class SimpleThermostat extends i$1 {
         var _a, _b, _c, _d;
         if (['boolean', 'string'].includes(typeof this.config.unit)) {
             return (_a = this.config) === null || _a === void 0 ? void 0 : _a.unit;
+        }
+        const entityDomain = this.config.entity.split('.')[0];
+        if (entityDomain === 'fan' || entityDomain === 'humidifier') {
+            return '%';
         }
         return (_d = (_c = (_b = this._hass.config) === null || _b === void 0 ? void 0 : _b.unit_system) === null || _c === void 0 ? void 0 : _c.temperature) !== null && _d !== void 0 ? _d : false;
     }

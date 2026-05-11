@@ -27,6 +27,13 @@ export declare const MODE_ICONS: {
     heat_cool: string;
     heat: string;
     off: string;
+    forward: string;
+    reverse: string;
+    true: string;
+    false: string;
+    normal: string;
+    away: string;
+    boost: string;
 };
 type Icon = string | false | LooseObject;
 type Name = string | false;

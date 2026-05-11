@@ -5,4 +5,4 @@ export interface Service {
         [key: string]: string;
     };
 }
-export default function parseServie(config: false | Service): Service;
+export default function parseServie(config: false | Service, entityDomain?: string): Service;
