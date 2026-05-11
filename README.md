@@ -4,7 +4,7 @@
 
 An AI-assisted, community-maintained fork of [simple-thermostat](https://github.com/nervetattoo/simple-thermostat) by [@nervetattoo](https://github.com/nervetattoo), kept working with current Home Assistant releases.
 
-A compact Lovelace thermostat card for Home Assistant. It shows climate controls, setpoints, extra entities, header toggles, and mode controls in a small configurable layout.
+A compact Lovelace thermostat card for Home Assistant. It supports climate, fan, and humidifier/dehumidifier entities with setpoints, extra entities, header toggles, and mode controls in a small configurable layout.
 
 <img src="https://github.com/Wheemer/simple-thermostat/raw/master/examples.png" alt="Examples" width="620">
 
@@ -50,6 +50,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.45 | Added fan and humidifier/dehumidifier entity support with domain-specific targets, controls, and units. |
 | 3.0.44 | Tightened header toggle switch spacing to better match entity row spacing. |
 | 3.0.43 | Tightened stacked header toggle spacing to better match entity rows. |
 | 3.0.42 | Fixed header toggle icons not rendering when configured. |
@@ -133,11 +134,11 @@ control:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `entity` | string | Climate entity id. Required. |
+| `entity` | string | Climate, fan, humidifier, or dehumidifier entity id. Required. |
 | `current_temperature_entity` | string | Entity used for current temperature instead of the climate entity. |
-| `unit` | string or `false` | Override or hide the temperature unit. |
-| `decimals` | number | Decimal places for temperature display. |
-| `step_size` | number | Amount changed by the temperature buttons. Default `0.5`. |
+| `unit` | string or `false` | Override or hide the target unit. |
+| `decimals` | number | Decimal places for target display. |
+| `step_size` | number | Amount changed by the target buttons. Default `0.5`. |
 | `fallback` | string | Text shown when no valid setpoint exists. Default `N/A`. |
 | `header` | object or `false` | Header configuration. |
 | `hide` | object | Hide built-in state or temperature rows. |
@@ -146,7 +147,7 @@ control:
 | `entities` | array or `false` | Extra entity rows. Preferred key. |
 | `sensors` | array or `false` | Legacy alias for `entities`. |
 | `setpoints` | object or `false` | Manual setpoint configuration. Usually not needed. |
-| `service` | object | Override the service used to set temperature. |
+| `service` | object | Override the service used to set the target value. |
 
 ### Hide Built-In Rows
 
@@ -234,7 +235,7 @@ Fault options:
 
 ## Control
 
-By default, the card shows supported `hvac` and `preset` controls.
+By default, the card shows supported controls for the selected entity domain.
 
 Simple format:
 
@@ -272,6 +273,11 @@ Supported control types:
 - `swing_vertical`
 - `vane_horizontal`
 - `vane_vertical`
+- `direction`
+- `oscillating`
+- `mode`
+
+`direction` and `oscillating` are for fan entities. `mode` is for humidifier and dehumidifier entities.
 
 Per-mode options:
 
@@ -372,7 +378,7 @@ Version 3 entity options:
 
 ## Setpoints
 
-Setpoints are detected automatically. Override them only when needed.
+Setpoints are detected automatically. Climate entities use temperature setpoints, fan entities use percentage, and humidifier/dehumidifier entities use humidity. Override them only when needed.
 
 Single setpoint:
 
@@ -400,7 +406,7 @@ setpoints:
 
 ## Service Override
 
-Override the service used when setting temperature:
+Override the service used when setting the target value:
 
 ```yaml
 service:
