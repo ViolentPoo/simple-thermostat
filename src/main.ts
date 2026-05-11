@@ -575,7 +575,7 @@ export default class SimpleThermostat extends LitElement {
       if (type === MODES.DIRECTION || type === MODES.OSCILLATING) {
         this._hass.callService('fan', `set_${type}`, {
           entity_id: this.config.entity,
-          [type]: type === MODES.OSCILLATING ? mode === 'true' : mode,
+          [type]: type === MODES.OSCILLATING ? mode === true : mode,
         })
       } else if (type === MODES.MODE) {
         this._hass.callService('humidifier', 'set_mode', {
