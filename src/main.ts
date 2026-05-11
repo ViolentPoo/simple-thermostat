@@ -112,10 +112,12 @@ function getModeList(
   let modeOptions = attributes[getModeOptionsKey(type)]
   if (type === MODES.DIRECTION && attributes.direction) {
     modeOptions = ['forward', 'reverse']
-  } else if (type === MODES.OSCILLATING && typeof attributes.oscillating === 'boolean') {
+  } else if (
+    type === MODES.OSCILLATING &&
+    typeof attributes.oscillating === 'boolean'
+  ) {
     modeOptions = [false, true]
   }
-
   if (!Array.isArray(modeOptions)) {
     return []
   }
@@ -129,7 +131,7 @@ function getModeList(
           ? specification[modeKey]
           : ({} as {})
       return {
-        icon: MODE_ICONS[modeOption],
+        icon: MODE_ICONS[modeKey],
         value: modeKey,
         name: modeKey,
         ...values,
@@ -290,10 +292,14 @@ export default class SimpleThermostat extends LitElement {
             }
           })
       } else {
-        controlModes = buildBasicModes(DEFAULT_CONTROL[entityDomain] ?? DEFAULT_CONTROL.climate)
+        controlModes = buildBasicModes(
+          DEFAULT_CONTROL[entityDomain] ?? DEFAULT_CONTROL.climate
+        )
       }
     } else {
-      controlModes = buildBasicModes(DEFAULT_CONTROL[entityDomain] ?? DEFAULT_CONTROL.climate)
+      controlModes = buildBasicModes(
+        DEFAULT_CONTROL[entityDomain] ?? DEFAULT_CONTROL.climate
+      )
     }
 
     // Decorate mode types with active value and set to this.modes
