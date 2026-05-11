@@ -50,6 +50,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.46 | Added `current_value_entity` as the generic current value option, kept `current_temperature_entity` as a backwards-compatible alias, and fixed compatible entity filtering in the visual editor. |
 | 3.0.45 | Added fan and humidifier/dehumidifier entity support with domain-specific targets, controls, and units. |
 | 3.0.44 | Tightened header toggle switch spacing to better match entity row spacing. |
 | 3.0.43 | Tightened stacked header toggle spacing to better match entity rows. |
@@ -135,7 +136,8 @@ control:
 | Option | Type | Description |
 |--------|------|-------------|
 | `entity` | string | Climate, fan, humidifier, or dehumidifier entity id. Required. |
-| `current_temperature_entity` | string | Entity used for current temperature instead of the climate entity. |
+| `current_value_entity` | string | Entity used for the current displayed value instead of the main entity. |
+| `current_temperature_entity` | string | Backwards-compatible alias for `current_value_entity`. |
 | `unit` | string or `false` | Override or hide the target unit. |
 | `decimals` | number | Decimal places for target display. |
 | `step_size` | number | Amount changed by the target buttons. Default `0.5`. |
@@ -362,7 +364,7 @@ entities:
     show: false
 ```
 
-Built-in rows `state` and `temperature` are added automatically unless you define rows with those ids.
+Built-in rows `state` and `temperature` are added automatically unless you define rows with those ids. The `temperature` id is kept for backwards compatibility and represents the current displayed value.
 
 Version 3 entity options:
 
