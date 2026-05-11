@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.45";
+var version = "3.0.46";
 
 /**
  * @license
@@ -381,7 +381,8 @@ function setValue(obj, path, value) {
 const OptionsDecimals = [0, 1];
 const OptionsStepSize = [0.5, 1];
 const OptionsStepLayout = ['column', 'row'];
-const includeDomains = ['climate', 'fan', 'humidifier'];
+const SUPPORTED_ENTITY_DOMAINS = ['climate', 'fan', 'humidifier'];
+const supportedEntityFilter = (stateObj) => SUPPORTED_ENTITY_DOMAINS.includes(stateObj.entity_id.split('.')[0]);
 const GithubReadMe = 'https://github.com/Wheemer/simple-thermostat/blob/master/README.md';
 const stub = {
     header: {},
@@ -407,7 +408,7 @@ class SimpleThermostatEditor extends i$1 {
         window.open(GithubReadMe);
     }
     render() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3;
         if (!this.hass)
             return b ``;
         return b `
@@ -419,15 +420,15 @@ class SimpleThermostatEditor extends i$1 {
               .hass=${this.hass}
               .value="${this.config.entity}"
               .configValue=${'entity'}
-              .includeDomains=${includeDomains}
+              .entityFilter=${supportedEntityFilter}
               @change="${this.valueChanged}"
               allow-custom-entity
             ></ha-entity-picker>
             <ha-entity-picker
-              label="Current temperature entity (optional)"
+              label="Current value entity (optional)"
               .hass=${this.hass}
-              .value="${this.config.current_temperature_entity}"
-              .configValue=${'current_temperature_entity'}
+              .value="${(_a = this.config.current_value_entity) !== null && _a !== void 0 ? _a : this.config.current_temperature_entity}"
+              .configValue=${'current_value_entity'}
               @change="${this.valueChanged}"
               allow-custom-entity
             ></ha-entity-picker>
@@ -441,21 +442,21 @@ class SimpleThermostatEditor extends i$1 {
           </ha-formfield>
           <ha-formfield label="Show mode names?">
             <ha-switch
-              .checked=${((_c = (_b = (_a = this.config) === null || _a === void 0 ? void 0 : _a.layout) === null || _b === void 0 ? void 0 : _b.mode) === null || _c === void 0 ? void 0 : _c.names) !== false}
+              .checked=${((_d = (_c = (_b = this.config) === null || _b === void 0 ? void 0 : _b.layout) === null || _c === void 0 ? void 0 : _c.mode) === null || _d === void 0 ? void 0 : _d.names) !== false}
               .configValue="${'layout.mode.names'}"
               @change=${this.valueChanged}
             ></ha-switch>
           </ha-formfield>
           <ha-formfield label="Show mode icons?">
             <ha-switch
-              .checked=${((_f = (_e = (_d = this.config) === null || _d === void 0 ? void 0 : _d.layout) === null || _e === void 0 ? void 0 : _e.mode) === null || _f === void 0 ? void 0 : _f.icons) !== false}
+              .checked=${((_g = (_f = (_e = this.config) === null || _e === void 0 ? void 0 : _e.layout) === null || _f === void 0 ? void 0 : _f.mode) === null || _g === void 0 ? void 0 : _g.icons) !== false}
               .configValue="${'layout.mode.icons'}"
               @change=${this.valueChanged}
             ></ha-switch>
           </ha-formfield>
           <ha-formfield label="Show mode headings?">
             <ha-switch
-              .checked=${((_j = (_h = (_g = this.config) === null || _g === void 0 ? void 0 : _g.layout) === null || _h === void 0 ? void 0 : _h.mode) === null || _j === void 0 ? void 0 : _j.headings) !== false}
+              .checked=${((_k = (_j = (_h = this.config) === null || _h === void 0 ? void 0 : _h.layout) === null || _j === void 0 ? void 0 : _j.mode) === null || _k === void 0 ? void 0 : _k.headings) !== false}
               .configValue="${'layout.mode.headings'}"
               @change=${this.valueChanged}
             ></ha-switch>
@@ -466,14 +467,14 @@ class SimpleThermostatEditor extends i$1 {
                 <div class="side-by-side">
                   <ha-textfield
                     label="Name (optional)"
-                    .value="${(_l = (_k = this.config.header) === null || _k === void 0 ? void 0 : _k.name) !== null && _l !== void 0 ? _l : ''}"
+                    .value="${(_m = (_l = this.config.header) === null || _l === void 0 ? void 0 : _l.name) !== null && _m !== void 0 ? _m : ''}"
                     .configValue="${'header.name'}"
                     @input="${this.valueChanged}"
                   ></ha-textfield>
 
                   <ha-icon-input
                     label="Icon (optional)"
-                    .value="${(_m = this.config.header) === null || _m === void 0 ? void 0 : _m.icon}"
+                    .value="${(_o = this.config.header) === null || _o === void 0 ? void 0 : _o.icon}"
                     .configValue=${'header.icon'}
                     @value-changed=${this.valueChanged}
                   ></ha-icon-input>
@@ -483,7 +484,7 @@ class SimpleThermostatEditor extends i$1 {
                   <ha-entity-picker
                     label="Toggle Entity (optional)"
                     .hass=${this.hass}
-                    .value="${(_q = (_p = (_o = this.config) === null || _o === void 0 ? void 0 : _o.header) === null || _p === void 0 ? void 0 : _p.toggle) === null || _q === void 0 ? void 0 : _q.entity}"
+                    .value="${(_r = (_q = (_p = this.config) === null || _p === void 0 ? void 0 : _p.header) === null || _q === void 0 ? void 0 : _q.toggle) === null || _r === void 0 ? void 0 : _r.entity}"
                     .configValue=${'header.toggle.entity'}
                     @change="${this.valueChanged}"
                     allow-custom-entity
@@ -491,7 +492,7 @@ class SimpleThermostatEditor extends i$1 {
 
                   <ha-textfield
                     label="Toggle entity label"
-                    .value="${(_u = (_t = (_s = (_r = this.config) === null || _r === void 0 ? void 0 : _r.header) === null || _s === void 0 ? void 0 : _s.toggle) === null || _t === void 0 ? void 0 : _t.name) !== null && _u !== void 0 ? _u : ''}"
+                    .value="${(_v = (_u = (_t = (_s = this.config) === null || _s === void 0 ? void 0 : _s.header) === null || _t === void 0 ? void 0 : _t.toggle) === null || _u === void 0 ? void 0 : _u.name) !== null && _v !== void 0 ? _v : ''}"
                     .configValue="${'header.toggle.name'}"
                     @input="${this.valueChanged}"
                   ></ha-textfield>
@@ -502,7 +503,7 @@ class SimpleThermostatEditor extends i$1 {
           <div class="side-by-side">
             <ha-textfield
               label="Fallback Text (optional)"
-              .value="${(_v = this.config.fallback) !== null && _v !== void 0 ? _v : ''}"
+              .value="${(_w = this.config.fallback) !== null && _w !== void 0 ? _w : ''}"
               .configValue="${'fallback'}"
               @input="${this.valueChanged}"
             ></ha-textfield>
@@ -512,7 +513,7 @@ class SimpleThermostatEditor extends i$1 {
             <ha-select
               label="Decimals (optional)"
               .configValue=${'decimals'}
-              .value="${(_x = (_w = this.config.decimals) === null || _w === void 0 ? void 0 : _w.toString()) !== null && _x !== void 0 ? _x : ''}"
+              .value="${(_y = (_x = this.config.decimals) === null || _x === void 0 ? void 0 : _x.toString()) !== null && _y !== void 0 ? _y : ''}"
               @selected="${this.valueChanged}"
               @closed="${(e) => e.stopPropagation()}"
             >
@@ -521,7 +522,7 @@ class SimpleThermostatEditor extends i$1 {
 
             <ha-textfield
               label="Unit (optional)"
-              .value="${(_y = this.config.unit) !== null && _y !== void 0 ? _y : ''}"
+              .value="${(_z = this.config.unit) !== null && _z !== void 0 ? _z : ''}"
               .configValue="${'unit'}"
               @input="${this.valueChanged}"
             ></ha-textfield>
@@ -531,7 +532,7 @@ class SimpleThermostatEditor extends i$1 {
             <ha-select
               label="Step Layout (optional)"
               .configValue=${'layout.step'}
-              .value="${(_0 = (_z = this.config.layout) === null || _z === void 0 ? void 0 : _z.step) !== null && _0 !== void 0 ? _0 : ''}"
+              .value="${(_1 = (_0 = this.config.layout) === null || _0 === void 0 ? void 0 : _0.step) !== null && _1 !== void 0 ? _1 : ''}"
               @selected="${this.valueChanged}"
               @closed="${(e) => e.stopPropagation()}"
             >
@@ -541,7 +542,7 @@ class SimpleThermostatEditor extends i$1 {
             <ha-select
               label="Step Size (optional)"
               .configValue=${'step_size'}
-              .value="${(_2 = (_1 = this.config.step_size) === null || _1 === void 0 ? void 0 : _1.toString()) !== null && _2 !== void 0 ? _2 : ''}"
+              .value="${(_3 = (_2 = this.config.step_size) === null || _2 === void 0 ? void 0 : _2.toString()) !== null && _3 !== void 0 ? _3 : ''}"
               @selected="${this.valueChanged}"
               @closed="${(e) => e.stopPropagation()}"
             >
@@ -1561,7 +1562,7 @@ class SimpleThermostat extends i$1 {
         }
     }
     set hass(hass) {
-        var _a, _b, _c, _d, _e, _f, _g;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         if (!this.config.entity) {
             return;
         }
@@ -1690,9 +1691,9 @@ class SimpleThermostat extends i$1 {
                 });
             }
             if (!ids.includes('temperature')) {
-                const tempEntityId = (_g = this.config.current_temperature_entity) !== null && _g !== void 0 ? _g : this.config.entity;
-                const tempContext = this.config.current_temperature_entity
-                    ? this._hass.states[this.config.current_temperature_entity]
+                const tempEntityId = (_h = (_g = this.config.current_value_entity) !== null && _g !== void 0 ? _g : this.config.current_temperature_entity) !== null && _h !== void 0 ? _h : this.config.entity;
+                const tempContext = this.config.current_value_entity || this.config.current_temperature_entity
+                    ? this._hass.states[tempEntityId]
                     : this.entity;
                 builtins.push({
                     id: 'temperature',
