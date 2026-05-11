@@ -367,10 +367,14 @@ export default class SimpleThermostat extends LitElement {
         })
       }
       if (!ids.includes('temperature')) {
-        const tempEntityId = this.config.current_temperature_entity ?? this.config.entity
-        const tempContext = this.config.current_temperature_entity
-          ? this._hass.states[this.config.current_temperature_entity]
-          : this.entity
+        const tempEntityId =
+          this.config.current_value_entity ??
+          this.config.current_temperature_entity ??
+          this.config.entity
+        const tempContext =
+          this.config.current_value_entity || this.config.current_temperature_entity
+            ? this._hass.states[tempEntityId]
+            : this.entity
         builtins.push({
           id: 'temperature',
           label: '{{ui.currently}}',
