@@ -212,8 +212,10 @@ export default class SimpleThermostat extends LitElement {
       this.entity = entity
     }
 
+    const entityDomain = this.config.entity.split('.')[0]
+
     this.header = parseHeader(this.config.header, entity, hass)
-    this.service = parseService(this.config?.service ?? false)
+    this.service = parseService(this.config?.service ?? false, entityDomain)
 
     const attributes = entity.attributes
 
