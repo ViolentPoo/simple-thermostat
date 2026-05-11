@@ -43,12 +43,19 @@ const MODE_TYPES: Array<string> = Object.values(MODES)
 const MODES_WITH_POSITIONS = [MODES.VANE_HORIZONTAL, MODES.VANE_VERTICAL]
 
 function getModeOptionsKey(type: string): string {
+  if (type === MODES.DIRECTION) return 'direction'
+  if (type === MODES.OSCILLATING) return 'oscillating'
+  if (type === MODES.MODE) return 'available_modes'
+
   return MODES_WITH_POSITIONS.includes(type as MODES)
     ? `${type}_positions`
     : `${type}_modes`
 }
 
-const DEFAULT_CONTROL = [MODES.HVAC, MODES.PRESET]
+const DEFAULT_CONTROL = {
+  climate: [MODES.HVAC, MODES.PRESET],
+  fan: [MODES.PRESET, MODES.DIRECTION, MODES.OSCILLATING],
+  humidifier: [MODES.MODE],
 
 const ICONS = {
   UP: 'hass:chevron-up',
@@ -267,10 +274,10 @@ export default class SimpleThermostat extends LitElement {
             }
           })
       } else {
-        controlModes = buildBasicModes(DEFAULT_CONTROL)
+        controlModes = buildBasicModes(DEFAULT_CONTROL[entityDomain] ?? DEFAULT_CONTROL.climate)
       }
     } else {
-      controlModes = buildBasicModes(DEFAULT_CONTROL)
+      controlModes = buildBasicModes(DEFAULT_CONTROL[entityDomain] ?? DEFAULT_CONTROL.climate)
     }
 
     // Decorate mode types with active value and set to this.modes
@@ -555,10 +562,25 @@ export default class SimpleThermostat extends LitElement {
 
   setMode = (type: string, mode: string) => {
     if (type && mode) {
-      if (MODES_WITH_POSITIONS.includes(type as MODES)) {
+      if (type === MODES.DIRECTION || type === MODES.OSCILLATING) {
+        this._hass.callService('fan', `set_${type}`, {
+          entity_id: this.config.entity,
+          [type]: mode,
+        })
+      } else if (type === MODES.MODE) {
+        this._hass.callService('humidifier', 'set_mode', {
+          entity_id: this.config.entity,
+          mode,
+        })
+      } else if (MODES_WITH_POSITIONS.includes(type as MODES)) {
         this._hass.callService('climate', `set_${type}`, {
           entity_id: this.config.entity,
           [`${type}`]: mode,
+        })
+      } else {
+        this._hass.callService('climate', `set_${type}_mode`, {
+          entity_id: this.config.entity,
+          [`${type}_mode`]: mode,
         })
       } else {
         this._hass.callService('climate', `set_${type}_mode`, {
