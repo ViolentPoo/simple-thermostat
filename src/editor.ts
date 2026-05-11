@@ -83,8 +83,8 @@ export default class SimpleThermostatEditor extends LitElement {
             <ha-entity-picker
               label="Current value entity (optional)"
               .hass=${this.hass}
-              .value="${this.config.current_temperature_entity}"
-              .configValue=${'current_temperature_entity'}
+              .value="${this.config.current_value_entity ?? this.config.current_temperature_entity}"
+              .configValue=${'current_value_entity'}
               @change="${this.valueChanged}"
               allow-custom-entity
             ></ha-entity-picker>
