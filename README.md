@@ -12,7 +12,11 @@ A compact Lovelace thermostat card for Home Assistant. It shows climate controls
 
 ### HACS
 
+Easily add my repo using this convenient button:
+
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Wheemer&repository=simple-thermostat&category=plugin)
+
+or:
 
 1. Open **HACS** in Home Assistant.
 2. Open **Custom repositories**.
@@ -28,7 +32,7 @@ A compact Lovelace thermostat card for Home Assistant. It shows climate controls
 
 ### Migrating from another fork
 
-If you already installed `simple-thermostat` from another repository, uninstall the old HACS entry first. Then add this repository as a HACS custom repository and install it again.
+If you already installed `simple-thermostat` from another repository, uninstall the old HACS entry first. Then click the blue "open hacs repository on my home assistant" button or add this repository as a HACS custom repository type dashboard and install it again.
 
 ### Manual install
 
