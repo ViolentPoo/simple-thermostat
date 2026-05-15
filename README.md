@@ -50,6 +50,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.49 | Fixed the default version 3 current value row for humidifier and dehumidifier entities so it displays current humidity instead of `N/A`. |
 | 3.0.47 | Fixed the card failing to render after adding domain-aware entity support. |
 | 3.0.46 | Added `current_value_entity` as the generic current value option, kept `current_temperature_entity` as a backwards-compatible alias, and fixed compatible entity filtering in the visual editor. |
 | 3.0.45 | Added fan and humidifier/dehumidifier entity support with domain-specific targets, controls, and units. |
