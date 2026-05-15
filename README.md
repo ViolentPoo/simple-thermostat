@@ -50,6 +50,7 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 | Version | Changes |
 |---------|---------|
+| 3.0.47 | Fixed the card failing to render after adding domain-aware entity support. |
 | 3.0.46 | Added `current_value_entity` as the generic current value option, kept `current_temperature_entity` as a backwards-compatible alias, and fixed compatible entity filtering in the visual editor. |
 | 3.0.45 | Added fan and humidifier/dehumidifier entity support with domain-specific targets, controls, and units. |
 | 3.0.44 | Tightened header toggle switch spacing to better match entity row spacing. |
