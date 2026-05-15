@@ -11,7 +11,7 @@
 })();
 
 var name = "simple-thermostat";
-var version = "3.0.47";
+var version = "3.0.49";
 
 /**
  * @license
@@ -1690,17 +1690,21 @@ class SimpleThermostat extends i$1 {
                     context: this.entity,
                 });
             }
-            if (!ids.includes('temperature')) {
-                const tempEntityId = (_h = (_g = this.config.current_value_entity) !== null && _g !== void 0 ? _g : this.config.current_temperature_entity) !== null && _h !== void 0 ? _h : this.config.entity;
-                const tempContext = this.config.current_value_entity || this.config.current_temperature_entity
-                    ? this._hass.states[tempEntityId]
+            const currentValueId = entityDomain === 'humidifier' ? 'humidity' : 'temperature';
+            const currentValueTemplate = entityDomain === 'humidifier'
+                ? '{{current_humidity|formatNumber}}'
+                : '{{current_temperature|formatNumber}}';
+            if (!ids.includes(currentValueId)) {
+                const currentValueEntityId = (_h = (_g = this.config.current_value_entity) !== null && _g !== void 0 ? _g : this.config.current_temperature_entity) !== null && _h !== void 0 ? _h : this.config.entity;
+                const currentValueContext = this.config.current_value_entity || this.config.current_temperature_entity
+                    ? this._hass.states[currentValueEntityId]
                     : this.entity;
                 builtins.push({
-                    id: 'temperature',
+                    id: currentValueId,
                     label: '{{ui.currently}}',
-                    template: '{{current_temperature|formatNumber}}',
-                    entityId: tempEntityId,
-                    context: tempContext,
+                    template: currentValueTemplate,
+                    entityId: currentValueEntityId,
+                    context: currentValueContext,
                 });
             }
             this.entities = [...builtins, ...customEntities];
