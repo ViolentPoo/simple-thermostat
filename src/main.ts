@@ -436,6 +436,8 @@ export default class SimpleThermostat extends LitElement {
       `
     }
 
+    const entityDomain = config.entity.split('.')[0]
+
     const {
       attributes: {
         min_temp: minTemp = null,
