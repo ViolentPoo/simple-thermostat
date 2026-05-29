@@ -489,11 +489,6 @@ export default class SimpleThermostat extends LitElement {
       if (this.entity !== undefined) {
         this.entity = undefined
       }
-      this.header = false
-      this.modes = []
-      this.entities = []
-      this.showEntities = false
-      this._values = {}
       return
     }
 
@@ -565,7 +560,6 @@ export default class SimpleThermostat extends LitElement {
     if (configuredEntities === false) {
       this.showEntities = false
     } else if (this.config.version === 3) {
-      this.showEntities = true
       this.entities = []
       const customEntities = configuredEntities.map((entity, index) => {
         const entityId = entity?.entity ?? this.config.entity
@@ -627,7 +621,6 @@ export default class SimpleThermostat extends LitElement {
       }
       this.entities = [...builtins, ...customEntities]
     } else if (configuredEntities) {
-      this.showEntities = true
       this.entities = configuredEntities.map(
         ({ name, entity, attribute, unit = '', ...rest }) => {
           let state
@@ -636,7 +629,7 @@ export default class SimpleThermostat extends LitElement {
             state = hass.states[entity]
             names.push(state?.attributes?.friendly_name)
             if (attribute) {
-              state = state?.attributes?.[attribute]
+              state = state.attributes[attribute]
             }
           } else if (attribute && attribute in this.entity.attributes) {
             state = this.entity.attributes[attribute]
