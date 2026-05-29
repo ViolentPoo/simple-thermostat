@@ -1,11 +1,13 @@
-import { LitElement, html } from 'lit'
-import { property } from 'lit/decorators.js'
-import { nothing } from 'lit'
+import { LitElement, html, nothing } from 'lit'
+import { state } from 'lit/decorators.js'
 import debounce from 'debounce-fn'
 import { name as CARD_NAME } from '../package.json'
 
+import { getAdapter, EntityAdapter } from './adapters'
 import isEqual from './isEqual'
 import styles from './styles.css'
+import sortHvacModes from './sortHvacModes'
+import sortFanModes from './sortFanModes'
 
 import formatNumber from './formatNumber'
 import fireEvent from './fireEvent'
@@ -13,8 +15,13 @@ import renderHeader from './components/header'
 import renderTemplated, { wrapEntities } from './components/templated'
 import renderEntities from './components/entities'
 import renderModeType from './components/modeType'
+import { appendUnit } from './unitFormat'
 
-import parseHeader, { HeaderData, MODE_ICONS } from './config/header'
+import parseHeader, {
+  getModeIcon,
+  getModeName,
+  HeaderData,
+} from './config/header'
 import parseSetpoints from './config/setpoints'
 import parseService, { Service } from './config/service'
 
@@ -22,7 +29,6 @@ import { CardConfig, ModeValue, ModeControlObject, MODES } from './config/card'
 
 import {
   ControlMode,
-  ControlModeOption,
   LooseObject,
   Entity,
   PreparedEntity,
@@ -31,32 +37,15 @@ import {
 } from './types'
 
 interface HANode extends Element {
-  hass: any
+  hass: HASS
 }
 
 const DEBOUNCE_TIMEOUT = 500
 const STEP_SIZE = 0.5
 const DECIMALS = 1
+const UPDATING_TIMEOUT = 10000
 
 const MODE_TYPES: Array<string> = Object.values(MODES)
-
-const MODES_WITH_POSITIONS = [MODES.VANE_HORIZONTAL, MODES.VANE_VERTICAL]
-
-function getModeOptionsKey(type: string): string {
-  if (type === MODES.DIRECTION) return 'direction'
-  if (type === MODES.OSCILLATING) return 'oscillating'
-  if (type === MODES.MODE) return 'available_modes'
-
-  return MODES_WITH_POSITIONS.includes(type as MODES)
-    ? `${type}_positions`
-    : `${type}_modes`
-}
-
-const DEFAULT_CONTROL = {
-  climate: [MODES.HVAC, MODES.PRESET],
-  fan: [MODES.PRESET, MODES.DIRECTION, MODES.OSCILLATING],
-  humidifier: [MODES.MODE],
-}
 
 const ICONS = {
   UP: 'hass:chevron-up',
@@ -65,23 +54,81 @@ const ICONS = {
   MINUS: 'mdi:minus',
 }
 
-type ModeIcons = {
-  [key: string]: string
-}
-
-interface ModeOptions {
-  names?: boolean
-  icons?: boolean
-  headings?: boolean
-}
-
 const DEFAULT_HIDE = {
   temperature: false,
   state: false,
 }
 
+const CONTROL_ORDER = [
+  MODES.PRESET,
+  MODES.FAN,
+  MODES.HVAC,
+  MODES.SWING,
+  MODES.SWING_HORIZONTAL,
+  MODES.SWING_VERTICAL,
+  MODES.VANE_HORIZONTAL,
+  MODES.VANE_VERTICAL,
+  MODES.DIRECTION,
+  MODES.OSCILLATING,
+  MODES.STATE,
+]
+
 function getConfiguredEntities(config: CardConfig) {
   return config.entities ?? config.sensors ?? []
+}
+
+function getTrackedEntityIds(config: CardConfig): Array<string> {
+  const configuredEntities = getConfiguredEntities(config)
+  const ids = [
+    config.entity,
+    config.current_value_entity ?? config.current_temperature_entity,
+  ]
+
+  if (Array.isArray(configuredEntities)) {
+    ids.push(
+      ...configuredEntities
+        .map((entity) => entity?.entity)
+        .filter((entityId) => !!entityId)
+    )
+  }
+
+  if (config.header && typeof config.header === 'object') {
+    ids.push(config.header.toggle?.entity)
+    ids.push(
+      ...(config.header.toggles ?? [])
+        .map((toggle) => toggle?.entity)
+        .filter((entityId) => !!entityId)
+    )
+    ids.push(
+      ...(config.header.faults ?? [])
+        .map((fault) => fault?.entity)
+        .filter((entityId) => !!entityId)
+    )
+  }
+
+  return Array.from(new Set(ids.filter((entityId) => !!entityId)))
+}
+
+const warnedLegacyConfigKeys = new Set<string>()
+
+function warnLegacyConfigKey(key: string, replacement: string) {
+  if (warnedLegacyConfigKeys.has(key)) return
+  warnedLegacyConfigKeys.add(key)
+  console.warn(
+    `[simple-thermostat] "${key}" is legacy but supported. Prefer "${replacement}" for new configs.`
+  )
+}
+
+function warnLegacyConfigAliases(config: CardConfig) {
+  if (config.current_temperature_entity) {
+    warnLegacyConfigKey('current_temperature_entity', 'current_value_entity')
+  }
+  if (typeof config.sensors !== 'undefined') {
+    warnLegacyConfigKey('sensors', 'entities')
+  }
+  if (typeof config.layout?.sensors !== 'undefined') {
+    warnLegacyConfigKey('layout.sensors', 'layout.entities')
+  }
 }
 
 function shouldShowModeControl(
@@ -107,10 +154,13 @@ function shouldShowModeControl(
 function getModeList(
   type: string,
   attributes: LooseObject,
+  adapter,
   specification: Partial<ModeControlObject> = {}
 ) {
-  let modeOptions = attributes[getModeOptionsKey(type)]
-  if (type === MODES.DIRECTION && attributes.direction) {
+  let modeOptions = attributes[adapter.getModeAttribute(type)]
+  if (type === MODES.STATE) {
+    modeOptions = ['off', 'on']
+  } else if (type === MODES.DIRECTION && attributes.direction) {
     modeOptions = ['forward', 'reverse']
   } else if (
     type === MODES.OSCILLATING &&
@@ -123,24 +173,167 @@ function getModeList(
   }
 
   return modeOptions
-    .filter((modeOption) => shouldShowModeControl(type, modeOption, specification))
+    .filter((modeOption) =>
+      shouldShowModeControl(type, modeOption, specification)
+    )
     .map((modeOption) => {
       const modeKey = String(modeOption)
-      const values =
+      const normalizedModeKey = modeKey.toLowerCase().replace(/\s+/g, '_')
+      const values: ModeValue =
         typeof specification[modeKey] === 'object'
           ? specification[modeKey]
-          : ({} as {})
+          : typeof specification[normalizedModeKey] === 'object'
+            ? specification[normalizedModeKey]
+            : {}
       return {
-        icon: MODE_ICONS[modeKey],
-        value: modeKey,
-        name: modeKey,
         ...values,
+        icon: values.icon ?? getModeIcon(modeKey),
+        value: modeKey,
+        name:
+          values.name === false
+            ? modeKey
+            : (values.name ?? getModeName(modeKey)),
       }
     })
 }
 
+function getCardStyle(entityDomain: string, attributes: LooseObject) {
+  if (entityDomain !== 'fan') return ''
+
+  const percentage = Number(attributes?.percentage)
+  if (Number.isNaN(percentage)) return ''
+
+  const normalizedPercentage = Math.min(Math.max(percentage, 0), 100)
+  const fanSpinDuration = Math.max(
+    0.9,
+    3.2 - (normalizedPercentage / 100) * 2.1
+  )
+
+  return `--st-fan-spin-duration: ${fanSpinDuration.toFixed(2)}s;`
+}
+
+function supportsModeType(
+  type: string,
+  entityDomain: string,
+  attributes: LooseObject,
+  adapter: EntityAdapter
+) {
+  return (
+    MODE_TYPES.includes(type) &&
+    (type === MODES.STATE
+      ? entityDomain === 'fan' || entityDomain === 'humidifier'
+      : typeof attributes[adapter.getModeAttribute(type)] !== 'undefined')
+  )
+}
+
+function buildBasicControlModes(
+  items: Array<string>,
+  entityDomain: string,
+  attributes: LooseObject,
+  adapter: EntityAdapter
+) {
+  return items
+    .filter((type) => supportsModeType(type, entityDomain, attributes, adapter))
+    .map((type: string) => ({
+      type,
+      hide_when_off: false,
+      list: getModeList(type, attributes, adapter),
+    }))
+}
+
+function buildConfiguredControlModes(
+  config: CardConfig,
+  entityDomain: string,
+  attributes: LooseObject,
+  adapter: EntityAdapter
+): Array<Partial<ControlMode>> {
+  if (config.control === false) return []
+
+  if (Array.isArray(config.control)) {
+    return buildBasicControlModes(
+      config.control,
+      entityDomain,
+      attributes,
+      adapter
+    )
+  }
+
+  if (config.control && typeof config.control === 'object') {
+    const entries = Object.entries(config.control)
+    if (entries.length > 0) {
+      return entries
+        .filter(([type]) =>
+          supportsModeType(type, entityDomain, attributes, adapter)
+        )
+        .map(([type, definition]: [string, ModeControlObject]) => {
+          const { _name, _hide_when_off, _icons, _heading, ...controlField } =
+            definition
+          return {
+            type,
+            hide_when_off: _hide_when_off,
+            icons: _icons,
+            heading: _heading,
+            name: _name,
+            list: getModeList(type, attributes, adapter, controlField),
+          }
+        })
+    }
+  }
+
+  return buildBasicControlModes(
+    adapter.getDefaultControl(),
+    entityDomain,
+    attributes,
+    adapter
+  )
+}
+
+function removeOffFromSecondaryModes(
+  controlModes: Array<Partial<ControlMode>>
+) {
+  if (!controlModes.some(({ type }) => type === MODES.STATE)) {
+    return controlModes
+  }
+
+  return controlModes.map((mode) =>
+    mode.type && mode.type !== MODES.STATE
+      ? {
+          ...mode,
+          list: mode.list?.filter(({ value }) => value !== 'off') ?? [],
+        }
+      : mode
+  )
+}
+
+function sortControlModes(
+  controlModes: Array<Partial<ControlMode>>,
+  entityDomain: string
+) {
+  if (entityDomain !== 'fan' && entityDomain !== 'climate') return controlModes
+
+  const getControlOrder = (type: string) => {
+    const index = CONTROL_ORDER.indexOf(type as MODES)
+    return index === -1 ? CONTROL_ORDER.length : index
+  }
+
+  return [...controlModes].sort(
+    (a, b) => getControlOrder(a.type) - getControlOrder(b.type)
+  )
+}
+
 interface Values {
-  [key: string]: number | string
+  [key: string]: number | string | null
+}
+
+interface SetpointRenderOptions {
+  field: string
+  value: number | string | null
+  minValue: number | null
+  maxValue: number | null
+  unit: string | boolean
+  row: boolean
+  stepLayout: string
+  isOff: boolean
 }
 
 export default class SimpleThermostat extends LitElement {
@@ -148,37 +341,47 @@ export default class SimpleThermostat extends LitElement {
     return styles
   }
 
-  @property()
+  @state()
   config: CardConfig
-  @property()
+  @state()
   header: false | HeaderData
-  @property()
+  @state()
   service: Service
-  @property()
+  @state()
   modes: Array<ControlMode> = []
-  _hass: HASS = {}
-  @property()
+  _hass: HASS = {
+    states: {},
+    performAction: () => undefined,
+  }
+  @state()
   entity: LooseObject
-  @property()
+  @state()
   entities: Array<Entity | PreparedEntity> = []
-  @property()
+  @state()
   showEntities: boolean = true
-  @property()
+  @state()
   name: string | false = ''
   stepSize = STEP_SIZE
-  @property({
-    type: Object,
-  })
+  @state()
   _values: Values = {}
-  @property()
+  @state()
   _updatingValues: boolean = false
-  @property()
+  @state()
   _hide = DEFAULT_HIDE
+  _updatingValuesTimeout: ReturnType<typeof setTimeout> | null = null
+  _trackedStateRefs: Record<string, unknown> = {}
+  _trackedEntityIdsSignature = ''
+  _holdTimer: ReturnType<typeof setTimeout> | null = null
+  _holdFired = false
+  _clickCount = 0
+  _clickTimer: ReturnType<typeof setTimeout> | null = null
+  static HOLD_MS = 500
+  static DOUBLE_TAP_MS = 250
 
   _debouncedSetTemperature = debounce(
     (values: object) => {
       const { domain, service, data = {} } = this.service
-      this._hass.callService(domain, service, {
+      this._callAction(`${domain}.${service}`, {
         entity_id: this.config.entity,
         ...data,
         ...values,
@@ -189,35 +392,71 @@ export default class SimpleThermostat extends LitElement {
     }
   )
 
+  _callAction(action: string, data: object) {
+    if (typeof this._hass.performAction === 'function') {
+      this._hass.performAction({ action, data })
+    } else {
+      const [domain, service] = action.split('.')
+      this._hass.callService(domain, service, data)
+    }
+  }
+
   static getConfigElement() {
     return window.document.createElement(`${CARD_NAME}-editor`)
   }
 
+  static getStubConfig(hass) {
+    const entity = Object.keys(hass.states ?? {}).find(
+      (id) =>
+        id.startsWith('climate.') ||
+        id.startsWith('fan.') ||
+        id.startsWith('humidifier.')
+    )
+    return { entity: entity ?? '' }
+  }
+
   setConfig(config: CardConfig) {
+    warnLegacyConfigAliases(config)
     this.config = {
       decimals: DECIMALS,
       ...config,
     }
+    this._trackedStateRefs = {}
+    this._trackedEntityIdsSignature = ''
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    this._debouncedSetTemperature.cancel()
+    if (this._updatingValuesTimeout) {
+      clearTimeout(this._updatingValuesTimeout)
+      this._updatingValuesTimeout = null
+    }
+    if (this._holdTimer) {
+      clearTimeout(this._holdTimer)
+      this._holdTimer = null
+    }
+    if (this._clickTimer) {
+      clearTimeout(this._clickTimer)
+      this._clickTimer = null
+    }
   }
 
   updated() {
-    super.connectedCallback()
     const patchHass: Array<HANode> = Array.from(
       this.renderRoot.querySelectorAll('[with-hass]')
     )
     for (const child of Array.from(patchHass)) {
-      // Forward attributes to properties
       Array.from(child.attributes).forEach((attr) => {
         if (attr.name.startsWith('fwd-')) {
           child[attr.name.replace('fwd-', '')] = attr.value
         }
       })
-      // Always forward hass
       child.hass = this._hass
     }
   }
 
-  set hass(hass: any) {
+  set hass(hass: HASS) {
     if (!this.config.entity) {
       return
     }
@@ -226,113 +465,95 @@ export default class SimpleThermostat extends LitElement {
       return
     }
 
-    const entity = hass.states[this.config.entity]
-    if (!entity) {
+    this._hass = hass
+    const trackedEntityIds = getTrackedEntityIds(this.config)
+    const trackedEntityIdsSignature = trackedEntityIds.join('|')
+    const trackedStatesUnchanged =
+      trackedEntityIdsSignature === this._trackedEntityIdsSignature &&
+      trackedEntityIds.every(
+        (entityId) => this._trackedStateRefs[entityId] === hass.states[entityId]
+      )
+
+    if (trackedStatesUnchanged) {
       return
     }
 
-    this._hass = hass
+    this._trackedEntityIdsSignature = trackedEntityIdsSignature
+    this._trackedStateRefs = trackedEntityIds.reduce((result, entityId) => {
+      result[entityId] = hass.states[entityId]
+      return result
+    }, {})
+
+    const entity = hass.states[this.config.entity]
+    if (!entity) {
+      if (this.entity !== undefined) {
+        this.entity = undefined
+      }
+      return
+    }
+
     if (this.entity !== entity) {
       this.entity = entity
     }
 
-    const entityDomain = this.config.entity.split('.')[0]
-
-    this.header = parseHeader(this.config.header, entity, hass)
-    this.service = parseService(this.config?.service ?? false, entityDomain)
+    const adapter = getAdapter(this.config.entity)
+    this.header = parseHeader(
+      this.config.header,
+      entity,
+      hass,
+      this.config.enhanced_visuals !== false
+    )
+    this.service = parseService(this.config?.service ?? false, adapter)
 
     const attributes = entity.attributes
-
     let values = parseSetpoints(
       this.config?.setpoints ?? null,
       attributes,
-      entityDomain
+      adapter
     )
 
-    // If we are updating the values, and they are now equal
-    // we can safely assume we've been able to update the set points
-    // in HA and remove the updating flag
-    // If we are not updating we take the values we get from HA
-    // because it means they changed elsewhere
     if (this._updatingValues && isEqual(values, this._values)) {
       this._updatingValues = false
+      if (this._updatingValuesTimeout) {
+        clearTimeout(this._updatingValuesTimeout)
+        this._updatingValuesTimeout = null
+      }
     } else if (!this._updatingValues) {
       this._values = values
     }
 
-    const supportedModeType = (type: string) =>
-      MODE_TYPES.includes(type) &&
-      typeof attributes[getModeOptionsKey(type)] !== 'undefined'
-    const buildBasicModes = (items: any) => {
-      return items.filter(supportedModeType).map((type: string) => ({
-        type,
-        hide_when_off: false,
-        list: getModeList(type, attributes),
-      }))
-    }
-
-    let controlModes: Array<Partial<ControlMode>> = []
-    if (this.config.control === false) {
-      controlModes = []
-    } else if (Array.isArray(this.config.control)) {
-      controlModes = buildBasicModes(this.config.control)
-    } else if (typeof this.config.control === 'object') {
-      const entries = Object.entries(this.config.control)
-      if (entries.length > 0) {
-        controlModes = entries
-          .filter(([type]) => supportedModeType(type))
-          .map(([type, definition]: [string, ModeControlObject]) => {
-            const { _name, _hide_when_off, _icons, ...controlField } = definition
-            return {
-              type,
-              hide_when_off: _hide_when_off,
-              icons: _icons,
-              name: _name,
-              list: getModeList(type, attributes, controlField),
-            }
-          })
-      } else {
-        controlModes = buildBasicModes(
-          DEFAULT_CONTROL[entityDomain] ?? DEFAULT_CONTROL.climate
+    const entityDomain = this.config.entity.split('.')[0]
+    const controlModes = sortControlModes(
+      removeOffFromSecondaryModes(
+        buildConfiguredControlModes(
+          this.config,
+          entityDomain,
+          attributes,
+          adapter
         )
-      }
-    } else {
-      controlModes = buildBasicModes(
-        DEFAULT_CONTROL[entityDomain] ?? DEFAULT_CONTROL.climate
-      )
-    }
+      ),
+      entityDomain
+    )
 
-    // Decorate mode types with active value and set to this.modes
     this.modes = controlModes.map((values) => {
-      if (values.type === MODES.HVAC) {
-        const sortedList: Array<Partial<ControlMode>> = []
-        const hvacModeValues = Object.values(HVAC_MODES) as Array<string>
-        values.list.forEach((item: ControlModeOption) => {
-          const index = hvacModeValues.indexOf(item.value)
-          sortedList[index] = item
-        })
-        return {
-          ...values,
-          list: sortedList,
-          mode: entity.state,
-        } as ControlMode
-      }
-      const modeKey = MODES_WITH_POSITIONS.includes(values.type as MODES)
-        ? values.type
-        : values.type === MODES.DIRECTION || values.type === MODES.OSCILLATING
-          ? values.type
-          : `${values.type}_mode`
-      const mode = attributes[modeKey]
-      return { ...values, mode } as ControlMode
+      const list =
+        values.type === MODES.HVAC
+          ? sortHvacModes(values.list)
+          : values.type === MODES.FAN
+            ? sortFanModes(values.list)
+            : values.list
+      const mode =
+        values.type === MODES.HVAC || values.type === MODES.STATE
+          ? entity.state
+          : attributes[adapter.getModePayloadKey(values.type)]
+
+      return { ...values, list, mode } as ControlMode
     })
 
-    if (this.config.step_size) {
-      this.stepSize = +this.config.step_size
-    }
+    const { step: rangeStep } = adapter.getRange(attributes)
+    this.stepSize = Number(this.config.step_size ?? rangeStep ?? STEP_SIZE)
 
-    if (this.config.hide) {
-      this._hide = { ...this._hide, ...this.config.hide }
-    }
+    this._hide = { ...DEFAULT_HIDE, ...(this.config.hide ?? {}) }
 
     const configuredEntities = getConfiguredEntities(this.config)
 
@@ -353,6 +574,7 @@ export default class SimpleThermostat extends LitElement {
           show: entity?.show !== false,
           entityId,
           context,
+          unit: entity?.unit ?? '',
         } as PreparedEntity
       })
       const ids = customEntities.map((entity) => entity.id)
@@ -366,19 +588,27 @@ export default class SimpleThermostat extends LitElement {
           context: this.entity,
         })
       }
-      const currentValueId = entityDomain === 'humidifier' ? 'humidity' : 'temperature'
-      const currentValueTemplate =
-        entityDomain === 'humidifier'
-          ? '{{current_humidity|formatNumber}}'
-          : '{{current_temperature|formatNumber}}'
-
-      if (!ids.includes(currentValueId)) {
+      const currentValueId = adapter
+        .getSetpointService()
+        .service.replace('set_', '')
+      const currentValueTemplate = adapter.getCurrentValueTemplate()
+      const hasExplicitCurrentValueEntity = Boolean(
+        this.config.current_value_entity ||
+        this.config.current_temperature_entity
+      )
+      const hasDefaultCurrentValue =
+        adapter.getCurrentValue(attributes) !== null
+      if (
+        !ids.includes(currentValueId) &&
+        (hasExplicitCurrentValueEntity || hasDefaultCurrentValue)
+      ) {
         const currentValueEntityId =
           this.config.current_value_entity ??
           this.config.current_temperature_entity ??
           this.config.entity
         const currentValueContext =
-          this.config.current_value_entity || this.config.current_temperature_entity
+          this.config.current_value_entity ||
+          this.config.current_temperature_entity
             ? this._hass.states[currentValueEntityId]
             : this.entity
         builtins.push({
@@ -428,49 +658,53 @@ export default class SimpleThermostat extends LitElement {
     const warnings = []
     if (this.stepSize < 1 && this.config.decimals === 0) {
       warnings.push(html`
-        <hui-warning>
+        <ha-alert alert-type="warning">
           Decimals is set to 0 and step_size is lower than 1. Decrementing a
           setpoint will likely not work. Change one of the settings to clear
           this warning.
-        </hui-warning>
+        </ha-alert>
       `)
     }
 
     if (!entity) {
+      if (!this._hass?.states) {
+        return html`<ha-card
+          class="loading ${config.enhanced_visuals === false
+            ? 'standard-visuals'
+            : ''}"
+        ></ha-card>`
+      }
       return html`
-        <hui-warning> Entity not available: ${config.entity} </hui-warning>
+        <ha-alert alert-type="error">
+          Entity not available: ${config.entity}
+        </ha-alert>
       `
     }
 
-    const entityDomain = config.entity.split('.')[0]
-
+    const adapter = getAdapter(config.entity)
     const {
-      attributes: {
-        min_temp: minTemp = null,
-        max_temp: maxTemp = null,
-        min_humidity: minHumidity = null,
-        max_humidity: maxHumidity = null,
-        hvac_action: action,
-      },
+      attributes: { hvac_action: action },
     } = entity
-
-    const minValue = entityDomain === 'fan'
-      ? 0
-      : entityDomain === 'humidifier'
-        ? minHumidity
-        : minTemp
-    const maxValue = entityDomain === 'fan'
-      ? 100
-      : entityDomain === 'humidifier'
-        ? maxHumidity
-        : maxTemp
-
+    const { min: minValue, max: maxValue } = adapter.getRange(entity.attributes)
     const unit = this.getUnit()
-
-    const stepLayout = this.config?.layout?.step ?? 'column'
+    const stepLayout =
+      this.config.enhanced_visuals === false
+        ? (this.config?.layout?.step ?? 'column')
+        : (this.config?.layout?.step ?? 'row')
     const row = stepLayout === 'row'
-
-    const classes = [!this.header && 'no-header', action].filter((cx) => !!cx)
+    const entityDomain = config.entity.split('.')[0]
+    const isUnavailable = ['unavailable', 'unknown'].includes(entity.state)
+    const safeClass = (value: unknown) =>
+      typeof value === 'string' ? value.replace(/[^a-z0-9_-]/gi, '') : ''
+    const classes = [
+      !this.header && 'no-header',
+      `domain-${safeClass(entityDomain)}`,
+      `state-${safeClass(entity.state)}`,
+      this.config.enhanced_visuals === false && 'standard-visuals',
+      safeClass(action),
+      isUnavailable && safeClass(entity.state),
+    ].filter((cx) => !!cx)
+    const cardStyle = getCardStyle(entityDomain, entity.attributes)
 
     let entitiesHtml
     if (this.config.version === 3) {
@@ -490,19 +724,25 @@ export default class SimpleThermostat extends LitElement {
     } else {
       entitiesHtml = this.showEntities
         ? renderEntities({
-            _hide: this._hide,
+            _hide,
             unit,
             hass: this._hass,
             entity: this.entity,
             entities: this.entities,
             config: this.config,
+            adapter,
             localize: this.localize,
             openEntityPopover: this.openEntityPopover,
           })
         : ''
     }
     return html`
-      <ha-card class="${classes.join(' ')}">
+      <ha-card class="${classes.join(' ')}" style=${cardStyle}>
+        ${config.styles
+          ? html`<style>
+              ${config.styles}
+            </style>`
+          : nothing}
         ${warnings}
         ${renderHeader({
           header: this.header,
@@ -512,60 +752,35 @@ export default class SimpleThermostat extends LitElement {
         })}
         <section class="body">
           ${entitiesHtml}
-          ${Object.entries(_values).map(([field, value]) => {
-            const hasValue = ['string', 'number'].includes(typeof value)
-            const showUnit = unit !== false && hasValue
-            return html`
-              <div class="current-wrapper ${stepLayout}">
-                <ha-icon-button
-                  ?disabled=${maxValue !== null && value >= maxValue}
-                  class="thermostat-trigger"
-                  icon=${row ? ICONS.PLUS : ICONS.UP}
-                  @click="${() => this.setTemperature(this.stepSize, field)}"
-                >
-                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
-                </ha-icon-button>
-
-                <h3
-                  @click=${() => this.openEntityPopover()}
-                  class=${_updatingValues
-                    ? 'current--value updating'
-                    : 'current--value'}
-                >
-                  ${formatNumber(value, {
-                    ...config,
-                    fallback:
-                      entity.state === HVAC_MODES.OFF
-                        ? 'OFF'
-                        : config.fallback,
-                    locale: this._hass.locale,
-                  })}
-                  ${showUnit
-                    ? html`<span class="current--unit">${unit}</span>`
-                    : nothing}
-                </h3>
-                <ha-icon-button
-                  ?disabled=${minValue !== null && value <= minValue}
-                  class="thermostat-trigger"
-                  icon=${row ? ICONS.MINUS : ICONS.DOWN}
-                  @click="${() => this.setTemperature(-this.stepSize, field)}"
-                >
-                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
-                </ha-icon-button>
-              </div>
-            `
+          ${this.renderSetpoints({
+            values: _values,
+            minValue,
+            maxValue,
+            unit,
+            row,
+            stepLayout,
+            isOff: entity.state === HVAC_MODES.OFF,
           })}
         </section>
 
-        ${this.modes.map((mode) =>
-          renderModeType({
-            state: entity.state,
-            mode,
-            localize: this.localize,
-            modeOptions: this.config?.layout?.mode ?? {},
-            setMode: this.setMode,
-          })
-        )}
+        ${this.modes.length
+          ? html`
+              <section class="controls">
+                ${this.modes.map((mode) =>
+                  renderModeType({
+                    state: entity.state,
+                    entity,
+                    hass: this._hass,
+                    mode,
+                    adapter,
+                    localize: this.localize,
+                    modeOptions: this.config?.layout?.mode ?? {},
+                    setMode: this.setMode,
+                  })
+                )}
+              </section>
+            `
+          : nothing}
       </ha-card>
     `
   }
@@ -574,18 +789,147 @@ export default class SimpleThermostat extends LitElement {
     if (!this.header || !entityId) return
 
     const el = ev.target as HTMLInputElement
-    this._hass.callService(
-      'homeassistant',
-      el.checked ? 'turn_on' : 'turn_off',
-      {
-        entity_id: entityId,
-      }
+    this._callAction(`homeassistant.turn_${el.checked ? 'on' : 'off'}`, {
+      entity_id: entityId,
+    })
+  }
+
+  renderSetpoints({
+    values,
+    minValue,
+    maxValue,
+    unit,
+    row,
+    stepLayout,
+    isOff,
+  }: {
+    values: Values
+    minValue: number | null
+    maxValue: number | null
+    unit: string | boolean
+    row: boolean
+    stepLayout: string
+    isOff: boolean
+  }) {
+    if (this.config.hide_setpoint === true) return nothing
+
+    return Object.entries(values).map(([field, value]) =>
+      this.renderSetpointControl({
+        field,
+        value,
+        minValue,
+        maxValue,
+        unit,
+        row,
+        stepLayout,
+        isOff,
+      })
     )
   }
 
-  setTemperature(change: number, field: string) {
+  renderSetpointControl(options: SetpointRenderOptions) {
+    const { row, stepLayout } = options
+    const decreaseButton = this.renderSetpointStepper(options, 'decrease')
+    const valueButton = this.renderSetpointValue(options)
+    const increaseButton = this.renderSetpointStepper(options, 'increase')
+
+    return html`
+      <div class="current-wrapper ${stepLayout}">
+        ${row
+          ? html`${decreaseButton}${valueButton}${increaseButton}`
+          : html`${increaseButton}${valueButton}${decreaseButton}`}
+      </div>
+    `
+  }
+
+  renderSetpointStepper(
+    { field, value, minValue, maxValue, row }: SetpointRenderOptions,
+    direction: 'increase' | 'decrease'
+  ) {
+    const numericValue = Number(value)
+    const hasNumericValue = !Number.isNaN(numericValue)
+    const decreasing = direction === 'decrease'
+    const disabled = decreasing
+      ? value === null ||
+        (minValue !== null && hasNumericValue && numericValue <= minValue)
+      : (value === null && minValue === null) ||
+        (value !== null &&
+          maxValue !== null &&
+          hasNumericValue &&
+          numericValue >= maxValue)
+    const icon = decreasing
+      ? row
+        ? ICONS.MINUS
+        : ICONS.DOWN
+      : row
+        ? ICONS.PLUS
+        : ICONS.UP
+
+    return html`
+      <button
+        type="button"
+        ?disabled=${disabled}
+        class="thermostat-trigger ${direction}"
+        aria-label=${`${decreasing ? 'Decrease' : 'Increase'} ${field}`}
+        @click="${() =>
+          decreasing
+            ? this.setTemperature(-this.stepSize, field)
+            : value === null && minValue !== null
+              ? this.setTemperature(0, field, minValue)
+              : this.setTemperature(this.stepSize, field)}"
+      >
+        <ha-icon .icon=${icon}></ha-icon>
+      </button>
+    `
+  }
+
+  renderSetpointValue({ field, value, unit, isOff }: SetpointRenderOptions) {
+    const hasValue =
+      ['string', 'number'].includes(typeof value) &&
+      value !== '' &&
+      value !== null
+    const showUnit = unit !== false && hasValue
+    const showOffFallback = isOff && !hasValue
+    const displayValue = showOffFallback
+      ? 'OFF'
+      : formatNumber(value, {
+          ...this.config,
+          locale: this._hass.locale,
+        })
+
+    return html`
+      <h3
+        @pointerdown=${this._onActionPointerDown}
+        @pointerup=${this._onActionPointerUp}
+        @pointercancel=${this._onActionPointerUp}
+        @click=${this._onActionClick}
+        @keydown=${this._onSetpointKeyDown}
+        role="button"
+        tabindex="0"
+        aria-label=${`${field}: ${displayValue}${showUnit ? ` ${unit}` : ''}`}
+        class=${[
+          'current--value',
+          showOffFallback && 'current--off',
+          this._updatingValues && 'updating',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        ${appendUnit(displayValue, showUnit ? unit : false)}
+      </h3>
+    `
+  }
+
+  setTemperature(change: number, field: string, baseValue?: number) {
     this._updatingValues = true
-    const previousValue = this._values[field]
+    if (this._updatingValuesTimeout) {
+      clearTimeout(this._updatingValuesTimeout)
+    }
+    this._updatingValuesTimeout = setTimeout(() => {
+      this._updatingValues = false
+      this._updatingValuesTimeout = null
+    }, UPDATING_TIMEOUT)
+    const previousValue = baseValue ?? this._values[field]
     const newValue = Number(previousValue) + change
     const { decimals } = this.config
 
@@ -598,27 +942,22 @@ export default class SimpleThermostat extends LitElement {
 
   setMode = (type: string, mode: string) => {
     if (type && mode) {
-      if (type === MODES.DIRECTION || type === MODES.OSCILLATING) {
-        this._hass.callService('fan', `set_${type}`, {
+      const adapter = getAdapter(this.config.entity)
+      if (type === MODES.STATE) {
+        this._callAction(`${adapter.getLocalizationDomain()}.turn_${mode}`, {
           entity_id: this.config.entity,
-          [type]: type === MODES.OSCILLATING ? mode === 'true' : mode,
         })
-      } else if (type === MODES.MODE) {
-        this._hass.callService('humidifier', 'set_mode', {
-          entity_id: this.config.entity,
-          mode,
-        })
-      } else if (MODES_WITH_POSITIONS.includes(type as MODES)) {
-        this._hass.callService('climate', `set_${type}`, {
-          entity_id: this.config.entity,
-          [`${type}`]: mode,
-        })
-      } else {
-        this._hass.callService('climate', `set_${type}_mode`, {
-          entity_id: this.config.entity,
-          [`${type}_mode`]: mode,
-        })
+        fireEvent(this, 'haptic', 'light')
+        return
       }
+      const value = adapter.transformModePayloadValue?.(type, mode) ?? mode
+      this._callAction(
+        `${adapter.getLocalizationDomain()}.${adapter.getModeService(type)}`,
+        {
+          entity_id: this.config.entity,
+          [adapter.getModePayloadKey(type)]: value,
+        }
+      )
       fireEvent(this, 'haptic', 'light')
     } else {
       fireEvent(this, 'haptic', 'failure')
@@ -631,8 +970,78 @@ export default class SimpleThermostat extends LitElement {
     })
   }
 
-  // The height of your card. Home Assistant uses this to automatically
-  // distribute all cards over the available columns.
+  _onActionPointerDown = (e: PointerEvent) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return
+    this._holdFired = false
+    if (this._holdTimer) clearTimeout(this._holdTimer)
+    this._holdTimer = setTimeout(() => {
+      this._holdFired = true
+      this._holdTimer = null
+      this._dispatchAction('hold')
+    }, SimpleThermostat.HOLD_MS)
+  }
+
+  _onActionPointerUp = () => {
+    if (this._holdTimer) {
+      clearTimeout(this._holdTimer)
+      this._holdTimer = null
+    }
+  }
+
+  _onActionClick = (e: MouseEvent) => {
+    e.preventDefault()
+    if (this._holdFired) {
+      this._holdFired = false
+      return
+    }
+    this._clickCount += 1
+    if (this._clickCount === 1) {
+      if (this._clickTimer) clearTimeout(this._clickTimer)
+      this._clickTimer = setTimeout(() => {
+        this._clickCount = 0
+        this._clickTimer = null
+        this._dispatchSetpointTap()
+      }, SimpleThermostat.DOUBLE_TAP_MS)
+    } else {
+      if (this._clickTimer) clearTimeout(this._clickTimer)
+      this._clickTimer = null
+      this._clickCount = 0
+      this._dispatchAction('double_tap')
+    }
+  }
+
+  _onSetpointKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      this._dispatchSetpointTap()
+    }
+  }
+
+  _dispatchSetpointTap() {
+    if (this.config?.tap_action) {
+      this._dispatchAction('tap')
+      return
+    }
+
+    this.openEntityPopover(this.config.entity)
+  }
+
+  _dispatchAction(kind: 'tap' | 'hold' | 'double_tap') {
+    const key =
+      kind === 'tap'
+        ? 'tap_action'
+        : kind === 'hold'
+          ? 'hold_action'
+          : 'double_tap_action'
+    const action =
+      this.config?.[key] ??
+      (kind === 'tap' ? { action: 'more-info' } : { action: 'none' })
+    fireEvent(this, 'hass-action', {
+      config: this.config,
+      action,
+    })
+  }
+
   getCardSize() {
     return 3
   }

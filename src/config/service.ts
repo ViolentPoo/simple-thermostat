@@ -2,25 +2,19 @@ export interface Service {
   domain: string
   service: string
   data?: {
-    [key: string]: string
+    [key: string]: any
   }
 }
 
-const DEFAULT_SERVICES = {
-  climate: 'set_temperature',
-  fan: 'set_percentage',
-  humidifier: 'set_humidity',
-}
+import { EntityAdapter } from '../adapters'
+import { climateAdapter } from '../adapters/climate'
 
-export default function parseServie(
+export default function parseService(
   config: false | Service,
-  entityDomain = 'climate'
+  adapter: EntityAdapter = climateAdapter
 ): Service {
   if (!config) {
-    return {
-      domain: entityDomain,
-      service: DEFAULT_SERVICES[entityDomain] ?? 'set_temperature',
-    }
+    return adapter.getSetpointService()
   }
   return config
 }

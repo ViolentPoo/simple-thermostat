@@ -36,9 +36,8 @@ test('render into dom', () => {
   const heading = document.body.querySelector('div').textContent
   const value = document.body.querySelector('div:last-child').textContent
 
-  // TODO Spaces exist in render result. For sanitys sake they should probably be removed
-  expect(heading).toBe(` ${spec.heading}: `)
-  expect(value).toBe(spec.value)
+  expect(heading.trim()).toBe(`${spec.heading}:`)
+  expect(value.trim()).toBe(spec.value)
 })
 
 test('render with icon', () => {
@@ -57,7 +56,169 @@ test('render with icon', () => {
   const heading = document.body.querySelector('div').innerHTML
   const value = document.body.querySelector('div:last-child').textContent
 
-  // TODO Spaces exist in render result. For sanitys sake they should probably be removed
   expect(heading).toContain('<ha-icon icon="test"')
-  expect(value).toBe(spec.value)
+  expect(value.trim()).toBe(spec.value)
+})
+
+test('appends entity unit after Home Assistant formatted state', () => {
+  const result = renderInfoItem({
+    hide: false,
+    hass: {
+      formatEntityState: () => '48.64',
+    },
+    state: {
+      entity_id: 'sensor.average_humidity',
+      state: '48.64',
+      attributes: {
+        unit_of_measurement: '%',
+      },
+    },
+    details: { heading: false },
+    openEntityPopover: () => undefined,
+  })
+
+  render(result, document.body)
+  const valueElement = document.body.querySelector('div')
+  const value = valueElement.textContent
+
+  expect(value.trim()).toBe('48.64%')
+  expect(valueElement.getAttribute('title')).toBe('sensor.average_humidity')
+})
+
+test('does not duplicate entity unit from Home Assistant formatted state', () => {
+  const result = renderInfoItem({
+    hide: false,
+    hass: {
+      formatEntityState: () => '20.44 °C',
+    },
+    state: {
+      entity_id: 'sensor.average_temperature',
+      state: '20.44',
+      attributes: {
+        unit_of_measurement: '°C',
+      },
+    },
+    details: { heading: false },
+    openEntityPopover: () => undefined,
+  })
+
+  render(result, document.body)
+  const value = document.body.querySelector('div').textContent
+
+  expect(value.trim()).toBe('20.44 °C')
+})
+
+test('falls back to percent for humidity rows without an entity unit', () => {
+  const result = renderInfoItem({
+    hide: false,
+    hass: {
+      formatEntityState: () => '48.11',
+    },
+    state: {
+      entity_id: 'sensor.average_humidity',
+      state: '48.11',
+      attributes: {},
+    },
+    details: { heading: false, icon: 'mdi:water-percent' },
+    openEntityPopover: () => undefined,
+  })
+
+  render(result, document.body)
+  const value = document.body.querySelector('div').textContent
+
+  expect(value.trim()).toBe('48.11%')
+})
+
+test('does not render undefined when entity unit is missing', () => {
+  const result = renderInfoItem({
+    hide: false,
+    hass: {
+      formatEntityState: () => '123',
+    },
+    state: {
+      entity_id: 'sensor.no_unit',
+      state: '123',
+      attributes: {},
+    },
+    details: { heading: false },
+    openEntityPopover: () => undefined,
+  })
+
+  render(result, document.body)
+  const value = document.body.querySelector('div').textContent
+
+  expect(value.trim()).toBe('123')
+})
+
+test('plain text rows with an entity id open more info from label and value', () => {
+  const openEntityPopover = jest.fn()
+  const result = renderInfoItem({
+    hide: false,
+    hass: {
+      states: {
+        'sensor.average_humidity': {
+          attributes: { friendly_name: 'Average Humidity' },
+        },
+      },
+    },
+    state: '48.71%',
+    details: {
+      heading: 'Humidity',
+      entity: 'sensor.average_humidity',
+    },
+    openEntityPopover,
+  })
+
+  const container = document.createElement('div')
+  document.body.replaceChildren(container)
+  render(result, container)
+
+  const heading = container.querySelector('.entity-heading') as HTMLElement
+  const value = container.querySelector('.entity-value') as HTMLElement
+
+  heading.click()
+  value.click()
+
+  expect(openEntityPopover).toHaveBeenNthCalledWith(
+    1,
+    'sensor.average_humidity'
+  )
+  expect(openEntityPopover).toHaveBeenNthCalledWith(
+    2,
+    'sensor.average_humidity'
+  )
+})
+
+test('toggle entity rows expose domain, state, and icon classes for styling', () => {
+  const result = renderInfoItem({
+    hide: false,
+    hass: {},
+    state: {
+      entity_id: 'light.desk_lamp',
+      state: 'on',
+      attributes: {
+        icon: 'mdi:lightbulb',
+      },
+    },
+    details: {
+      icon: 'mdi:lightbulb',
+    },
+    openEntityPopover: () => undefined,
+  })
+
+  const container = document.createElement('div')
+  document.body.replaceChildren(container)
+  render(result, container)
+
+  const heading = container.querySelector('.entity-heading') as HTMLElement
+  const value = container.querySelector('.entity-value') as HTMLElement
+
+  expect(heading.classList.contains('toggle-entity')).toBe(true)
+  expect(heading.classList.contains('domain-light')).toBe(true)
+  expect(heading.classList.contains('state-on')).toBe(true)
+  expect(heading.classList.contains('toggle-lightbulb')).toBe(true)
+  expect(value.classList.contains('toggle-entity')).toBe(true)
+  expect(value.classList.contains('domain-light')).toBe(true)
+  expect(value.classList.contains('state-on')).toBe(true)
+  expect(value.querySelector('ha-switch')).not.toBeNull()
 })

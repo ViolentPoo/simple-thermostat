@@ -20,7 +20,19 @@ export const STATE_ICONS = {
   fan: 'mdi:fan',
   heating: 'mdi:radiator',
   idle: 'mdi:radiator-disabled',
+  on: 'mdi:power',
   off: 'mdi:radiator-off',
+}
+
+export const DOMAIN_STATE_ICONS = {
+  fan: {
+    on: 'mdi:fan',
+    off: 'mdi:fan-off',
+  },
+  humidifier: {
+    on: 'mdi:air-humidifier',
+    off: 'mdi:air-humidifier-off',
+  },
 }
 
 export const MODE_ICONS = {
@@ -30,14 +42,78 @@ export const MODE_ICONS = {
   fan_only: 'hass:fan',
   heat_cool: 'hass:autorenew',
   heat: 'hass:fire',
+  on: 'hass:power',
   off: 'hass:power',
   forward: 'mdi:arrow-right',
   reverse: 'mdi:arrow-left',
   true: 'mdi:fan',
   false: 'mdi:fan-off',
+  low: 'mdi:fan-speed-1',
+  mid: 'mdi:fan-speed-2',
+  medium: 'mdi:fan-speed-2',
+  high: 'mdi:fan-speed-3',
+  max: 'st:fan-speed-4',
+  turbo: 'st:fan-speed-5',
+  '1': 'mdi:fan-speed-1',
+  '2': 'mdi:fan-speed-2',
+  '3': 'mdi:fan-speed-3',
+  '4': 'st:fan-speed-4',
+  '5': 'st:fan-speed-5',
+  automatic: 'mdi:fan-auto',
+  powerful: 'mdi:fan-plus',
+  quiet: 'mdi:fan-minus',
+  silent: 'mdi:fan-minus',
   normal: 'mdi:water-percent',
+  vertical: 'mdi:arrow-up-down',
+  top: 'mdi:arrow-up',
+  'top-middle': 'mdi:arrow-top-right',
+  middle: 'mdi:arrow-collapse-vertical',
+  'middle-bottom': 'mdi:arrow-bottom-right',
+  bottom: 'mdi:arrow-down',
+  upper: 'mdi:arrow-up',
+  lower: 'mdi:arrow-down',
+  horizontal: 'mdi:arrow-left-right',
+  left: 'mdi:arrow-left',
+  'center-left': 'mdi:arrow-top-left',
+  center: 'mdi:arrow-collapse-horizontal',
+  'center-right': 'mdi:arrow-top-right',
+  right: 'mdi:arrow-right',
+  both: 'mdi:arrow-all',
+  swing: 'mdi:arrow-oscillating',
+  wide: 'mdi:arrow-expand-horizontal',
+  narrow: 'mdi:arrow-collapse-horizontal',
+  split: 'mdi:arrow-split-vertical',
+  none: 'mdi:circle-off-outline',
   away: 'mdi:home-export-outline',
+  eco: 'mdi:leaf',
   boost: 'mdi:weather-windy',
+  comfort: 'mdi:sofa',
+  home: 'mdi:home',
+  sleep: 'mdi:sleep',
+  activity: 'mdi:run',
+}
+
+export function getModeIcon(mode: string) {
+  const modeKey = String(mode)
+  const normalizedModeKey = modeKey.toLowerCase().replace(/\s+/g, '_')
+
+  return MODE_ICONS[modeKey] ?? MODE_ICONS[normalizedModeKey]
+}
+
+export function getModeName(mode: string) {
+  const modeKey = String(mode)
+  const normalizedModeKey = modeKey.toLowerCase().replace(/\s+/g, '_')
+  const modeNames: Record<string, string> = {
+    low: 'Low',
+    mid: 'Mid',
+    medium: 'Medium',
+    high: 'High',
+    max: 'Max',
+    turbo: 'Turbo',
+    auto: 'Auto',
+  }
+
+  return modeNames[normalizedModeKey] ?? modeKey
 }
 
 type Icon = string | false | LooseObject
@@ -53,8 +129,9 @@ export interface HeaderConfig {
 export interface HeaderData {
   name?: Name
   icon: Icon
+  slashOffIcon?: boolean
   faults?: Array<Fault>
-  toggle?: Toggle
+  toggle?: Toggle | null
   toggles?: Array<Toggle>
 }
 
@@ -72,7 +149,8 @@ export type ToggleConfig = {
 export default function parseHeaderConfig(
   config: false | HeaderConfig,
   entity,
-  hass: HASS
+  hass: HASS,
+  enhancedVisuals = true
 ): false | HeaderData {
   if (config === false) return false
 
@@ -82,10 +160,15 @@ export default function parseHeaderConfig(
   } else if (config?.name === false) {
     name = false
   } else {
-    name = entity.attributes.friendly_name
+    name =
+      typeof hass.formatEntityName === 'function'
+        ? hass.formatEntityName(entity)
+        : entity.attributes.friendly_name
   }
 
-  let icon: Icon = entity.attributes.hvac_action ? STATE_ICONS : MODE_ICONS
+  let icon: Icon = enhancedVisuals
+    ? getDefaultHeaderIcon(entity)
+    : getLegacyHeaderIcon(entity)
   if (typeof config?.icon !== 'undefined') {
     icon = config.icon
   }
@@ -93,18 +176,20 @@ export default function parseHeaderConfig(
   return {
     name,
     icon,
+    slashOffIcon: enhancedVisuals && shouldSlashOffIcon(entity, icon),
     toggle: config?.toggle ? parseToggle(config.toggle, hass) : null,
     toggles: parseToggles(config, hass),
     faults: parseFaults(config?.faults, hass),
   }
 }
 
-function parseToggle(config: ToggleConfig, hass): Toggle {
+function parseToggle(config: ToggleConfig, hass): Toggle | null {
   const entity: HAState = hass.states[config.entity]
+  if (!entity) return null
 
   let label = ''
   if (config?.name === true) {
-    label = entity.attributes.name
+    label = entity.attributes.friendly_name
   } else {
     label = (config?.name as string) ?? ''
   }
@@ -118,18 +203,46 @@ function parseToggles(config: HeaderConfig, hass): Array<Toggle> {
     ...(Array.isArray(config?.toggles) ? config.toggles : []),
   ]
 
-  return toggleConfigs.map((toggle) => parseToggle(toggle, hass))
+  return toggleConfigs
+    .map((toggle) => parseToggle(toggle, hass))
+    .filter((toggle): toggle is Toggle => !!toggle)
+}
+
+function getDefaultHeaderIcon(entity: HAState): Icon {
+  const [entityDomain] = entity.entity_id.split('.')
+
+  return (
+    entity.attributes.icon ??
+    DOMAIN_STATE_ICONS[entityDomain]?.[entity.state] ??
+    (entity.attributes.hvac_action ? STATE_ICONS : MODE_ICONS)
+  )
+}
+
+function getLegacyHeaderIcon(entity: HAState): Icon {
+  return entity.attributes.hvac_action ? STATE_ICONS : MODE_ICONS
+}
+
+function shouldSlashOffIcon(entity: HAState, icon: Icon) {
+  if (entity.state !== 'off' || typeof icon !== 'string') return false
+
+  const [entityDomain] = entity.entity_id.split('.')
+  const domainOffIcon =
+    entityDomain === 'climate'
+      ? STATE_ICONS.off
+      : DOMAIN_STATE_ICONS[entityDomain]?.off
+
+  return Boolean(domainOffIcon) && icon !== domainOffIcon && !icon.endsWith('-off')
 }
 
 function parseFaults(config: Array<Fault>, hass: HASS) {
   if (Array.isArray(config)) {
-    return config.map(({ entity, ...rest }: Fault) => {
-      return {
+    return config
+      .filter(({ entity }) => Boolean(hass.states?.[entity]))
+      .map(({ entity, ...rest }: Fault) => ({
         ...rest,
         state: hass.states[entity],
         entity,
-      }
-    })
+      }))
   }
   return []
 }

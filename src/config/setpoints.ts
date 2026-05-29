@@ -1,5 +1,5 @@
-import getEntityType from '../getEntityType'
-const DUAL = 'dual' as const
+import { EntityAdapter } from '../adapters'
+import { climateAdapter } from '../adapters/climate'
 
 export interface Setpoint {
   hide?: boolean
@@ -8,46 +8,21 @@ export interface Setpoint {
 export type Setpoints = Record<string, Setpoint>
 
 export default function parseSetpoints(
-  setpoints: Setpoints | false,
+  setpoints: Setpoints | false | undefined,
   attributes: any,
-  entityDomain = 'climate'
+  adapter: EntityAdapter = climateAdapter
 ) {
   if (setpoints === false) {
     return {}
   }
 
   if (setpoints) {
-    const def = Object.keys(setpoints)
-    return def.reduce((result, name: string) => {
-      const sp = setpoints[name]
+    return Object.entries(setpoints).reduce((result, [name, sp]) => {
       if (sp?.hide) return result
-      return {
-        ...result,
-        [name]: attributes?.[name],
-      }
-    }, {})
+      result[name] = attributes?.[name]
+      return result
+    }, {} as Record<string, any>)
   }
 
-  if (entityDomain === 'fan') {
-    return {
-      percentage: attributes.percentage,
-    }
-  }
-
-  if (entityDomain === 'humidifier') {
-    return {
-      humidity: attributes.humidity,
-    }
-  }
-
-  const entityType = getEntityType(attributes)
-  if (entityType === DUAL) {
-    return {
-      target_temp_low: attributes.target_temp_low,
-      target_temp_high: attributes.target_temp_high,
-    }
-  }
-  return {
-    temperature: attributes.temperature,
-  }
+  return adapter.getSetpoints(attributes)
 }

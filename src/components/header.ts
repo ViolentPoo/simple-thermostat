@@ -24,17 +24,14 @@ export default function renderHeader({
   if (typeof header.icon === 'object') {
     icon = icon?.[action] ?? false
   }
+  const slashOffIcon = Boolean(header.slashOffIcon)
 
   const name = header?.name ?? false
 
   return html`
     <header>
-      <div
-        style="display: flex;"
-        class="clickable"
-        @click=${() => openEntityPopover()}
-      >
-        ${renderIcon(icon)} ${renderName(name)}
+      <div class="header__main clickable" @click=${() => openEntityPopover()}>
+        ${renderIcon(icon, entity.state, slashOffIcon)} ${renderName(name)}
       </div>
       ${renderFaults(header.faults, openEntityPopover)}
       ${renderToggles(header.toggles, openEntityPopover, toggleEntityChanged)}
@@ -42,9 +39,15 @@ export default function renderHeader({
   `
 }
 
-function renderIcon(icon) {
+function renderIcon(icon, state, slashOffIcon = false) {
   return icon
-    ? html` <ha-icon class="header__icon" .icon=${icon}></ha-icon> `
+    ? html`
+        <span
+          class="header__icon-wrap ${state} ${slashOffIcon ? 'slash-off' : ''}"
+        >
+          <ha-icon class="header__icon ${state}" .icon=${icon}></ha-icon>
+        </span>
+      `
     : nothing
 }
 
@@ -53,17 +56,19 @@ function renderName(name) {
 }
 
 function renderFaults(faults, openEntityPopover) {
-  if (faults.length === 0) {
+  if (!faults?.length) {
     return nothing
   }
   const faultHtml = faults.map(({ icon, hide_inactive, state }) => {
+    if (!state) return nothing
+
     return html` <ha-icon
       class="fault-icon ${state.state === 'on'
         ? 'active'
         : hide_inactive
-        ? ' hide'
-        : ''}"
-      icon="${icon || state.attributes.icon}"
+          ? ' hide'
+          : ''}"
+      .icon=${icon || state.attributes?.icon}
       @click="${() => openEntityPopover(state.entity_id)}"
     ></ha-icon>`
   })
@@ -78,10 +83,23 @@ function renderToggles(toggles, openEntityPopover, toggleEntityChanged) {
     <div class="header__toggles">
       ${toggles.map((toggle) => {
         const entityId = toggle.entity?.entity_id
+        const toggleState = toggle.entity?.state
+        const toggleDomain =
+          typeof entityId === 'string' ? entityId.split('.')[0] : ''
+        const toggleKind =
+          typeof toggle.icon === 'string'
+            ? toggle.icon.replace(/^mdi:/, '').replace(/[^a-z0-9_-]/gi, '')
+            : ''
         return html`
-          <div class="header__toggle">
+          <div
+            class="header__toggle ${toggleState || ''} ${toggleDomain
+              ? `domain-${toggleDomain}`
+              : ''} ${toggleKind ? `toggle-${toggleKind}` : ''}"
+          >
             <span
-              class="clickable toggle-label"
+              class="clickable toggle-label ${toggleState || ''} ${toggleDomain
+                ? `domain-${toggleDomain}`
+                : ''} ${toggleKind ? `toggle-${toggleKind}` : ''}"
               title=${toggle.label || toggle.entity?.attributes?.friendly_name}
               @click=${() => openEntityPopover(entityId)}
               >${toggle.icon !== false

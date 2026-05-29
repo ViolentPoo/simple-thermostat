@@ -1,63 +1,69 @@
 # Development Guide
 
-## Local Testing
+## Local Setup
 
-### 1. Install dependencies
+Install dependencies from the lockfile:
+
 ```bash
-npm install --legacy-peer-deps
+npm ci
 ```
 
-### 2. Run tests
+## Local Checks
+
+Run the main checks before publishing or opening a pull request:
+
 ```bash
+npm run typecheck
 npm test
+npm run build:prod
 ```
 
-### 3. Build for production
-```bash
-npm run build
-```
-This creates `dist/simple-thermostat.js`
+`npm run build:prod` creates `simple-thermostat.js` in the repository root, the file used by HACS and GitHub release assets.
 
-### 4. Test in Home Assistant
+## Testing In Home Assistant
 
-**Option A: Direct file copy**
-1. Build: `npm run build`
-2. Copy `dist/simple-thermostat.js` to your HA config: `<config>/www/simple-thermostat.js`
-3. In HA, add resource (if not already added via HACS):
-   ```yaml
-   resources:
-     - url: /local/simple-thermostat.js?v=test
-       type: module
-   ```
-4. Clear browser cache and refresh
-5. Add card to your dashboard
+### Direct File Copy
 
-**Option B: Dev server (watch mode)**
+1. Build with `npm run build:prod`.
+2. Copy `simple-thermostat.js` to the Home Assistant config folder under `www/community/simple-thermostat/simple-thermostat.js` when testing the HACS path, or to `www/simple-thermostat.js` when testing a manual `/local/` resource.
+3. Update the Lovelace resource cache tag if needed.
+4. Hard refresh the browser.
+5. Add or edit a `custom:simple-thermostat` card.
+
+### Watch Build
+
 ```bash
 npm run dev
 ```
-This watches files and rebuilds automatically. Copy the updated file to HA's www folder after each build.
+
+This watches source files and rebuilds the debug bundle. Copy the rebuilt file to Home Assistant after each change you want to test there.
 
 ## Making Changes
 
-1. Edit TypeScript files in `src/`
-2. Run tests: `npm test`
-3. Build: `npm run build`
-4. Test in Home Assistant
-5. Commit with clear message: `fix: description` or `feat: description`
+1. Edit TypeScript files in `src/`.
+2. Build output is generated locally and should not be committed from `dist/`.
+3. Run `npm run typecheck`.
+4. Run `npm test`.
+5. Run `npm run build:prod`.
+6. Test the built card in Home Assistant.
 
-## Creating a Release
+## Creating A Release
 
-1. Update version in `package.json`
-2. Build: `npm run build`
-3. Commit changes: `git commit -am "chore: bump version to X.X.X"`
-4. Tag: `git tag vX.X.X`
-5. Push: `git push && git push --tags`
-6. GitHub Actions will automatically create the release with built files
+1. Update the version in `package.json`.
+2. Update README/changelog notes for the release.
+3. Run `npm run typecheck`, `npm test`, and `npm run build:prod`.
+4. Commit the source, lockfile, docs, and root `simple-thermostat.js` bundle.
+5. Push to `master`.
+6. Confirm HACS and test workflows pass.
+7. Draft and publish a GitHub release with tag `vX.X.X` and manual release notes.
+8. The Release workflow builds again and attaches `simple-thermostat.js` and `simple-thermostat.debug.js` to the published release.
 
 ## File Structure
 
-- `src/` - TypeScript source files
-- `dist/` - Built output (generated, not committed)
-- `.github/workflows/` - CI/CD automation
-- `hacs.json` - HACS metadata
+- `src/` - TypeScript source files.
+- `src/adapters/` - Domain-specific climate, fan, and humidifier behavior.
+- `src/test/` - Jest regression tests.
+- `simple-thermostat.js` - Built HACS plugin file committed at the repository root.
+- `dist/` - Local generated output, ignored by git.
+- `.github/workflows/` - CI, build, and release automation.
+- `hacs.json` - HACS metadata.

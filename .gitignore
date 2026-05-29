@@ -2,4 +2,37 @@ node_modules
 *.min.js
 .nvmrc
 .idea
-package-lock.json
+dist/
+simple-thermostat.debug.js
+
+# Debug build artifacts
+dist/*.debug.js
+
+# Test coverage
+coverage
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Editor
+.vscode
+*.swp
+*.swo
+
+# Local-only AI assistant notes
+CLAUDE.md
+.claude/

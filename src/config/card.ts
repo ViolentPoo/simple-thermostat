@@ -6,6 +6,7 @@ import { Setpoints } from './setpoints'
 export enum MODES {
   HVAC = 'hvac',
   FAN = 'fan',
+  STATE = 'state',
   PRESET = 'preset',
   SWING = 'swing',
   SWING_HORIZONTAL = 'swing_horizontal',
@@ -28,8 +29,9 @@ export type ModeValue = {
  *
  */
 export type ModeControlObject = Record<string, boolean | ModeValue> & {
-  _name: string
-  _hide_when_off: boolean
+  _name?: string | boolean
+  _heading?: boolean
+  _hide_when_off?: boolean
   _icons?: boolean
 }
 
@@ -44,6 +46,7 @@ export type ModeControlValue = boolean | ModeControlObject
 type ModeControl = {
   hvac: ModeControlValue
   fan: ModeControlValue
+  state: ModeControlValue
   preset: ModeControlValue
   swing: ModeControlValue
   swing_horizontal: ModeControlValue
@@ -86,7 +89,10 @@ interface CardConfig {
   }
   unit?: boolean | string
   fallback?: string
+  enhanced_visuals?: boolean
+  styles?: string
   service?: Service
+  hide_setpoint?: boolean
   hide?: {
     temperature?: boolean
     state?: boolean
@@ -95,6 +101,17 @@ interface CardConfig {
     temperature?: string
     state?: string
   }
+  tap_action?: TapAction
+  hold_action?: TapAction
+  double_tap_action?: TapAction
 }
+
+export type TapAction =
+  | { action: 'more-info' }
+  | { action: 'none' }
+  | { action: 'navigate'; navigation_path: string }
+  | { action: 'url'; url_path: string }
+  | { action: 'toggle' }
+  | { action: 'call-service'; service: string; service_data?: LooseObject }
 
 export { CardConfig }

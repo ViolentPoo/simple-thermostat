@@ -1,22 +1,46 @@
-# simple-thermostat
+<div align="center">
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
+# Simple Thermostat
 
-An AI-assisted, community-maintained fork of [simple-thermostat](https://github.com/nervetattoo/simple-thermostat) by [@nervetattoo](https://github.com/nervetattoo), kept working with current Home Assistant releases.
+### A HVAC, thermostat, climate, fan, and humidifier card for Home Assistant Lovelace UI
 
-A compact Lovelace thermostat card for Home Assistant. It supports climate, fan, and humidifier/dehumidifier entities with setpoints, extra entities, header toggles, and mode controls in a small configurable layout.
+[![HACS Custom](https://img.shields.io/badge/HACS-CUSTOM-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white&labelColor=555555)](https://github.com/hacs/integration)
+[![Home Assistant 2024.8+](https://img.shields.io/badge/HOME%20ASSISTANT-2024.8%2B-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white&labelColor=555555)](https://www.home-assistant.io/)
+[![Latest release](https://img.shields.io/github/v/release/Wheemer/simple-thermostat?style=for-the-badge&logo=github&logoColor=white&label=RELEASE&labelColor=555555&color=22C55E)](https://github.com/Wheemer/simple-thermostat/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/Wheemer/simple-thermostat/total?style=for-the-badge&logo=github&logoColor=white&label=DOWNLOADS&labelColor=555555&color=8A2BE2)](https://github.com/Wheemer/simple-thermostat/releases)
 
-<img src="https://github.com/Wheemer/simple-thermostat/raw/master/examples.png" alt="Examples" width="620">
+<p>
+  <strong>⭐ NEW V4 RELEASE ⭐</strong><br>
+  Fan, humidifier, dehumidifier, modern actions, and enhanced visuals
+</p>
+
+</div>
+
+A Codex assisted, community maintained fork of [simple-thermostat](https://github.com/nervetattoo/simple-thermostat) by [@nervetattoo](https://github.com/nervetattoo), kept working with current Home Assistant releases. The v4 modernization was heavily influenced by [duczz/ha-simple-thermostat](https://github.com/duczz/ha-simple-thermostat).
+
+A compact Lovelace card for Home Assistant climate, fan, humidifier, and dehumidifier entities. It keeps the original small-card style while adding domain-aware setpoints, current values, action handling, richer mode controls, and enhanced visuals.
+
+<div style="border: 1px solid rgba(65, 189, 245, 0.45); border-radius: 8px; padding: 16px 18px; margin: 18px 0;">
+  <strong style="color: #41bdf5;">New in v4:</strong> Fan, humidifier, and dehumidifier support, domain-aware controls, modern Home Assistant actions, richer mode buttons, and enhanced visuals.
+</div>
+
+<img src="examples.png" alt="Simple Thermostat v4 examples" width="900">
+
+<div style="border: 1px solid rgba(65, 189, 245, 0.45); border-radius: 8px; padding: 16px 18px; margin: 18px 0;">
+  <strong style="color: #41bdf5;">Requires:</strong> Home Assistant 2024.8 or newer. v4 uses Home Assistant's current frontend action API.
+</div>
+
+<div style="border: 1px solid rgba(65, 189, 245, 0.45); border-radius: 8px; padding: 16px 18px; margin: 18px 0;">
+  <strong style="color: #41bdf5;">Compatibility:</strong> Prefer <code>current_value_entity</code>, <code>entities</code>, and <code>layout.entities</code> for new configs. Older <code>current_temperature_entity</code>, <code>sensors</code>, and <code>layout.sensors</code> YAML is legacy but supported.
+</div>
 
 ## Installation
 
 ### HACS
 
-Easily add my repo using this convenient button:
-
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Wheemer&repository=simple-thermostat&category=plugin)
 
-or:
+Or add it manually in HACS:
 
 1. Open **HACS** in Home Assistant.
 2. Open **Custom repositories**.
@@ -27,17 +51,17 @@ or:
    ```
 
 4. Choose type **Dashboard**.
-5. Install **simple-thermostat** from HACS.
-6. Refresh Home Assistant. If the old card is still loading, clear your browser cache.
+5. Install **Simple Thermostat**.
+6. Refresh Home Assistant and clear the browser cache if the old card is still loaded.
 
 ### Migrating from another fork
 
-If you already installed `simple-thermostat` from another repository, uninstall the old HACS entry first. Then click the blue "open hacs repository on my home assistant" button or add this repository as a HACS custom repository type dashboard and install it again.
+If you installed `simple-thermostat` from another repository, uninstall the old HACS entry first. Then add this repository as the dashboard custom repository and install it again.
 
 ### Manual install
 
 1. Download `simple-thermostat.js` from the [latest release](https://github.com/Wheemer/simple-thermostat/releases/latest).
-2. Put the file in your Home Assistant `www` folder.
+2. Put it in your Home Assistant `www` folder.
 3. Add this Lovelace resource:
 
    ```yaml
@@ -48,62 +72,67 @@ If you already installed `simple-thermostat` from another repository, uninstall 
 
 ## Changelog
 
-| Version | Changes |
-|---------|---------|
-| 3.0.49 | Fixed the default version 3 current value row for humidifier and dehumidifier entities so it displays current humidity instead of `N/A`. |
-| 3.0.47 | Fixed the card failing to render after adding domain-aware entity support. |
-| 3.0.46 | Added `current_value_entity` as the generic current value option, kept `current_temperature_entity` as a backwards-compatible alias, and fixed compatible entity filtering in the visual editor. |
-| 3.0.45 | Added fan and humidifier/dehumidifier entity support with domain-specific targets, controls, and units. |
-| 3.0.44 | Tightened header toggle switch spacing to better match entity row spacing. |
-| 3.0.43 | Tightened stacked header toggle spacing to better match entity rows. |
-| 3.0.42 | Fixed header toggle icons not rendering when configured. |
-| 3.0.41 | Added support for icons on header toggles. |
-| 3.0.40 | Tightened entity row spacing to better match stacked header toggles. |
-| 3.0.39 | Corrected entity row and header toggle spacing. |
-| 3.0.38 | Balanced vertical spacing between entity rows and stacked header toggles. |
-| 3.0.37 | Adjusted header toggle alignment and tightened the spacing between toggle labels and switches. |
-| 3.0.36 | Added support for Home Assistant's `none` number format so dot decimals are preserved when selected. |
-| 3.0.35 | Fixed numeric fan modes being hidden when a fan control row has explicit configuration. |
-| 3.0.34 | Tightened spacing for multiple header toggles so they stack more compactly. |
-| 3.0.33 | Fixed multiple header toggles stretching the thermostat card layout. |
-| 3.0.32 | Restored the HACS install button in the README installation section. |
-| 3.0.31 | Reorganized the README installation/configuration guidance and updated the examples image. |
-| 3.0.30 | Fixed extra heading whitespace in rendered info item output after restoring direct icon heading clicks. |
-| 3.0.29 | Fixed icon-only extra entity heading clicks by declaring the entity id before binding the icon click handler. |
-| 3.0.28 | Restored entity popover clicks for icon-only extra entity headings in both standard and templated entity rows. |
-| 3.0.27 | Restored entity popover clicks on icon-only extra entity headings after adding hover tooltips, and preserved icon-only extra entity heading spacing so rendered output matches the existing tests. |
-| 3.0.26 | Used Home Assistant entity formatting for extra entity rows so display precision follows the entity setting when no row-level `decimals` override is set. |
-| 3.0.25 | Restored extra entity toggle rows to the standard table layout while keeping icon tooltips. |
-| 3.0.24 | Fixed icon-only toggle rows preserving table grid structure after adding heading-cell alignment. |
-| 3.0.23 | Added hover tooltips for icon-only extra entity headings so the entity name is visible without labels. |
-| 3.0.22 | Fixed icon-only extra entity toggles so the switch aligns beside the icon instead of appearing in a separate value column. |
-| 3.0.21 | Scoped switch padding so extra entity toggles no longer add excessive row spacing while header toggles keep their existing spacing. |
-| 3.0.20 | Increased the default target temperature font size, documented per-mode color CSS variables, and removed a stale generated declaration. |
-| 3.0.19 | Added `header.toggles`, added `entities` as the preferred key for extra entity rows, and render toggle-capable extra entities as switches. |
-| 3.0.18 | Added `swing_horizontal` and `swing_vertical` support. |
-| 3.0.17 | Added `current_temperature_entity`. |
-| 3.0.16 | Fixed font sizing after Home Assistant removed deprecated `--paper-*` CSS variables. |
-| 3.0.15 | Fixed duplicate custom element registration error on Safari and iOS. |
-| 3.0.14 | Fixed error when used inside collapsible or other custom container cards. |
-| 3.0.13 | Fixed unlisted preset modes appearing when explicit mode config is provided. |
-| 3.0.12 | Added `vane_horizontal` and `vane_vertical` support. |
-| 3.0.11 | Show OFF for unavailable target temperature when heater is off. |
-| 3.0.10 | Locale-aware number formatting for temperatures and sensor values. |
-| 3.0.9 | Added row-level `_icons` option for mode controls. |
-| 3.0.8 | Fixed `version: 3` templated sensor crash for some Home Assistant language configs. |
-| 3.0.7 | Fixed target temperature font size on themes without paper-font variables. |
-| 3.0.5 | Fixed updating-state CSS class binding for target temperature display. |
-| 3.0.4 | Updated localization for Home Assistant 2026.5.0 compatibility. |
-| 3.0.0 | Updated to Lit 3.x and current dependencies. |
+### v4.0.0
+
+- Changed the minimum supported Home Assistant version to 2024.8+.
+- Added domain-aware card behavior for climate, fan, humidifier, and dehumidifier entities. The card now chooses the right setpoint, current value, range, services, labels, and default controls from the selected entity domain.
+- Added fan support with percentage setpoints, fan speed/preset buttons, direction controls, oscillation controls, and on/off state controls.
+- Added humidifier and dehumidifier support with humidity setpoints, current humidity display, mode controls, and on/off state controls.
+- Added `current_value_entity` as the generic current value option while preserving `current_temperature_entity` for existing YAML.
+- Added `entities` as the preferred extra-row key while preserving `sensors` for backward compatibility.
+- Added automatic current value defaults for supported domains, so climate, humidifier, and fan cards can work from the main entity without extra YAML when Home Assistant exposes the needed attributes.
+- Added `hide_setpoint` for cards that should keep mode controls visible while hiding the target value and plus/minus controls.
+- Improved header behavior with state-aware default icons, custom off-icon slash overlays, header toggle icons, and safer fault rendering.
+- Added richer mode controls with better ordering, default mode icons, custom fan speed icons, tooltips for compact controls with hidden labels, hidden mode headings by default, and support for fan, preset, swing, vane, direction, oscillation, humidifier mode, HVAC, and state rows.
+- Added a cleaner horizontal setpoint layout using minus/value/plus controls by default.
+- Added Home Assistant-style actions for the target value, including tap, hold, and double tap actions.
+- Added an improved visual editor that only shows options relevant to the selected entity and supported features.
+- Added an `enhanced_visuals` tweak that keeps the new v4 visual polish on by default, while letting upgraded v3 cards opt back into a simpler legacy-style appearance.
+- Added documented CSS variables for colors, icon sizes, typography, mode buttons, active accents, and animation intensity.
+- Updated controls and service calls to use Home Assistant's current `hass.performAction` API with legacy fallback.
+- Updated release packaging so the HACS bundle is built as `simple-thermostat.js` at the repository root, generated `dist/` output is no longer tracked, and GitHub Actions builds from source. Thanks to [@nateww](https://github.com/nateww) for the cleanup request.
+- Updated the build, release, dependency, and test workflow around npm and GitHub Actions.
 
 ## Basic Usage
+
+Climate entity:
 
 ```yaml
 type: custom:simple-thermostat
 entity: climate.living_room
 ```
 
-## Example
+Fan entity:
+
+```yaml
+type: custom:simple-thermostat
+entity: fan.range_hood
+```
+
+Humidifier or dehumidifier entity:
+
+```yaml
+type: custom:simple-thermostat
+entity: humidifier.basement_dehumidifier
+```
+
+## Visual Editor
+
+The card includes a visual editor for common setup.
+
+The editor shows options that are relevant to the selected entity:
+
+- Entity and current value selection for climate and humidifier-style cards.
+- Fan, HVAC, preset, swing, vane, direction, oscillating, and humidifier mode controls only when the selected entity supports them.
+- Header toggle icon options only after a header toggle entity is configured.
+- Extra entity layout options only when extra entities are configured.
+- Hide setpoint controls only when the selected entity has a setpoint.
+
+Advanced mode filtering, templates, custom actions, and custom CSS are still configured in YAML.
+
+## Examples
+
+### Compact Climate Card
 
 ```yaml
 type: custom:simple-thermostat
@@ -115,21 +144,46 @@ header:
   toggle:
     entity: switch.heater
     name: Heater
-layout:
-  step: row
-  mode:
-    names: false
-    icons: true
-    headings: false
+    icon: mdi:radiator
+control:
+  - hvac
+  - preset
 entities:
   - entity: sensor.living_room_temperature
     icon: mdi:thermometer
   - entity: sensor.living_room_humidity
     icon: mdi:water-percent
-control:
-  - hvac
-  - preset
 ```
+
+### Fan With Speeds
+
+```yaml
+type: custom:simple-thermostat
+entity: fan.range_hood
+control:
+  - fan
+  - state
+```
+
+### Dehumidifier
+
+```yaml
+type: custom:simple-thermostat
+entity: humidifier.basement_dehumidifier
+control:
+  - mode
+  - state
+```
+
+### Hide The Setpoint
+
+```yaml
+type: custom:simple-thermostat
+entity: climate.living_room
+hide_setpoint: true
+```
+
+This hides the target value and setpoint controls while keeping supported mode controls visible.
 
 ## Configuration
 
@@ -138,44 +192,39 @@ control:
 | Option | Type | Description |
 |--------|------|-------------|
 | `entity` | string | Climate, fan, humidifier, or dehumidifier entity id. Required. |
-| `current_value_entity` | string | Entity used for the current displayed value instead of the main entity. |
-| `current_temperature_entity` | string | Backwards-compatible alias for `current_value_entity`. |
-| `unit` | string or `false` | Override or hide the target unit. |
+| `current_value_entity` | string | Entity used for the displayed current value instead of the main entity. |
+| `current_temperature_entity` | string | Legacy but supported alias for `current_value_entity`. Prefer `current_value_entity` for new configs. |
+| `unit` | string, boolean | Override the target unit, or set `false` to hide it. |
 | `decimals` | number | Decimal places for target display. |
-| `step_size` | number | Amount changed by the target buttons. Default `0.5`. |
+| `step_size` | number | Amount changed by the target controls. |
+| `hide_setpoint` | boolean | Hide target value and setpoint controls. |
 | `fallback` | string | Text shown when no valid setpoint exists. Default `N/A`. |
-| `header` | object or `false` | Header configuration. |
-| `hide` | object | Hide built-in state or temperature rows. |
+| `enhanced_visuals` | boolean | Enable v4 visual polish. Set to `false` for a simpler legacy-style appearance while keeping v4 fixes and compatibility. Defaults to `true`. |
+| `header` | object, `false` | Header configuration. |
+| `hide` | object | Hide built-in state or current value rows. |
+| `label` | object | Override built-in row labels. |
 | `layout` | object | Layout settings. |
-| `control` | array, object, or `false` | Mode controls. |
-| `entities` | array or `false` | Extra entity rows. Preferred key. |
-| `sensors` | array or `false` | Legacy alias for `entities`. |
-| `setpoints` | object or `false` | Manual setpoint configuration. Usually not needed. |
-| `service` | object | Override the service used to set the target value. |
+| `control` | array, object, `false` | Mode controls. |
+| `entities` | array, `false` | Extra entity rows. Preferred key. |
+| `sensors` | array, `false` | Legacy but supported alias for `entities`. Prefer `entities` for new configs. |
+| `setpoints` | object, `false` | Manual setpoint configuration. Usually not needed. |
+| `service` | object | Override the action used to set the target value. |
+| `styles` | string | Inline CSS scoped to this card. |
+| `tap_action` | object | Action fired from the target value. |
+| `hold_action` | object | Hold action fired from the target value. |
+| `double_tap_action` | object | Double tap action fired from the target value. |
 
-### Hide Built-In Rows
+### Domain Defaults
 
-```yaml
-hide:
-  state: true
-  temperature: true
-```
+The card chooses the right behavior from the entity domain:
 
-### Layout
+| Domain | Target | Current value | Default controls |
+|--------|--------|---------------|------------------|
+| `climate` | Temperature | `current_temperature` or configured current value entity | HVAC, preset, fan, swing, vane |
+| `fan` | Percentage | Percentage when available | Fan speeds, direction, oscillating, state |
+| `humidifier` | Humidity | `current_humidity` | Mode, state |
 
-```yaml
-layout:
-  step: row
-  mode:
-    names: false
-    icons: true
-    headings: false
-  entities:
-    type: table
-    labels: true
-```
-
-`layout.step` can be `row` or `column`.
+Dehumidifiers use the Home Assistant `humidifier` domain.
 
 ## Header
 
@@ -192,7 +241,7 @@ header:
   name: My Room
   icon: mdi:sofa
   toggle:
-    entity: switch.fan
+    entity: switch.room_fan
     name: Fan
     icon: mdi:fan
 ```
@@ -215,19 +264,19 @@ Header options:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `name` | string or `false` | Header title. Defaults to the climate entity name. |
-| `icon` | string, object, or `false` | Header icon. |
+| `name` | string, `false` | Header title. Defaults to the entity friendly name. |
+| `icon` | string, object, `false` | Header icon override. Defaults to the entity icon, then a domain/state icon. |
 | `toggle` | object | Single header toggle. |
 | `toggles` | array | Multiple header toggles. |
-| `faults` | array or `false` | Binary sensor fault icons. |
+| `faults` | array, `false` | Binary sensor fault icons. |
 
 Toggle options:
 
 | Option | Type | Description |
 |--------|------|-------------|
 | `entity` | string | Entity to toggle. |
-| `name` | string or `true` | Toggle label. Use `true` for the entity friendly name. |
-| `icon` | string | Show an icon instead of the text label. |
+| `name` | string, boolean | Toggle label. Use `true` for the entity friendly name. |
+| `icon` | string | Icon shown beside or instead of the toggle label. |
 
 Fault options:
 
@@ -237,9 +286,56 @@ Fault options:
 | `icon` | string | Optional icon override. |
 | `hide_inactive` | boolean | Hide the icon when the sensor is off. |
 
-## Control
+## Layout
 
-By default, the card shows supported controls for the selected entity domain.
+```yaml
+layout:
+  step: row
+  mode:
+    names: true
+    icons: true
+    headings: false
+  entities:
+    type: table
+    labels: true
+```
+
+Layout options:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `layout.step` | `row`, `column` | Setpoint control layout. v4 defaults to the horizontal minus/value/plus layout. |
+| `layout.mode.names` | boolean | Show text on mode buttons. |
+| `layout.mode.icons` | boolean | Show icons on mode buttons. |
+| `layout.mode.headings` | boolean | Show mode row headings. Defaults to hidden. |
+| `layout.entities.type` | `table`, `list` | Extra entity row layout. |
+| `layout.entities.labels` | boolean | Show labels for extra entity rows. |
+| `layout.sensors.*` | object | Legacy but supported alias for `layout.entities.*`. Prefer `layout.entities.*` for new configs. |
+
+## Tweaks
+
+V4 enhanced visuals are enabled by default:
+
+```yaml
+enhanced_visuals: true
+```
+
+Set `enhanced_visuals: false` when you want an upgraded v3 card to keep a simpler legacy-style appearance while still using v4 fixes and compatibility:
+
+- Active button underline.
+- Mode button hover lift and hover tint.
+- Mode icon hover lift.
+- Button press shrink.
+- Setpoint update pulse.
+- Active heating, cooling, humidifying, dehumidifying, and fan header animations.
+- Custom off-icon slash overlay.
+- Loading shimmer.
+- Compact icon treatment for mode buttons.
+- The new default horizontal setpoint layout, unless explicitly configured.
+
+## Controls
+
+By default, the card shows supported controls for the selected entity.
 
 Simple format:
 
@@ -269,27 +365,34 @@ control: false
 
 Supported control types:
 
-- `hvac`
-- `fan`
-- `preset`
-- `swing`
-- `swing_horizontal`
-- `swing_vertical`
-- `vane_horizontal`
-- `vane_vertical`
-- `direction`
-- `oscillating`
-- `mode`
+| Control | Used by | Description |
+|---------|---------|-------------|
+| `hvac` | Climate | HVAC modes such as off, heat, cool, dry, fan only. |
+| `preset` | Climate | Preset modes such as away, eco, comfort, sleep. |
+| `fan` | Climate, fan | Fan modes or fan speeds. |
+| `state` | Fan, humidifier | On and off buttons. |
+| `swing` | Climate | Swing modes. |
+| `swing_horizontal` | Climate | Horizontal swing modes. |
+| `swing_vertical` | Climate | Vertical swing modes. |
+| `vane_horizontal` | Climate | Horizontal vane modes. |
+| `vane_vertical` | Climate | Vertical vane modes. |
+| `direction` | Fan | Forward and reverse direction. |
+| `oscillating` | Fan | Oscillation on and off. |
+| `mode` | Humidifier | Humidifier or dehumidifier modes. |
 
-`direction` and `oscillating` are for fan entities. `mode` is for humidifier and dehumidifier entities.
+Per-row options:
+
+| Option | Description |
+|--------|-------------|
+| `_name` | Override the row heading. |
+| `_heading` | Set to `true` to show the row heading. |
+| `_hide_when_off` | Hide the row when the main entity is off. |
+| `_icons` | Set to `false` to hide icons for this row. |
 
 Per-mode options:
 
 | Option | Description |
 |--------|-------------|
-| `_name` | Override the row heading. |
-| `_hide_when_off` | Hide this row when the climate entity is off. |
-| `_icons` | Set to `false` to hide icons for this row. |
 | `name` | Override a mode label. |
 | `icon` | Override a mode icon. |
 | `include` | Set to `false` to hide a mode. |
@@ -305,9 +408,11 @@ control:
       name: Heat
 ```
 
+Mode headings are hidden by default in v4. Use `_heading: true` only where a visible row label helps.
+
 ## Extra Entities
 
-Use `entities` to show extra rows in the card. The older `sensors` key still works.
+Use `entities` to show extra rows in the card. The older `sensors` key is legacy but supported for existing configurations.
 
 ```yaml
 entities:
@@ -349,6 +454,16 @@ Hide extra entities:
 entities: false
 ```
 
+Hide built-in rows:
+
+```yaml
+hide:
+  state: true
+  temperature: true
+```
+
+The `temperature` key is kept for compatibility and means the built-in current value row.
+
 ## Version 3 Templated Entities
 
 Set `version: 3` to use template-based entity rows.
@@ -366,15 +481,15 @@ entities:
     show: false
 ```
 
-Built-in rows `state` and `temperature` are added automatically unless you define rows with those ids. The `temperature` id is kept for backwards compatibility and represents the current displayed value.
+Built-in rows `state` and `temperature` are added automatically unless you define rows with those ids. The `temperature` id is kept for compatibility and represents the current displayed value.
 
 Version 3 entity options:
 
 | Option | Type | Description |
 |--------|------|-------------|
 | `id` | string | Unique row id. Use `state` or `temperature` to override built-ins. |
-| `entity` | string | Template context entity. Defaults to the climate entity. |
-| `label` | string or `false` | Row label. |
+| `entity` | string | Template context entity. Defaults to the main entity. |
+| `label` | string, `false` | Row label. |
 | `template` | string | Template to render. |
 | `unit` | string | Unit suffix. |
 | `decimals` | number | Decimal places. |
@@ -382,7 +497,13 @@ Version 3 entity options:
 
 ## Setpoints
 
-Setpoints are detected automatically. Climate entities use temperature setpoints, fan entities use percentage, and humidifier/dehumidifier entities use humidity. Override them only when needed.
+Setpoints are detected automatically:
+
+- Climate entities use temperature setpoints.
+- Fan entities use percentage.
+- Humidifier and dehumidifier entities use humidity.
+
+Override setpoints only when needed.
 
 Single setpoint:
 
@@ -420,20 +541,56 @@ service:
     entity_id: climate.living_room
 ```
 
+The card calls Home Assistant actions using the current `hass.performAction` API.
+
+## Actions
+
+The target value supports Home Assistant-style actions:
+
+```yaml
+tap_action:
+  action: more-info
+hold_action:
+  action: navigate
+  navigation_path: /lovelace/climate
+double_tap_action:
+  action: none
+```
+
+Supported action handling follows the same shape used by Home Assistant dashboard cards.
+
 ## CSS Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `--st-spacing` | `4px` | Base spacing unit. |
-| `--st-font-size-xl` | `28px` | Target temperature on wide screens. |
-| `--st-font-size-l` | `22px` | Target temperature on narrow screens. |
-| `--st-font-size-m` | `var(--ha-font-size-xl, 20px)` | Temperature unit. |
-| `--st-font-size-title` | `var(--ha-card-header-font-size, 24px)` | Header title. |
+| `--st-font-size-xl` | `28px` | Target value on wide screens. |
+| `--st-font-size-l` | `22px` | Target value on narrow screens. |
+| `--st-font-size-m` | `var(--ha-font-size-xl, 20px)` | Target unit size. |
+| `--st-font-size-title` | `var(--ha-card-header-font-size, 24px)` | Header title size. |
 | `--st-font-size-entities` | `var(--st-font-size-sensors, var(--ha-font-size-l, 16px))` | Extra entity and mode label text. |
 | `--st-font-size-toggle-label` | `var(--ha-font-size-l, 16px)` | Header toggle label. |
+| `--st-control-icon-size` | `var(--st-font-size-xl, 32px)` | Header, state, and HVAC control icon size. |
+| `--st-font-size-preset-icon` | `var(--ha-font-size-xl, 20px)` | Preset mode icon size. |
+| `--st-font-size-compact-mode` | `var(--st-font-size-fan-mode, var(--ha-font-size-m, 14px))` | Text size for compact horizontal preset and fan speed buttons. |
+| `--st-font-size-compact-mode-icon` | `var(--st-font-size-fan-mode-icon, 20px)` | Icon size for compact horizontal preset and fan speed buttons. |
+| `--st-font-size-fan-mode` | `var(--ha-font-size-m, 14px)` | Legacy alias used as the fallback for compact horizontal mode text. |
+| `--st-font-size-fan-mode-icon` | `20px` | Legacy alias used as the fallback for compact horizontal mode icons. |
 | `--st-mode-background` | `var(--secondary-background-color)` | Inactive mode background. |
 | `--st-mode-active-background` | `var(--primary-color)` | Active mode background. |
 | `--st-mode-active-color` | `var(--text-primary-color)` | Active mode text. |
+| `--st-mode-hover-background` | mixed from inactive mode background and text color | Inactive mode hover background. |
+| `--st-mode-hover-color` | `var(--primary-text-color)` | Inactive mode hover text. |
+| `--st-mode-active-accent-color` | `rgba(245, 245, 245, 0.72)` | Active button underline and accent. |
+| `--st-mode-border-radius` | `var(--ha-card-border-radius, 4px)` | Mode button corner radius. |
+| `--st-mode-transition` | `200ms ease` | Mode button color transition. |
+| `--st-active-icon-glow-duration` | `5s` | Active heating, cooling, humidifying, and dehumidifying header icon glow cycle. |
+| `--st-active-icon-glow-min-size` | `4px` | Faintest active header icon glow radius. |
+| `--st-active-icon-glow-mid-size` | `9px` | Midpoint active header icon glow radius. |
+| `--st-active-icon-glow-max-size` | `14px` | Strongest active header icon glow radius. |
+| `--st-active-icon-glow-min-strength` | `36%` | Faintest active header icon glow opacity mix. |
+| `--st-active-icon-glow-mid-strength` | `52%` | Midpoint active header icon glow opacity mix. |
+| `--st-active-icon-glow-max-strength` | `70%` | Strongest active header icon glow opacity mix. |
 | `--auto-color` | `green` | Active auto mode. |
 | `--heat_cool-color` | `springgreen` | Active heat/cool mode. |
 | `--cool-color` | `#2b9af9` | Active cool mode. |

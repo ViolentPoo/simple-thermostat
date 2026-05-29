@@ -1,5 +1,3 @@
-import { HeaderConfig } from './config/header'
-
 export type LooseObject = Record<string, any>
 
 export interface ConfigEntity {
@@ -36,6 +34,13 @@ export interface Entity extends ConfigEntity {
 
 export interface HASS {
   states?: Record<string, any>
+  performAction?: (request: { action: string; data: object }) => void
+  callService?: (domain: string, service: string, data: object) => void
+  formatEntityName?: (
+    stateObj: LooseObject,
+    context?: unknown,
+    options?: unknown
+  ) => string
   [key: string]: any
 }
 
@@ -58,6 +63,7 @@ export interface ControlMode {
   type: string
   mode: any
   name?: string | boolean
+  heading?: boolean
   icons?: boolean
   hide_when_off?: boolean
   list: Array<ControlModeOption>

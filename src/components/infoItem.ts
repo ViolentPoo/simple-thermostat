@@ -1,5 +1,6 @@
-import { html } from 'lit'
+import { html, nothing } from 'lit'
 import formatNumber from '../formatNumber'
+import { appendUnit } from '../unitFormat'
 import { LooseObject } from '../types'
 
 const TOGGLE_DOMAINS = [
@@ -16,6 +17,8 @@ interface InfoItemDetails extends LooseObject {
   icon?: string
   unit?: string
   decimals?: number
+  tooltip?: string
+  entity?: string
   type?: string
 }
 
@@ -29,13 +32,24 @@ interface InfoItemOptions {
 }
 
 function toggleEntity(hass, entityId: string, checked: boolean) {
-  hass.callService('homeassistant', checked ? 'turn_on' : 'turn_off', {
-    entity_id: entityId,
-  })
+  const service = `turn_${checked ? 'on' : 'off'}`
+  if (typeof hass.performAction === 'function') {
+    hass.performAction({
+      action: `homeassistant.${service}`,
+      data: { entity_id: entityId },
+    })
+  } else {
+    hass.callService('homeassistant', service, { entity_id: entityId })
+  }
 }
 
-// Preset mode can be  one of: none, eco, away, boost, comfort, home, sleep, activity
-// See https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/climate/const.py#L36-L57
+function safeClass(value: unknown) {
+  return String(value ?? '').replace(/[^a-z0-9_-]/gi, '')
+}
+
+function iconClass(icon?: string) {
+  return icon ? `toggle-${safeClass(icon.replace(/^mdi:/, ''))}` : ''
+}
 
 export default function renderInfoItem({
   hide = false,
@@ -47,12 +61,30 @@ export default function renderInfoItem({
 }: InfoItemOptions) {
   if (hide || typeof state === 'undefined') return
 
-  const { type, heading, icon, unit, decimals } = details
+  const {
+    type,
+    heading,
+    icon,
+    unit,
+    decimals,
+    tooltip: configuredTooltip,
+    entity,
+  } = details
+  const hasConfiguredUnit = typeof unit === 'string' && unit.length > 0
+  const entityId = typeof state === 'object' ? state.entity_id : entity
+  const canOpenEntity = entityId && typeof openEntityPopover === 'function'
+  const entityTooltip =
+    configuredTooltip ||
+    (typeof state === 'object'
+      ? state?.attributes?.friendly_name || state?.entity_id
+      : entity
+        ? hass.states?.[entity]?.attributes?.friendly_name || entity
+        : undefined)
+  let entityDomain = ''
+  let entityState = ''
+  let isToggleEntity = false
 
   let valueCell
-  if (process.env.DEBUG) {
-    console.log('ST: infoItem', { state, details })
-  }
   if (type === 'relativetime') {
     valueCell = html`
       <div class="entity-value">
@@ -61,9 +93,21 @@ export default function renderInfoItem({
     `
   } else if (typeof state === 'object') {
     const [domain] = state.entity_id.split('.')
-    if (TOGGLE_DOMAINS.includes(domain)) {
+    entityDomain = domain
+    entityState = state.state
+    isToggleEntity = TOGGLE_DOMAINS.includes(domain)
+    const entityClasses = [
+      isToggleEntity && 'toggle-entity',
+      entityDomain && `domain-${safeClass(entityDomain)}`,
+      entityState && `state-${safeClass(entityState)}`,
+      isToggleEntity && iconClass(icon || state.attributes?.icon),
+    ]
+      .filter(Boolean)
+      .join(' ')
+
+    if (isToggleEntity) {
       valueCell = html`
-        <div class="entity-value">
+        <div class="entity-value ${entityClasses}">
           <ha-switch
             .checked=${state.state === 'on'}
             @change=${(ev: Event) =>
@@ -94,18 +138,25 @@ export default function renderInfoItem({
           locale: hass.locale,
         })
       }
-      const formattedWithHass =
-        typeof hass.formatEntityState === 'function' &&
-        typeof decimals !== 'number'
-
+      const stateUnit = state.attributes.unit_of_measurement ?? ''
+      const humidityUnit =
+        state.attributes?.device_class === 'humidity' ||
+        state.entity_id?.includes('humidity') ||
+        icon === 'mdi:water-percent'
+          ? '%'
+          : ''
+      const configuredUnit = hasConfiguredUnit
+        ? unit
+        : stateUnit || humidityUnit
       valueCell = html`
         <div
-          class="entity-value clickable"
-          @click="${() => openEntityPopover(state.entity_id)}"
+          class="entity-value ${canOpenEntity ? 'clickable' : ''}"
+          title=${entityTooltip}
+          @click="${canOpenEntity
+            ? () => openEntityPopover(state.entity_id)
+            : null}"
         >
-          ${value}${formattedWithHass
-            ? ''
-            : ` ${unit || state.attributes.unit_of_measurement}`}
+          ${appendUnit(value, configuredUnit, value)}
         </div>
       `
     }
@@ -117,30 +168,47 @@ export default function renderInfoItem({
             locale: hass.locale,
           })
         : state
-    valueCell = html` <div class="entity-value">${value}${unit}</div> `
+    valueCell = html`<div
+      class="entity-value ${canOpenEntity ? 'clickable' : ''}"
+      title=${entityTooltip || nothing}
+      @click=${canOpenEntity ? () => openEntityPopover(entityId) : null}
+    >
+      ${appendUnit(value, hasConfiguredUnit ? unit : false)}
+    </div>`
   }
 
   if (heading === false) {
     return valueCell
   }
 
-  const tooltip = heading || state?.attributes?.friendly_name || state?.entity_id
-
-  const entityId = typeof state === 'object' ? state.entity_id : null
+  const tooltip = heading || entityTooltip
+  const headingClasses = [
+    'entity-heading',
+    canOpenEntity && 'clickable',
+    isToggleEntity && 'toggle-entity',
+    entityDomain && `domain-${safeClass(entityDomain)}`,
+    entityState && `state-${safeClass(entityState)}`,
+    isToggleEntity && iconClass(icon || state?.attributes?.icon),
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const headingResult = icon
-    ? html` <ha-icon
-        icon="${icon}"
-        title=${tooltip}
-        @click=${entityId ? () => openEntityPopover(entityId) : null}
-      ></ha-icon> `
+    ? html`
+        <ha-icon
+          icon="${icon}"
+          title=${tooltip}
+          @click=${canOpenEntity ? () => openEntityPopover(entityId) : null}
+        ></ha-icon>
+      `
     : ` ${heading}: `
 
   return html`<div
-      class="entity-heading ${entityId ? 'clickable' : ''}"
-      title=${tooltip}
-      @click=${entityId ? () => openEntityPopover(entityId) : null}
-    >${headingResult}</div>
-    ${valueCell}
-  `
+      class=${headingClasses}
+      title=${icon ? tooltip : nothing}
+      @click=${canOpenEntity ? () => openEntityPopover(entityId) : null}
+    >
+      ${headingResult}
+    </div>
+    ${valueCell} `
 }

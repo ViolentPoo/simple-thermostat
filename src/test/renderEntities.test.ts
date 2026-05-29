@@ -1,0 +1,87 @@
+import { render } from 'lit'
+import renderEntities from '../components/entities'
+import { climateAdapter } from '../adapters/climate'
+
+function freshContainer() {
+  const container = document.createElement('div')
+  document.body.replaceChildren(container)
+  return container
+}
+
+test('state row shows hvac action without repeating hvac mode', () => {
+  const result = renderEntities({
+    _hide: { temperature: true, state: false },
+    entity: {
+      entity_id: 'climate.garage_heat',
+      state: 'heat',
+      attributes: {
+        hvac_action: 'heating',
+        current_temperature: 19,
+      },
+    },
+    unit: '°C',
+    hass: {
+      formatEntityState: () => 'Heat',
+      formatEntityAttributeValue: () => 'Heating',
+    },
+    entities: [],
+    config: {},
+    localize: (value: string) => value,
+    openEntityPopover: () => undefined,
+    adapter: climateAdapter,
+  })
+
+  const container = freshContainer()
+  render(result, container)
+
+  const text = container.textContent
+  expect(text).toContain('Heating')
+  expect(text).not.toContain('Heating (Heat)')
+})
+
+test('built-in currently and state rows open their entities', () => {
+  const openEntityPopover = jest.fn()
+  const result = renderEntities({
+    _hide: { temperature: false, state: false },
+    entity: {
+      entity_id: 'climate.garage_heat',
+      state: 'off',
+      attributes: {
+        current_temperature: 20.4,
+      },
+    },
+    unit: '°C',
+    hass: {
+      states: {
+        'climate.garage_heat': {
+          entity_id: 'climate.garage_heat',
+          state: 'off',
+          attributes: { current_temperature: 20.4 },
+        },
+      },
+      formatEntityState: () => 'Off',
+    },
+    entities: [],
+    config: { entity: 'climate.garage_heat' },
+    localize: (value: string) => value,
+    openEntityPopover,
+    adapter: climateAdapter,
+  })
+
+  const container = freshContainer()
+  render(result, container)
+
+  const headings = container.querySelectorAll('.entity-heading')
+  const values = container.querySelectorAll('.entity-value')
+
+  ;(headings[0] as HTMLElement).click()
+  ;(values[0] as HTMLElement).click()
+  ;(headings[1] as HTMLElement).click()
+  ;(values[1] as HTMLElement).click()
+
+  expect(openEntityPopover).toHaveBeenCalledTimes(4)
+  expect(openEntityPopover).toHaveBeenNthCalledWith(1, 'climate.garage_heat')
+  expect(openEntityPopover).toHaveBeenNthCalledWith(2, 'climate.garage_heat')
+  expect(openEntityPopover).toHaveBeenNthCalledWith(3, 'climate.garage_heat')
+  expect(openEntityPopover).toHaveBeenNthCalledWith(4, 'climate.garage_heat')
+})

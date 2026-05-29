@@ -9,12 +9,6 @@ type Options = {
   locale?: LocaleOptions
 }
 
-function getLanguage(locale?: LocaleOptions): string | undefined {
-  if (!locale) return undefined
-  if (locale.number_format === 'system') return undefined
-  return locale.language
-}
-
 function formatNumber(
   number: Input,
   { decimals = 1, fallback = 'N/A', locale }: Options = {}
@@ -35,11 +29,10 @@ function formatNumber(
     return value.toFixed(decimals)
   }
 
-  if (locale.number_format === 'decimal_comma') {
-    return value.toFixed(decimals).replace('.', ',')
-  }
-
-  if (locale.number_format === 'space_comma') {
+  if (
+    locale.number_format === 'decimal_comma' ||
+    locale.number_format === 'space_comma'
+  ) {
     return value.toFixed(decimals).replace('.', ',')
   }
 
@@ -50,10 +43,13 @@ function formatNumber(
     return value.toFixed(decimals)
   }
 
-  return new Intl.NumberFormat(getLanguage(locale), {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(value)
+  return new Intl.NumberFormat(
+    locale.number_format === 'system' ? undefined : locale.language,
+    {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }
+  ).format(value)
 }
 
 export default formatNumber

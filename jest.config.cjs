@@ -7,15 +7,23 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.(j|t)s?$': 'ts-jest',
+    '^.+\\.(j|t)s?$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          module: 'commonjs',
+          moduleResolution: 'node10',
+          allowJs: true,
+          rootDir: './',
+          strict: false,
+          noImplicitAny: false,
+          strictNullChecks: false,
+        },
+      },
+    ],
   },
   transformIgnorePatterns: ['node_modules/(?!(lit|@lit))'],
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        allowJs: true,
-        rootDir: './',
-      },
-    },
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': '<rootDir>/src/test/__mocks__/styleMock.js',
   },
 }
