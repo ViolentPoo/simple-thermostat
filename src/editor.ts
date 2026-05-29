@@ -127,6 +127,36 @@ const DIRECT_FORM_PATHS = [
   'double_tap_action.action',
 ]
 
+const HEADER_FORM_PATHS = [
+  'show_header',
+  'name',
+  'icon',
+  'toggle.entity',
+  'toggle.name',
+  'toggle.icon',
+]
+
+const valueChanged = (before: unknown, after: unknown) => before !== after
+
+function getChangedFormPaths(current: FormData, updated: FormData) {
+  return new Set(
+    Object.keys(updated).filter((path) =>
+      valueChanged(current[path], updated[path])
+    )
+  )
+}
+
+function ignoreImplicitDefaultChanges(
+  changedPaths: Set<string>,
+  config: CardConfig
+) {
+  if (!changedPaths.has('enhanced_visuals')) return
+
+  if (!config.layout?.step) {
+    changedPaths.delete('layout.step')
+  }
+}
+
 function setNested(obj: Record<string, unknown>, path: string, value: unknown) {
   const parts = path.split('.')
   let target = obj
@@ -508,7 +538,10 @@ export default class SimpleThermostatEditor extends LitElement {
       'layout.mode.headings': this.config.layout?.mode?.headings === true,
       decimals: this.config.decimals ?? '',
       unit: typeof this.config.unit === 'string' ? this.config.unit : '',
-      'layout.step': this.config.layout?.step ?? 'row',
+      'layout.step':
+        this.config.enhanced_visuals === false
+          ? (this.config.layout?.step ?? 'column')
+          : (this.config.layout?.step ?? 'row'),
       step_size:
         this.config.step_size != null ? String(this.config.step_size) : 'auto',
       fallback: this.config.fallback ?? '',
@@ -535,12 +568,18 @@ export default class SimpleThermostatEditor extends LitElement {
   }
 
   _applyFormChange(updated: FormData) {
-    const formData = { ...this._buildFormData(), ...updated }
+    const currentFormData = this._buildFormData()
+    const changedPaths = getChangedFormPaths(currentFormData, updated)
+    ignoreImplicitDefaultChanges(changedPaths, this.config)
+    const formData = { ...currentFormData, ...updated }
     const copy = cloneDeep(this.config) as unknown as Record<string, unknown>
 
-    this._applyDirectFormPaths(copy, formData)
+    this._applyDirectFormPaths(copy, formData, changedPaths)
 
-    if (formData.current_value_entity) {
+    if (
+      changedPaths.has('current_value_entity') &&
+      formData.current_value_entity
+    ) {
       delete copy.current_temperature_entity
     }
 
@@ -550,23 +589,37 @@ export default class SimpleThermostatEditor extends LitElement {
       delete copy.enhanced_visuals
     }
 
-    if (formData.show_header === false) {
-      copy.header = false
-    } else {
-      this._applyHeaderFormChange(copy, formData)
+    if (HEADER_FORM_PATHS.some((path) => changedPaths.has(path))) {
+      if (formData.show_header === false) {
+        copy.header = false
+      } else {
+        this._applyHeaderFormChange(copy, formData)
+      }
     }
 
-    this._applyStepSize(copy, formData.step_size)
+    if (changedPaths.has('step_size')) {
+      this._applyStepSize(copy, formData.step_size)
+    }
 
-    const control = getControlFromForm(formData, this.config, this.hass)
-    if (typeof control === 'undefined') delete copy.control
-    else copy.control = control
+    if (
+      changedPaths.has('entity') ||
+      CONTROL_TYPES.some((type) => changedPaths.has(`control.${type}`))
+    ) {
+      const control = getControlFromForm(formData, this.config, this.hass)
+      if (typeof control === 'undefined') delete copy.control
+      else copy.control = control
+    }
 
     return copy as unknown as CardConfig
   }
 
-  _applyDirectFormPaths(copy: Record<string, unknown>, updated: FormData) {
+  _applyDirectFormPaths(
+    copy: Record<string, unknown>,
+    updated: FormData,
+    changedPaths: Set<string>
+  ) {
     for (const path of DIRECT_FORM_PATHS) {
+      if (!changedPaths.has(path)) continue
       const newValue = updated[path]
       if (newValue === undefined || newValue === null || newValue === '') {
         deleteNested(copy, path)

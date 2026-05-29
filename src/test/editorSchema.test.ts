@@ -256,7 +256,9 @@ test('editor updates its local form data when enhanced visuals changes', () => {
   } as CustomEvent)
 
   expect(editor.config.enhanced_visuals).toBe(false)
+  expect(editor.config.layout?.step).toBeUndefined()
   expect(editor._buildFormData().enhanced_visuals).toBe(false)
+  expect(editor._buildFormData()['layout.step']).toBe('column')
   expect(configChanged).toHaveBeenCalledWith(
     expect.objectContaining({
       detail: expect.objectContaining({
@@ -264,4 +266,145 @@ test('editor updates its local form data when enhanced visuals changes', () => {
       }),
     })
   )
+})
+
+test('enhanced visuals on returns to v4 row default when step layout was never explicit', () => {
+  if (!customElements.get('simple-thermostat-editor-test')) {
+    customElements.define(
+      'simple-thermostat-editor-test',
+      SimpleThermostatEditor
+    )
+  }
+  const editor = new SimpleThermostatEditor()
+  editor.setConfig({
+    entity: 'climate.living_room',
+    header: { name: 'Living Room' },
+  } as any)
+  editor.hass = {
+    performAction,
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: { hvac_modes: ['off', 'heat'], temperature: 20 },
+      },
+    },
+  } as any
+
+  editor.config = editor._applyFormChange({ enhanced_visuals: false } as any)
+  expect(editor.config.layout?.step).toBeUndefined()
+  expect(editor._buildFormData()['layout.step']).toBe('column')
+
+  editor.config = editor._applyFormChange({ enhanced_visuals: true } as any)
+  expect(editor.config.enhanced_visuals).toBeUndefined()
+  expect(editor.config.layout?.step).toBeUndefined()
+  expect(editor._buildFormData()['layout.step']).toBe('row')
+})
+
+test('enhanced visuals toggle does not save unrelated displayed defaults', () => {
+  if (!customElements.get('simple-thermostat-editor-test')) {
+    customElements.define(
+      'simple-thermostat-editor-test',
+      SimpleThermostatEditor
+    )
+  }
+  const editor = new SimpleThermostatEditor()
+  editor.setConfig({
+    entity: 'climate.living_room',
+  } as any)
+  editor.hass = {
+    performAction,
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: { hvac_modes: ['off', 'heat'], temperature: 20 },
+      },
+    },
+  } as any
+
+  const updated = editor._applyFormChange({ enhanced_visuals: false } as any)
+
+  expect(updated).toEqual({
+    entity: 'climate.living_room',
+    enhanced_visuals: false,
+  })
+})
+
+test('enhanced visuals toggle ignores full-form step default changes', () => {
+  if (!customElements.get('simple-thermostat-editor-test')) {
+    customElements.define(
+      'simple-thermostat-editor-test',
+      SimpleThermostatEditor
+    )
+  }
+  const editor = new SimpleThermostatEditor()
+  editor.setConfig({
+    entity: 'climate.living_room',
+  } as any)
+  editor.hass = {
+    performAction,
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: { hvac_modes: ['off', 'heat'], temperature: 20 },
+      },
+    },
+  } as any
+
+  const offForm = {
+    ...editor._buildFormData(),
+    enhanced_visuals: false,
+    'layout.step': 'column',
+  }
+  const offConfig = editor._applyFormChange(offForm as any)
+  expect(offConfig).toEqual({
+    entity: 'climate.living_room',
+    enhanced_visuals: false,
+  })
+
+  editor.config = offConfig
+  const onForm = {
+    ...editor._buildFormData(),
+    enhanced_visuals: true,
+    'layout.step': 'row',
+  }
+  const onConfig = editor._applyFormChange(onForm as any)
+  expect(onConfig).toEqual({
+    entity: 'climate.living_room',
+  })
+})
+
+test('enhanced visuals toggle preserves explicit step layout', () => {
+  if (!customElements.get('simple-thermostat-editor-test')) {
+    customElements.define(
+      'simple-thermostat-editor-test',
+      SimpleThermostatEditor
+    )
+  }
+  const editor = new SimpleThermostatEditor()
+  editor.setConfig({
+    entity: 'climate.living_room',
+    layout: { step: 'row' },
+  } as any)
+  editor.hass = {
+    performAction,
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: { hvac_modes: ['off', 'heat'], temperature: 20 },
+      },
+    },
+  } as any
+
+  const updated = editor._applyFormChange({
+    ...editor._buildFormData(),
+    enhanced_visuals: false,
+    'layout.step': 'row',
+  } as any)
+
+  expect(updated.layout?.step).toBe('row')
+  expect(updated.enhanced_visuals).toBe(false)
 })

@@ -919,212 +919,6 @@ ha-card.dehumidifying {
   --st-value-update-color: var(--primary-color);
 }
 
-ha-card.standard-visuals .header__icon,
-ha-card.standard-visuals .current--value,
-ha-card.standard-visuals .mode-item,
-ha-card.standard-visuals .mode-icon,
-ha-card.standard-visuals .thermostat-trigger {
-  animation: none;
-  filter: none;
-  text-shadow: none;
-  transition: none;
-}
-
-ha-card.standard-visuals {
-  display: block;
-  row-gap: 0;
-  --cool-color: #2b9af9;
-  --fan_only-color: #8a8a8a;
-}
-
-ha-card.standard-visuals .body {
-  padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
-}
-
-ha-card.standard-visuals .toggle-label,
-ha-card.standard-visuals .entity-heading,
-ha-card.standard-visuals .entity-value,
-ha-card.standard-visuals .header__main {
-  transition: none;
-}
-
-ha-card.standard-visuals .entities {
-  padding-block: 0;
-}
-
-ha-card.standard-visuals .entity-heading {
-  justify-self: auto;
-}
-
-ha-card.standard-visuals header {
-  padding: calc(var(--st-spacing, var(--st-default-spacing)) * 6)
-    calc(var(--st-spacing, var(--st-default-spacing)) * 2)
-    calc(var(--st-spacing, var(--st-default-spacing)) * 4)
-    calc(var(--st-spacing, var(--st-default-spacing)) * 4);
-}
-
-ha-card.standard-visuals .header__toggles {
-  margin-right: 0;
-}
-
-ha-card.standard-visuals .header__icon-wrap {
-  width: auto;
-  height: auto;
-  margin-right: 0;
-}
-
-ha-card.standard-visuals .header__icon {
-  --iron-icon-width: 24px;
-  --iron-icon-height: 24px;
-  --mdc-icon-size: 24px;
-  width: 24px;
-  height: 24px;
-  margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
-}
-
-ha-card.standard-visuals .current-wrapper {
-  flex-wrap: wrap;
-}
-
-ha-card.standard-visuals .current-wrapper.row {
-  display: flex;
-  flex-direction: row-reverse;
-  column-gap: 0;
-}
-
-ha-card.standard-visuals .current-wrapper.row .current--value {
-  overflow: visible;
-}
-
-ha-card.standard-visuals .current--value.updating {
-  color: var(--error-color);
-}
-
-ha-card.standard-visuals .thermostat-trigger {
-  display: inline-block;
-  width: auto;
-  height: auto;
-  border-radius: 0;
-  overflow: visible;
-}
-
-ha-card.standard-visuals .thermostat-trigger ha-icon {
-  --iron-icon-width: 24px;
-  --iron-icon-height: 24px;
-  --mdc-icon-size: 24px;
-  width: 24px;
-  height: 24px;
-}
-
-ha-card.standard-visuals .controls {
-  display: block;
-  padding: 0;
-}
-
-ha-card.standard-visuals .modes {
-  display: grid;
-  grid-template-columns: auto;
-  grid-auto-flow: column;
-  grid-gap: 2px;
-  margin-top: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
-  padding: var(--st-spacing, var(--st-default-spacing));
-}
-
-ha-card.standard-visuals .modes.heading {
-  grid-template-columns: min-content;
-}
-
-ha-card.loading.standard-visuals {
-  background: var(--card-background-color);
-  animation: none;
-}
-
-ha-card.standard-visuals .header__icon-wrap.slash-off::before,
-ha-card.standard-visuals .header__icon-wrap.slash-off::after,
-ha-card.standard-visuals .mode-item::after,
-ha-card.standard-visuals .thermostat-trigger::before {
-  display: none;
-}
-
-ha-card.standard-visuals .mode-item.active {
-  box-shadow: none;
-}
-
-ha-card.standard-visuals .mode-item.active.off {
-  background: var(--st-mode-active-background, var(--off-color));
-}
-
-ha-card.standard-visuals .mode-item.active.heat {
-  background: var(--st-mode-active-background, var(--heat-color));
-}
-
-ha-card.standard-visuals .mode-item.active.cool {
-  background: var(--st-mode-active-background, var(--cool-color));
-}
-
-ha-card.standard-visuals .mode-item.active.heat_cool {
-  background: var(--st-mode-active-background, var(--heat_cool-color));
-}
-
-ha-card.standard-visuals .mode-item.active.auto {
-  background: var(--st-mode-active-background, var(--auto-color));
-}
-
-ha-card.standard-visuals .mode-item.active.dry {
-  background: var(--st-mode-active-background, var(--dry-color));
-}
-
-ha-card.standard-visuals .mode-item.active.fan_only {
-  background: var(--st-mode-active-background, var(--fan_only-color));
-}
-
-ha-card.standard-visuals .modes.hvac .mode-item,
-ha-card.standard-visuals .modes.state .mode-item,
-ha-card.standard-visuals .modes.preset .mode-item,
-ha-card.standard-visuals .modes.preset.compact .mode-item,
-ha-card.standard-visuals .modes.fan .mode-item,
-ha-card.standard-visuals .modes.fan-preset .mode-item,
-ha-card.standard-visuals .modes.swing .mode-item,
-ha-card.standard-visuals .modes.swing_horizontal .mode-item,
-ha-card.standard-visuals .modes.swing_vertical .mode-item,
-ha-card.standard-visuals .modes.vane_horizontal .mode-item,
-ha-card.standard-visuals .modes.vane_vertical .mode-item {
-  --st-mode-min-width: 72px;
-  flex: 1 1 var(--st-mode-min-width);
-  flex-direction: column;
-  gap: 0;
-  min-width: min(100%, var(--st-mode-min-width));
-  min-height: 24px;
-  padding: var(--st-spacing, var(--st-default-spacing)) 0;
-  font-size: inherit;
-}
-
-ha-card.standard-visuals .modes.preset .mode-icon,
-ha-card.standard-visuals .modes.preset.compact .mode-icon,
-ha-card.standard-visuals .modes.fan .mode-icon,
-ha-card.standard-visuals .modes.fan-preset .mode-icon {
-  --iron-icon-width: var(--st-preset-icon-size);
-  --iron-icon-height: var(--st-preset-icon-size);
-  --mdc-icon-size: var(--st-preset-icon-size);
-  position: static;
-  top: auto;
-  width: var(--st-preset-icon-size);
-  height: var(--st-preset-icon-size);
-  flex: initial;
-}
-
-ha-card.standard-visuals .modes.fan .mode-label,
-ha-card.standard-visuals .modes.fan-preset .mode-label,
-ha-card.standard-visuals .modes.preset.compact .mode-label {
-  display: block;
-  min-height: 0;
-}
-
-ha-card.standard-visuals .mode-item:active,
-ha-card.standard-visuals .thermostat-trigger:active {
-  transform: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   ha-card.loading {
     animation: none;
@@ -1282,6 +1076,234 @@ ha-card.standard-visuals .thermostat-trigger:active {
 .side-by-side > * {
   flex: 1;
   padding-right: 4px;
+}
+
+ha-card.standard-visuals {
+  display: block;
+  row-gap: 0;
+  --cool-color: #2b9af9;
+  --fan_only-color: #8a8a8a;
+}
+
+ha-card.loading.standard-visuals {
+  background: var(--card-background-color);
+  animation: none;
+}
+
+ha-card.standard-visuals .header__icon,
+ha-card.standard-visuals .current--value,
+ha-card.standard-visuals .mode-item,
+ha-card.standard-visuals .mode-icon,
+ha-card.standard-visuals .thermostat-trigger {
+  animation: none;
+  filter: none;
+  text-shadow: none;
+  transition: none;
+}
+
+ha-card.standard-visuals .toggle-label,
+ha-card.standard-visuals .entity-heading,
+ha-card.standard-visuals .entity-value,
+ha-card.standard-visuals .header__main {
+  transition: none;
+}
+
+ha-card.standard-visuals header {
+  padding: calc(var(--st-spacing, var(--st-default-spacing)) * 6)
+    calc(var(--st-spacing, var(--st-default-spacing)) * 2)
+    calc(var(--st-spacing, var(--st-default-spacing)) * 4)
+    calc(var(--st-spacing, var(--st-default-spacing)) * 4);
+}
+
+ha-card.standard-visuals .header__toggles {
+  margin-right: 0;
+}
+
+ha-card.standard-visuals .header__icon-wrap {
+  width: auto;
+  height: auto;
+  margin-right: 0;
+}
+
+ha-card.standard-visuals .header__icon {
+  --iron-icon-width: 24px;
+  --iron-icon-height: 24px;
+  --mdc-icon-size: 24px;
+  width: 24px;
+  height: 24px;
+  margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
+
+ha-card.standard-visuals .entities {
+  padding-block: 0;
+}
+
+ha-card.standard-visuals .entity-heading {
+  justify-self: auto;
+}
+
+ha-card.standard-visuals .body {
+  padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
+
+ha-card.standard-visuals .body + .controls {
+  margin-top: calc(var(--st-spacing, var(--st-default-spacing)) * 4);
+}
+
+ha-card.standard-visuals .current-wrapper {
+  flex-wrap: wrap;
+}
+
+ha-card.standard-visuals .current-wrapper.row {
+  column-gap: 0;
+}
+
+ha-card.standard-visuals .current-wrapper.row .current--value {
+  overflow: visible;
+}
+
+ha-card.standard-visuals .current--value.updating {
+  color: var(--error-color);
+}
+
+ha-card.standard-visuals .thermostat-trigger {
+  display: inline-block;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  overflow: visible;
+}
+
+ha-card.standard-visuals .thermostat-trigger ha-icon {
+  --iron-icon-width: 24px;
+  --iron-icon-height: 24px;
+  --mdc-icon-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+ha-card.standard-visuals .controls {
+  display: block;
+  gap: 0;
+  padding: 0;
+  margin-top: calc(var(--st-spacing, var(--st-default-spacing)) * 4);
+}
+
+ha-card.standard-visuals .modes,
+ha-card.standard-visuals .modes.hvac,
+ha-card.standard-visuals .modes.state,
+ha-card.standard-visuals .modes.preset,
+ha-card.standard-visuals .modes.preset.compact,
+ha-card.standard-visuals .modes.fan,
+ha-card.standard-visuals .modes.fan-preset,
+ha-card.standard-visuals .modes.swing,
+ha-card.standard-visuals .modes.swing_horizontal,
+ha-card.standard-visuals .modes.swing_vertical,
+ha-card.standard-visuals .modes.vane_horizontal,
+ha-card.standard-visuals .modes.vane_vertical {
+  display: grid;
+  grid-template-columns: auto;
+  grid-auto-flow: column;
+  grid-gap: 2px;
+  margin-top: 0;
+  padding: var(--st-spacing, var(--st-default-spacing));
+}
+
+ha-card.standard-visuals .mode-item,
+ha-card.standard-visuals .modes.hvac .mode-item,
+ha-card.standard-visuals .modes.state .mode-item,
+ha-card.standard-visuals .modes.preset .mode-item,
+ha-card.standard-visuals .modes.preset.compact .mode-item,
+ha-card.standard-visuals .modes.fan .mode-item,
+ha-card.standard-visuals .modes.fan-preset .mode-item,
+ha-card.standard-visuals .modes.swing .mode-item,
+ha-card.standard-visuals .modes.swing_horizontal .mode-item,
+ha-card.standard-visuals .modes.swing_vertical .mode-item,
+ha-card.standard-visuals .modes.vane_horizontal .mode-item,
+ha-card.standard-visuals .modes.vane_vertical .mode-item {
+  display: flex;
+  flex: initial;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  min-height: 24px;
+  padding: var(--st-spacing, var(--st-default-spacing)) 0;
+  font-size: inherit;
+  line-height: var(--ha-line-height-normal, 1.5);
+}
+
+ha-card.standard-visuals .mode-icon,
+ha-card.standard-visuals .modes.preset .mode-icon,
+ha-card.standard-visuals .modes.preset.compact .mode-icon,
+ha-card.standard-visuals .modes.fan .mode-icon,
+ha-card.standard-visuals .modes.fan-preset .mode-icon {
+  --iron-icon-width: 24px;
+  --iron-icon-height: 24px;
+  --mdc-icon-size: 24px;
+  position: static;
+  top: auto;
+  width: 24px;
+  height: 24px;
+  flex: initial;
+}
+
+ha-card.standard-visuals .mode-label,
+ha-card.standard-visuals .modes.preset.compact .mode-label,
+ha-card.standard-visuals .modes.fan .mode-label,
+ha-card.standard-visuals .modes.fan-preset .mode-label {
+  display: block;
+  min-height: 0;
+  line-height: inherit;
+}
+
+ha-card.standard-visuals .modes.heading {
+  grid-template-columns: min-content;
+}
+
+ha-card.standard-visuals .header__icon-wrap.slash-off::before,
+ha-card.standard-visuals .header__icon-wrap.slash-off::after,
+ha-card.standard-visuals .mode-item::after,
+ha-card.standard-visuals .thermostat-trigger::before {
+  display: none;
+}
+
+ha-card.standard-visuals .mode-item.active {
+  box-shadow: none;
+}
+
+ha-card.standard-visuals .mode-item.active.off {
+  background: var(--st-mode-active-background, var(--off-color));
+}
+
+ha-card.standard-visuals .mode-item.active.heat {
+  background: var(--st-mode-active-background, var(--heat-color));
+}
+
+ha-card.standard-visuals .mode-item.active.cool {
+  background: var(--st-mode-active-background, var(--cool-color));
+}
+
+ha-card.standard-visuals .mode-item.active.heat_cool {
+  background: var(--st-mode-active-background, var(--heat_cool-color));
+}
+
+ha-card.standard-visuals .mode-item.active.auto {
+  background: var(--st-mode-active-background, var(--auto-color));
+}
+
+ha-card.standard-visuals .mode-item.active.dry {
+  background: var(--st-mode-active-background, var(--dry-color));
+}
+
+ha-card.standard-visuals .mode-item.active.fan_only {
+  background: var(--st-mode-active-background, var(--fan_only-color));
+}
+
+ha-card.standard-visuals .mode-item:active,
+ha-card.standard-visuals .thermostat-trigger:active {
+  transform: none;
 }
 
 .card-config {

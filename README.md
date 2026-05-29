@@ -87,7 +87,7 @@ If you installed `simple-thermostat` from another repository, uninstall the old 
 - Added a cleaner horizontal setpoint layout using minus/value/plus controls by default.
 - Added Home Assistant-style actions for the target value, including tap, hold, and double tap actions.
 - Added an improved visual editor that only shows options relevant to the selected entity and supported features.
-- Added an `enhanced_visuals` tweak that keeps the new v4 visual polish on by default, while letting upgraded v3 cards opt back into a simpler legacy-style appearance.
+- Added an `enhanced_visuals` tweak that keeps the new v4 visual polish on by default, while letting upgraded v3 cards opt back into v3-style visual defaults without needing to write every legacy layout option in YAML.
 - Added documented CSS variables for colors, icon sizes, typography, mode buttons, active accents, and animation intensity.
 - Updated controls and service calls to use Home Assistant's current `hass.performAction` API with legacy fallback.
 - Updated release packaging so the HACS bundle is built as `simple-thermostat.js` at the repository root, generated `dist/` output is no longer tracked, and GitHub Actions builds from source. Thanks to [@nateww](https://github.com/nateww) for the cleanup request.
@@ -199,7 +199,7 @@ This hides the target value and setpoint controls while keeping supported mode c
 | `step_size` | number | Amount changed by the target controls. |
 | `hide_setpoint` | boolean | Hide target value and setpoint controls. |
 | `fallback` | string | Text shown when no valid setpoint exists. Default `N/A`. |
-| `enhanced_visuals` | boolean | Enable v4 visual polish. Set to `false` for a simpler legacy-style appearance while keeping v4 fixes and compatibility. Defaults to `true`. |
+| `enhanced_visuals` | boolean | Enable v4 visual polish. Set to `false` for v3-style visual defaults while keeping v4 fixes and compatibility. Defaults to `true` and only needs to be written when disabled. |
 | `header` | object, `false` | Header configuration. |
 | `hide` | object | Hide built-in state or current value rows. |
 | `label` | object | Override built-in row labels. |
@@ -304,7 +304,7 @@ Layout options:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `layout.step` | `row`, `column` | Setpoint control layout. v4 defaults to the horizontal minus/value/plus layout. |
+| `layout.step` | `row`, `column` | Setpoint control layout. Enhanced v4 visuals default to the horizontal minus/value/plus layout. With `enhanced_visuals: false`, unset cards use the v3-style column chevron layout. Explicit `layout.step` values are always respected. |
 | `layout.mode.names` | boolean | Show text on mode buttons. |
 | `layout.mode.icons` | boolean | Show icons on mode buttons. |
 | `layout.mode.headings` | boolean | Show mode row headings. Defaults to hidden. |
@@ -320,7 +320,7 @@ V4 enhanced visuals are enabled by default:
 enhanced_visuals: true
 ```
 
-Set `enhanced_visuals: false` when you want an upgraded v3 card to keep a simpler legacy-style appearance while still using v4 fixes and compatibility:
+Set `enhanced_visuals: false` when you want an upgraded v3 card to keep v3-style visual defaults while still using v4 fixes and compatibility:
 
 - Active button underline.
 - Mode button hover lift and hover tint.
@@ -331,7 +331,7 @@ Set `enhanced_visuals: false` when you want an upgraded v3 card to keep a simple
 - Custom off-icon slash overlay.
 - Loading shimmer.
 - Compact icon treatment for mode buttons.
-- The new default horizontal setpoint layout, unless explicitly configured.
+When this is disabled, the card uses v3-style visual defaults such as column setpoint chevrons and tighter legacy mode rows unless you explicitly configure an option such as `layout.step: row`. The visual editor should only write the `enhanced_visuals` toggle when that is the only changed setting; displayed defaults are not saved back into YAML.
 
 ## Controls
 

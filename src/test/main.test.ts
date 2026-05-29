@@ -225,6 +225,67 @@ test('enhanced visuals off keeps legacy column setpoint layout by default', asyn
       ?.querySelector('.current-wrapper')
       ?.classList.contains('column')
   ).toBe(true)
+  expect(
+    (card.shadowRoot?.querySelector('button.increase ha-icon') as any)?.icon
+  ).toBe('hass:chevron-up')
+  expect(
+    (card.shadowRoot?.querySelector('button.decrease ha-icon') as any)?.icon
+  ).toBe('hass:chevron-down')
+})
+
+test('enhanced visuals off preserves explicitly configured row step layout', async () => {
+  document.body.innerHTML = ''
+  const card = createCard()
+  document.body.appendChild(card)
+  card.setConfig({
+    entity: 'climate.living_room',
+    header: false,
+    control: false,
+    enhanced_visuals: false,
+    layout: { step: 'row' },
+  } as any)
+  card.hass = {
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: {
+          temperature: 20,
+          current_temperature: 19,
+          min_temp: 7,
+          max_temp: 30,
+        },
+      },
+    },
+    config: {
+      unit_system: {
+        temperature: '°C',
+      },
+    },
+    localize: (key: string) => key,
+  }
+
+  await card.updateComplete
+
+  expect(
+    card.shadowRoot
+      ?.querySelector('.current-wrapper')
+      ?.classList.contains('row')
+  ).toBe(true)
+  expect(
+    (card.shadowRoot?.querySelector('button.increase ha-icon') as any)?.icon
+  ).toBe('mdi:plus')
+  expect(
+    (card.shadowRoot?.querySelector('button.decrease ha-icon') as any)?.icon
+  ).toBe('mdi:minus')
+  const children = Array.from(
+    card.shadowRoot?.querySelector('.current-wrapper')?.children ?? []
+  )
+  expect(children.map((child) => child.className)).toEqual([
+    expect.stringContaining('decrease'),
+    expect.stringContaining('current--value'),
+    expect.stringContaining('increase'),
+  ])
 })
 
 test('legacy aliases warn without warning for version 3 configs', () => {
