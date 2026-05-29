@@ -95,3 +95,24 @@ test('ignores configured faults that do not exist', () => {
   expect(result && result.faults).toHaveLength(1)
   expect(result && result.faults?.[0].entity).toBe('binary_sensor.exists')
 })
+
+test('ignores configured header toggles that do not exist yet', () => {
+  const result = parseHeader(
+    {
+      toggle: { entity: 'switch.missing', icon: 'mdi:fire' },
+      toggles: [{ entity: 'fan.missing', icon: 'mdi:fan' }],
+    },
+    {
+      entity_id: 'climate.thermostat',
+      state: 'heat',
+      attributes: { friendly_name: 'Thermostat' },
+    },
+    {
+      performAction: () => undefined,
+      states: {},
+    }
+  )
+
+  expect(result && result.toggle).toBe(null)
+  expect(result && result.toggles).toEqual([])
+})
