@@ -86,9 +86,13 @@ function renderToggles(toggles, openEntityPopover, toggleEntityChanged) {
         const toggleState = toggle.entity?.state
         const toggleDomain =
           typeof entityId === 'string' ? entityId.split('.')[0] : ''
-        const toggleKind =
+        const styleIcon =
           typeof toggle.icon === 'string'
-            ? toggle.icon.replace(/^mdi:/, '').replace(/[^a-z0-9_-]/gi, '')
+            ? toggle.icon
+            : toggle.entity?.attributes?.icon
+        const toggleKind =
+          typeof styleIcon === 'string'
+            ? styleIcon.replace(/^mdi:/, '').replace(/[^a-z0-9_-]/gi, '')
             : ''
         return html`
           <div

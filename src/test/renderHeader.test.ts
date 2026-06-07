@@ -28,3 +28,46 @@ test('renders slash overlay class for custom off header icons', () => {
     'custom:fan'
   )
 })
+
+test('uses entity icon for label-only header toggle color classes', async () => {
+  const container = document.createElement('div')
+  const result = renderHeader({
+    header: {
+      name: 'Fishy Heat',
+      icon: 'mdi:radiator',
+      slashOffIcon: false,
+      faults: [],
+      toggles: [
+        {
+          label: 'Heater',
+          icon: false,
+          entity: {
+            entity_id: 'switch.fishy_heater',
+            state: 'on',
+            attributes: {
+              icon: 'mdi:radiator',
+              friendly_name: 'Fishy Heater',
+            },
+          },
+        },
+      ],
+    },
+    entity: {
+      entity_id: 'climate.fishy',
+      state: 'heat',
+      attributes: {},
+    },
+    openEntityPopover: () => undefined,
+    toggleEntityChanged: () => undefined,
+  })
+
+  render(result, container)
+  await Promise.resolve()
+
+  const toggle = container.querySelector('.header__toggle')
+  const label = container.querySelector('.toggle-label')
+  expect(toggle?.classList.contains('toggle-radiator')).toBe(true)
+  expect(label?.classList.contains('toggle-radiator')).toBe(true)
+  expect(label?.textContent).toContain('Heater')
+  expect(label?.querySelector('ha-icon')).toBeNull()
+})

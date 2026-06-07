@@ -226,7 +226,13 @@ ha-card.loading {
   --st-toggle-color: var(--cool-color);
 }
 .header__toggle.toggle-fire,
-.toggle-label.toggle-fire {
+.toggle-label.toggle-fire,
+.header__toggle.toggle-radiator,
+.toggle-label.toggle-radiator,
+.header__toggle.toggle-heat-wave,
+.toggle-label.toggle-heat-wave,
+.header__toggle.toggle-heating-coil,
+.toggle-label.toggle-heating-coil {
   --st-toggle-color: var(--heat-color);
 }
 .header__toggle.toggle-fan,
@@ -437,11 +443,7 @@ ha-card.cooling .header__icon {
     var(--disabled-text-color) 22%,
     var(--secondary-background-color) 78%
   );
-  --st-switch-on-button-color: color-mix(
-    in srgb,
-    var(--st-toggle-color, var(--primary-color)) 48%,
-    var(--primary-text-color) 52%
-  );
+  --st-switch-on-button-color: var(--st-toggle-color, var(--primary-color));
   --st-switch-on-track-color: color-mix(
     in srgb,
     var(--st-toggle-color, var(--primary-color)) 28%,
@@ -463,6 +465,7 @@ ha-card.cooling .header__icon {
 
 .header__toggle.on,
 .entity-value.toggle-entity.state-on {
+  --st-switch-button-color: var(--st-switch-on-button-color);
   --st-switch-track-color: var(--st-switch-on-track-color);
 }
 
@@ -782,21 +785,23 @@ ha-card:not(.standard-visuals)
   .entities
   .entity-value.toggle-entity:hover
   ha-switch {
-  --switch-checked-track-color: var(--st-switch-track-color);
-  --switch-unchecked-track-color: var(--st-switch-track-color);
-  --mdc-switch-selected-track-color: var(--st-switch-track-color);
-  --mdc-switch-unselected-track-color: var(--st-switch-track-color);
-  --mdc-switch-selected-focus-track-color: var(--st-switch-track-color);
-  --mdc-switch-selected-hover-track-color: var(--st-switch-track-color);
-  --mdc-switch-selected-pressed-track-color: var(--st-switch-track-color);
-  --mdc-switch-unselected-focus-track-color: var(--st-switch-track-color);
-  --mdc-switch-unselected-hover-track-color: var(--st-switch-track-color);
-  --mdc-switch-unselected-pressed-track-color: var(--st-switch-track-color);
   --ha-switch-background-color: var(--st-switch-track-color);
   --ha-switch-background-color-hover: var(--st-switch-hover-track-color);
+  --ha-switch-thumb-background-color: var(--st-switch-button-color);
+  --ha-switch-thumb-background-color-hover: var(--st-switch-hover-button-color);
+  --ha-switch-thumb-border-color: var(--st-switch-button-color);
+  --ha-switch-thumb-border-color-hover: var(--st-switch-hover-button-color);
   --ha-switch-checked-background-color: var(--st-switch-track-color);
   --ha-switch-checked-background-color-hover: var(
     --st-switch-hover-track-color
+  );
+  --ha-switch-checked-thumb-background-color: var(--st-switch-button-color);
+  --ha-switch-checked-thumb-background-color-hover: var(
+    --st-switch-hover-button-color
+  );
+  --ha-switch-checked-thumb-border-color: var(--st-switch-button-color);
+  --ha-switch-checked-thumb-border-color-hover: var(
+    --st-switch-hover-button-color
   );
 }
 
@@ -827,6 +832,7 @@ ha-card:not(.standard-visuals)
     .entities
     .entity-value.toggle-entity:hover
     ha-switch {
+    --st-switch-button-color: var(--st-switch-hover-button-color);
     --st-switch-track-color: var(--st-switch-hover-track-color);
   }
 

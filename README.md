@@ -83,6 +83,7 @@ If you installed `simple-thermostat` from another repository, uninstall the old 
 - Added automatic current value defaults for supported domains, so climate, humidifier, and fan cards can work from the main entity without extra YAML when Home Assistant exposes the needed attributes.
 - Added `hide_setpoint` for cards that should keep mode controls visible while hiding the target value and plus/minus controls.
 - Improved header behavior with state-aware default icons, custom off-icon slash overlays, header toggle icons, and safer fault rendering.
+- Improved header toggle coloring so label-only toggles can still use the target entity icon to pick the correct active color.
 - Added richer mode controls with better ordering, default mode icons, custom fan speed icons, tooltips for compact controls with hidden labels, hidden mode headings by default, and support for fan, preset, swing, vane, direction, oscillation, humidifier mode, HVAC, and state rows.
 - Added a cleaner horizontal setpoint layout using minus/value/plus controls by default.
 - Added Home Assistant-style actions for the target value, including tap, hold, and double tap actions.
@@ -90,6 +91,7 @@ If you installed `simple-thermostat` from another repository, uninstall the old 
 - Added an `enhanced_visuals` tweak that keeps the new v4 visual polish on by default, while letting upgraded v3 cards opt back into v3-style visual defaults without needing to write every legacy layout option in YAML.
 - Added documented CSS variables for colors, icon sizes, typography, mode buttons, active accents, and animation intensity.
 - Updated controls and service calls to use Home Assistant's current `hass.performAction` API with legacy fallback.
+- Updated custom element registration to avoid mutating an already registered card class in long-lived Home Assistant tabs.
 - Updated release packaging so the HACS bundle is built as `simple-thermostat.js` at the repository root, generated `dist/` output is no longer tracked, and GitHub Actions builds from source. Thanks to [@nateww](https://github.com/nateww) for the cleanup request.
 - Updated the build, release, dependency, and test workflow around npm and GitHub Actions.
 

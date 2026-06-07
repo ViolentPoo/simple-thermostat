@@ -2,32 +2,11 @@ import { name as CARD_NAME, version } from '../package.json'
 import SimpleThermostatEditor from './editor'
 import SimpleThermostat from './main'
 
-function patchRegisteredElement(
-  registeredElement: CustomElementConstructor,
-  replacementElement: CustomElementConstructor
-) {
-  for (const key of Reflect.ownKeys(replacementElement.prototype)) {
-    if (key === 'constructor') continue
-    const descriptor = Object.getOwnPropertyDescriptor(
-      replacementElement.prototype,
-      key
-    )
-    if (descriptor) {
-      Object.defineProperty(registeredElement.prototype, key, descriptor)
-    }
-  }
-}
-
-const registeredCard = customElements.get(CARD_NAME)
-if (registeredCard) {
-  patchRegisteredElement(registeredCard, SimpleThermostat)
-} else {
+if (!customElements.get(CARD_NAME)) {
   customElements.define(CARD_NAME, SimpleThermostat)
 }
-const registeredEditor = customElements.get(`${CARD_NAME}-editor`)
-if (registeredEditor) {
-  patchRegisteredElement(registeredEditor, SimpleThermostatEditor)
-} else {
+
+if (!customElements.get(`${CARD_NAME}-editor`)) {
   customElements.define(`${CARD_NAME}-editor`, SimpleThermostatEditor)
 }
 
