@@ -77,38 +77,6 @@ function getConfiguredEntities(config: CardConfig) {
   return config.entities ?? config.sensors ?? []
 }
 
-function getTrackedEntityIds(config: CardConfig): Array<string> {
-  const configuredEntities = getConfiguredEntities(config)
-  const ids = [
-    config.entity,
-    config.current_value_entity ?? config.current_temperature_entity,
-  ]
-
-  if (Array.isArray(configuredEntities)) {
-    ids.push(
-      ...configuredEntities
-        .map((entity) => entity?.entity)
-        .filter((entityId) => !!entityId)
-    )
-  }
-
-  if (config.header && typeof config.header === 'object') {
-    ids.push(config.header.toggle?.entity)
-    ids.push(
-      ...(config.header.toggles ?? [])
-        .map((toggle) => toggle?.entity)
-        .filter((entityId) => !!entityId)
-    )
-    ids.push(
-      ...(config.header.faults ?? [])
-        .map((fault) => fault?.entity)
-        .filter((entityId) => !!entityId)
-    )
-  }
-
-  return Array.from(new Set(ids.filter((entityId) => !!entityId)))
-}
-
 const warnedLegacyConfigKeys = new Set<string>()
 
 function warnLegacyConfigKey(key: string, replacement: string) {
@@ -369,8 +337,6 @@ export default class SimpleThermostat extends LitElement {
   @state()
   _hide = DEFAULT_HIDE
   _updatingValuesTimeout: ReturnType<typeof setTimeout> | null = null
-  _trackedStateRefs: Record<string, unknown> = {}
-  _trackedEntityIdsSignature = ''
   _holdTimer: ReturnType<typeof setTimeout> | null = null
   _holdFired = false
   _clickCount = 0
@@ -421,8 +387,6 @@ export default class SimpleThermostat extends LitElement {
       decimals: DECIMALS,
       ...config,
     }
-    this._trackedStateRefs = {}
-    this._trackedEntityIdsSignature = ''
   }
 
   disconnectedCallback() {
@@ -466,24 +430,6 @@ export default class SimpleThermostat extends LitElement {
     }
 
     this._hass = hass
-    const trackedEntityIds = getTrackedEntityIds(this.config)
-    const trackedEntityIdsSignature = trackedEntityIds.join('|')
-    const trackedStatesUnchanged =
-      trackedEntityIdsSignature === this._trackedEntityIdsSignature &&
-      trackedEntityIds.every(
-        (entityId) => this._trackedStateRefs[entityId] === hass.states[entityId]
-      )
-
-    if (trackedStatesUnchanged) {
-      return
-    }
-
-    this._trackedEntityIdsSignature = trackedEntityIdsSignature
-    this._trackedStateRefs = trackedEntityIds.reduce((result, entityId) => {
-      result[entityId] = hass.states[entityId]
-      return result
-    }, {})
-
     const entity = hass.states[this.config.entity]
     if (!entity) {
       if (this.entity !== undefined) {

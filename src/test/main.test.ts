@@ -317,6 +317,43 @@ test('legacy aliases warn without warning for version 3 configs', () => {
   warn.mockRestore()
 })
 
+test('hass setter rebuilds even when state object references are unchanged', () => {
+  const card = createCard()
+  card.setConfig({
+    entity: 'climate.living_room',
+    header: false,
+    control: false,
+  } as any)
+  const hass = {
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: {
+          temperature: 20,
+          current_temperature: 19,
+          min_temp: 7,
+          max_temp: 30,
+        },
+      },
+    },
+    config: {
+      unit_system: {
+        temperature: '°C',
+      },
+    },
+    localize: (key: string) => key,
+  }
+
+  card.hass = hass
+  expect(card.entity?.entity_id).toBe('climate.living_room')
+
+  card.entity = undefined as any
+  card.hass = hass
+
+  expect(card.entity?.entity_id).toBe('climate.living_room')
+})
+
 test('setpoint tap opens the configured entity more-info by default', async () => {
   jest.useFakeTimers()
   document.body.innerHTML = ''
