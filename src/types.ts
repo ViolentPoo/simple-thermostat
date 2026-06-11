@@ -8,24 +8,8 @@ export interface ConfigEntity {
   attribute?: string
   unit?: string
   decimals?: number
-  template?: string
   show?: boolean
-  type?: 'relativetime' | 'template'
-}
-
-export interface TemplatedEntity {
-  template: string
-  label?: string | false
-  entity?: string
-}
-
-export interface PreparedEntity {
-  id: string
-  label: string | false
-  entityId: string
-  template: string
-  show: boolean
-  context: LooseObject
+  type?: 'relativetime'
 }
 
 export interface Entity extends ConfigEntity {

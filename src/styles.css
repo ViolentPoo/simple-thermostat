@@ -14,13 +14,10 @@
     --st-font-size-preset-icon,
     var(--ha-font-size-xl, 20px)
   );
-  --st-compact-mode-icon-size: var(
-    --st-font-size-compact-mode-icon,
-    var(--st-font-size-fan-mode-icon, 20px)
-  );
+  --st-compact-mode-icon-size: var(--st-font-size-compact-mode-icon, 20px);
   --st-compact-mode-font-size: var(
     --st-font-size-compact-mode,
-    var(--st-font-size-fan-mode, var(--ha-font-size-m, 14px))
+    var(--ha-font-size-m, 14px)
   );
   --st-active-icon-glow-duration: 5s;
   --st-active-icon-glow-min-size: 4px;
@@ -41,15 +38,18 @@ ha-card {
 
   padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
 
-  --auto-color: green;
-  --heat_cool-color: springgreen;
-  --cool-color: color-mix(in srgb, #2b9af9 72%, var(--card-background-color));
-  --heat-color: #ff8100;
-  --manual-color: #44739e;
+  --auto-color: var(--state-climate-auto-color, var(--primary-color));
+  --heat_cool-color: var(--state-climate-heat-cool-color, var(--primary-color));
+  --cool-color: var(--state-climate-cool-color, var(--primary-color));
+  --heat-color: var(--state-climate-heat-color, var(--primary-color));
+  --manual-color: var(--state-icon-color, var(--secondary-text-color));
   --on-color: var(--primary-color);
-  --off-color: #8a8a8a;
-  --fan_only-color: var(--manual-color);
-  --dry-color: #efbd07;
+  --off-color: var(--state-icon-color, var(--secondary-text-color));
+  --fan_only-color: var(
+    --state-climate-fan-only-color,
+    var(--state-fan-active-color, var(--manual-color))
+  );
+  --dry-color: var(--state-climate-dry-color, var(--primary-color));
   --st-interactive-tint: color-mix(
     in srgb,
     currentColor 50%,
@@ -217,7 +217,7 @@ ha-card.loading {
 .entity-value.toggle-string-lights,
 .entity-heading.toggle-wall-sconce,
 .entity-value.toggle-wall-sconce {
-  --st-toggle-color: var(--state-light-active-color, #fdd835);
+  --st-toggle-color: var(--state-light-active-color, var(--primary-color));
 }
 .toggle-label.domain-fan,
 .header__toggle.domain-fan,
@@ -253,7 +253,7 @@ ha-card.loading {
 }
 .header__toggle.toggle-lightbulb,
 .toggle-label.toggle-lightbulb {
-  --st-toggle-color: var(--state-light-active-color, #fdd835);
+  --st-toggle-color: var(--state-light-active-color, var(--primary-color));
 }
 .header__toggle.toggle-water-percent,
 .toggle-label.toggle-water-percent,
@@ -283,10 +283,7 @@ ha-card.loading {
   display: grid;
   grid-gap: 0;
   padding-block: calc(var(--st-spacing, var(--st-default-spacing)) * 4);
-  font-size: var(
-    --st-font-size-entities,
-    var(--st-font-size-sensors, var(--ha-font-size-l, 16px))
-  );
+  font-size: var(--st-font-size-entities, var(--ha-font-size-l, 16px));
 }
 .entities.as-list {
   grid-auto-flow: column;
@@ -354,10 +351,13 @@ header {
   width: var(--st-control-icon-size);
   height: var(--st-control-icon-size);
   margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
-  color: var(--state-icon-color, #44739e);
+  color: var(--state-icon-color, var(--secondary-text-color));
 
   &.on {
-    color: var(--state-icon-active-color, var(--state-icon-color, #44739e));
+    color: var(
+      --state-icon-active-color,
+      var(--state-icon-color, var(--primary-color))
+    );
   }
 
   &.off {
@@ -378,7 +378,7 @@ header {
 }
 .header__icon-wrap.slash-off::before {
   height: max(4px, calc(var(--st-control-icon-size) * 0.115));
-  background: var(--ha-card-background, var(--card-background-color, #fff));
+  background: var(--ha-card-background, var(--card-background-color));
   transform: translate(-50%, calc(-50% - (var(--st-control-icon-size) * 0.055)))
     rotate(45deg);
 }
@@ -418,7 +418,7 @@ ha-card.heating .header__icon {
     infinite;
 }
 ha-card.cooling .header__icon {
-  --st-active-icon-glow-color: #2b9af9;
+  --st-active-icon-glow-color: var(--cool-color);
   --st-active-icon-glow-min-size: 6px;
   --st-active-icon-glow-mid-size: 12px;
   --st-active-icon-glow-max-size: 18px;
@@ -502,13 +502,24 @@ ha-card.cooling .header__icon {
       var(--st-control-icon-size)
       minmax(0, max-content)
       var(--st-control-icon-size);
+    grid-template-areas:
+      'decrease value increase'
+      '. label .';
     column-gap: calc(var(--st-spacing, var(--st-default-spacing)) * 3);
+    row-gap: 2px;
     align-items: center;
     justify-items: center;
     justify-content: center;
   }
 }
+.current-wrapper.row .thermostat-trigger.decrease {
+  grid-area: decrease;
+}
+.current-wrapper.row .thermostat-trigger.increase {
+  grid-area: increase;
+}
 .current-wrapper.row .current--value {
+  grid-area: value;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -549,6 +560,21 @@ ha-card.cooling .header__icon {
 }
 .current--unit {
   font-size: var(--st-font-size-m, var(--ha-font-size-xl, 20px));
+}
+.current--label {
+  grid-area: label;
+  margin-top: 2px;
+  color: var(--secondary-text-color);
+  font-size: var(--st-font-size-setpoint-label, var(--ha-font-size-s, 12px));
+  line-height: 1.1;
+  opacity: 0.68;
+  pointer-events: none;
+  text-align: center;
+  white-space: nowrap;
+}
+.current-wrapper.column .current--label {
+  order: 2;
+  margin: 0 0 2px;
 }
 .thermostat-trigger {
   appearance: none;
@@ -620,6 +646,32 @@ ha-card.cooling .header__icon {
   gap: var(--st-spacing, var(--st-default-spacing));
   padding: 0 var(--st-spacing, var(--st-default-spacing));
 }
+ha-card.domain-fan.state-only {
+  row-gap: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
+ha-card.domain-fan.state-only header {
+  padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
+ha-card.domain-fan.state-only .body {
+  padding-bottom: 0;
+}
+ha-card.domain-fan.state-only .entities {
+  padding-block: calc(var(--st-spacing, var(--st-default-spacing)) * 1);
+}
+ha-card.domain-fan.state-only .controls {
+  padding-top: 0;
+}
+ha-card.domain-fan.state-only .modes.state .mode-item {
+  min-height: 38px;
+  padding-block: 5px;
+}
+ha-card.domain-fan.state-only .modes.state .mode-icon {
+  --iron-icon-width: var(--st-state-only-mode-icon-size, 24px);
+  --iron-icon-height: var(--st-state-only-mode-icon-size, 24px);
+  --mdc-icon-size: var(--st-state-only-mode-icon-size, 24px);
+  width: var(--st-state-only-mode-icon-size, 24px);
+  height: var(--st-state-only-mode-icon-size, 24px);
+}
 .modes {
   display: flex;
   flex-wrap: wrap;
@@ -637,10 +689,7 @@ ha-card.cooling .header__icon {
 .mode-title {
   padding: 0 16px;
   place-self: center;
-  font-size: var(
-    --st-font-size-entities,
-    var(--st-font-size-sensors, var(--ha-font-size-l, 16px))
-  );
+  font-size: var(--st-font-size-entities, var(--ha-font-size-l, 16px));
   font-weight: 300;
   white-space: nowrap;
 }
@@ -720,14 +769,22 @@ ha-card.cooling .header__icon {
     --st-mode-color: var(--fan_only-color);
   }
   &.low {
-    --st-mode-color: color-mix(in srgb, var(--fan_only-color) 65%, white 35%);
+    --st-mode-color: color-mix(
+      in srgb,
+      var(--fan_only-color) 65%,
+      var(--primary-text-color) 35%
+    );
   }
   &.mid,
   &.medium {
     --st-mode-color: var(--fan_only-color);
   }
   &.high {
-    --st-mode-color: color-mix(in srgb, var(--fan_only-color) 65%, black 35%);
+    --st-mode-color: color-mix(
+      in srgb,
+      var(--fan_only-color) 65%,
+      var(--secondary-text-color) 35%
+    );
   }
 
   &:not(.active):active {
@@ -747,7 +804,10 @@ ha-card.cooling .header__icon {
     );
     color: var(--st-mode-active-color, var(--text-primary-color));
     box-shadow: inset 0 -2px 0
-      var(--st-mode-active-accent-color, rgba(245, 245, 245, 0.72));
+      var(
+        --st-mode-active-accent-color,
+        color-mix(in srgb, var(--text-primary-color) 72%, transparent)
+      );
     filter: none;
     transform: none;
     transition: none;
@@ -1159,8 +1219,11 @@ ha-card:not(.standard-visuals) .modes.fan-preset.dense .mode-label {
 ha-card.standard-visuals {
   display: block;
   row-gap: 0;
-  --cool-color: #2b9af9;
-  --fan_only-color: #8a8a8a;
+  --cool-color: var(--state-climate-cool-color, var(--primary-color));
+  --fan_only-color: var(
+    --state-climate-fan-only-color,
+    var(--state-fan-active-color, var(--state-icon-color))
+  );
 }
 
 ha-card.loading.standard-visuals {

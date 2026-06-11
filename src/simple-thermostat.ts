@@ -12,8 +12,8 @@ if (!customElements.get(`${CARD_NAME}-editor`)) {
 
 console.info(
   `%c SIMPLE-THERMOSTAT %c v${version} `,
-  'color: white; background: #6f4cff; font-weight: 700; padding: 2px 6px; border-radius: 3px 0 0 3px;',
-  'color: #6f4cff; background: #1f1f1f; font-weight: 700; padding: 2px 6px; border-radius: 0 3px 3px 0;'
+  'color: var(--text-primary-color); background: var(--primary-color); font-weight: 700; padding: 2px 6px; border-radius: 3px 0 0 3px;',
+  'color: var(--primary-color); background: var(--card-background-color); font-weight: 700; padding: 2px 6px; border-radius: 0 3px 3px 0;'
 )
 const w = window as any
 w.customCards = w.customCards || []

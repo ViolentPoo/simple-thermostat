@@ -1,6 +1,6 @@
 import formatNumber from '../formatNumber'
 import renderInfoItem from './infoItem'
-import { wrapEntities } from './templated'
+import { wrapEntities } from './entityGroup'
 import { appendUnit } from '../unitFormat'
 import { getEntityStateText } from '../entityAction'
 
@@ -15,8 +15,7 @@ export default function renderEntities({
   openEntityPopover,
   adapter,
 }) {
-  const currentValueEntityId =
-    config.current_value_entity ?? config.current_temperature_entity
+  const currentValueEntityId = config.current_value_entity
   const currentValueEntity = currentValueEntityId
     ? hass.states[currentValueEntityId]
     : entity
@@ -24,8 +23,7 @@ export default function renderEntities({
     ? currentValueEntity?.state
     : adapter.getCurrentValue(entity.attributes)
 
-  const showLabels =
-    (config?.layout?.entities ?? config?.layout?.sensors)?.labels ?? true
+  const showLabels = config?.layout?.entities?.labels ?? true
   const stateString = getEntityStateText(entity, hass, localize)
   const entityHtml = [
     renderInfoItem({

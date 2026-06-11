@@ -6,6 +6,7 @@ import fireEvent from './fireEvent'
 import { version } from '../package.json'
 
 import { CardConfig, MODES } from './config/card'
+import normalizeConfig from './config/normalize'
 import { HeaderConfig } from './config/header'
 import { HASS } from './types'
 import { EntityAdapter, getAdapter } from './adapters'
@@ -76,9 +77,11 @@ const LABELS: Record<string, string> = {
   fallback: 'Fallback text',
   'hide.temperature': 'Hide temperature',
   'hide.state': 'Hide state',
+  'hide.setpoint_label': 'Hide setpoint label',
   hide_setpoint: 'Hide setpoint controls',
   'label.temperature': 'Temperature label',
   'label.state': 'State label',
+  'label.setpoint': 'Setpoint label',
   'layout.entities.type': 'Entity row layout',
   'layout.entities.labels': 'Show entity row labels',
   enhanced_visuals: 'V4 enhanced visuals',
@@ -119,9 +122,11 @@ const DIRECT_FORM_PATHS = [
   'layout.entities.labels',
   'hide.temperature',
   'hide.state',
+  'hide.setpoint_label',
   'hide_setpoint',
   'label.temperature',
   'label.state',
+  'label.setpoint',
   'tap_action.action',
   'hold_action.action',
   'double_tap_action.action',
@@ -265,25 +270,21 @@ function getControlFromForm(
 export function buildSchema(config: CardConfig, hass?: HASS) {
   const supportedControlTypes = getSupportedControlTypes(config, hass)
   const entityDomain = config.entity?.split('.')[0]
-  const hasExtraEntities =
-    Array.isArray(config.entities) && config.entities.length > 0
-  const entityLayoutSchema = hasExtraEntities
-    ? [
-        {
-          name: 'layout.entities.type',
-          selector: {
-            select: {
-              mode: 'dropdown',
-              options: [
-                { value: 'table', label: 'Table' },
-                { value: 'list', label: 'List' },
-              ],
-            },
-          },
+  const entityLayoutSchema = [
+    {
+      name: 'layout.entities.type',
+      selector: {
+        select: {
+          mode: 'dropdown',
+          options: [
+            { value: 'table', label: 'Table' },
+            { value: 'list', label: 'List' },
+          ],
         },
-        { name: 'layout.entities.labels', selector: { boolean: {} } },
-      ]
-    : []
+      },
+    },
+    { name: 'layout.entities.labels', selector: { boolean: {} } },
+  ]
   const adapter = getAdapter(config.entity)
   const entity = config.entity ? hass?.states?.[config.entity] : undefined
   const hasSetpoints =
@@ -319,14 +320,6 @@ export function buildSchema(config: CardConfig, hass?: HASS) {
       required: true,
       selector: { entity: { domain: SUPPORTED_ENTITY_DOMAINS } },
     },
-    ...(entityDomain === 'fan'
-      ? []
-      : [
-          {
-            name: 'current_value_entity',
-            selector: { entity: { domain: ['sensor', 'input_number'] } },
-          },
-        ]),
     {
       type: 'expandable',
       title: 'Header',
@@ -349,15 +342,6 @@ export function buildSchema(config: CardConfig, hass?: HASS) {
                   selector: { boolean: {} },
                 })),
               },
-              {
-                type: 'grid',
-                column_min_width: '150px',
-                schema: [
-                  { name: 'layout.mode.names', selector: { boolean: {} } },
-                  { name: 'layout.mode.icons', selector: { boolean: {} } },
-                  { name: 'layout.mode.headings', selector: { boolean: {} } },
-                ],
-              },
             ],
           },
         ]
@@ -368,7 +352,6 @@ export function buildSchema(config: CardConfig, hass?: HASS) {
             type: 'expandable',
             title: 'Setpoint Controls',
             schema: [
-              { name: 'hide_setpoint', selector: { boolean: {} } },
               {
                 type: 'grid',
                 schema: [
@@ -400,14 +383,42 @@ export function buildSchema(config: CardConfig, hass?: HASS) {
                   },
                 ],
               },
+              {
+                type: 'grid',
+                column_min_width: '160px',
+                schema: [
+                  { name: 'hide_setpoint', selector: { boolean: {} } },
+                  { name: 'hide.setpoint_label', selector: { boolean: {} } },
+                ],
+              },
+              { name: 'label.setpoint', selector: { text: {} } },
             ],
           },
         ]
       : []),
     {
       type: 'expandable',
-      title: 'Layout & Display',
+      title: 'Extra Entities',
       schema: [
+        {
+          type: 'grid',
+          column_min_width: '160px',
+          schema: entityLayoutSchema,
+        },
+      ],
+    },
+    {
+      type: 'expandable',
+      title: 'Display',
+      schema: [
+        ...(entityDomain === 'fan'
+          ? []
+          : [
+              {
+                name: 'current_value_entity',
+                selector: { entity: { domain: ['sensor', 'input_number'] } },
+              },
+            ]),
         ...(hasCurrentValue
           ? [
               {
@@ -445,12 +456,22 @@ export function buildSchema(config: CardConfig, hass?: HASS) {
             { name: 'label.state', selector: { text: {} } },
           ],
         },
+      ].filter((item) => item.schema?.length !== 0),
+    },
+    {
+      type: 'expandable',
+      title: 'Advanced Layout',
+      schema: [
         {
           type: 'grid',
-          column_min_width: '160px',
-          schema: entityLayoutSchema,
+          column_min_width: '150px',
+          schema: [
+            { name: 'layout.mode.names', selector: { boolean: {} } },
+            { name: 'layout.mode.icons', selector: { boolean: {} } },
+            { name: 'layout.mode.headings', selector: { boolean: {} } },
+          ],
         },
-      ].filter((item) => item.schema?.length !== 0),
+      ],
     },
     {
       type: 'expandable',
@@ -514,7 +535,7 @@ export default class SimpleThermostatEditor extends LitElement {
   }
 
   setConfig(config: CardConfig) {
-    this.config = config || ({ ...stub } as CardConfig)
+    this.config = normalizeConfig(config || ({ ...stub } as CardConfig))
   }
 
   _openLink() {
@@ -528,10 +549,7 @@ export default class SimpleThermostatEditor extends LitElement {
         : {}
     return {
       entity: this.config.entity ?? '',
-      current_value_entity:
-        this.config.current_value_entity ??
-        this.config.current_temperature_entity ??
-        '',
+      current_value_entity: this.config.current_value_entity ?? '',
       show_header: this.config.header !== false,
       'layout.mode.names': this.config.layout?.mode?.names !== false,
       'layout.mode.icons': this.config.layout?.mode?.icons !== false,
@@ -548,8 +566,10 @@ export default class SimpleThermostatEditor extends LitElement {
       'hide.temperature': this.config.hide?.temperature === true,
       'hide.state': this.config.hide?.state === true,
       hide_setpoint: this.config.hide_setpoint === true,
+      'hide.setpoint_label': this.config.hide?.setpoint_label === true,
       'label.temperature': this.config.label?.temperature ?? '',
       'label.state': this.config.label?.state ?? '',
+      'label.setpoint': this.config.label?.setpoint ?? '',
       'layout.entities.type': this.config.layout?.entities?.type ?? 'table',
       'layout.entities.labels': this.config.layout?.entities?.labels !== false,
       enhanced_visuals: this.config.enhanced_visuals !== false,
@@ -575,13 +595,6 @@ export default class SimpleThermostatEditor extends LitElement {
     const copy = cloneDeep(this.config) as unknown as Record<string, unknown>
 
     this._applyDirectFormPaths(copy, formData, changedPaths)
-
-    if (
-      changedPaths.has('current_value_entity') &&
-      formData.current_value_entity
-    ) {
-      delete copy.current_temperature_entity
-    }
 
     if (formData.enhanced_visuals === false) {
       copy.enhanced_visuals = false

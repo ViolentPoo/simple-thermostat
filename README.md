@@ -31,7 +31,7 @@ A compact Lovelace card for Home Assistant climate, fan, humidifier, and dehumid
 </div>
 
 <div style="border: 1px solid rgba(65, 189, 245, 0.45); border-radius: 8px; padding: 16px 18px; margin: 18px 0;">
-  <strong style="color: #41bdf5;">Compatibility:</strong> Prefer <code>current_value_entity</code>, <code>entities</code>, and <code>layout.entities</code> for new configs. Older <code>current_temperature_entity</code>, <code>sensors</code>, and <code>layout.sensors</code> YAML is legacy but supported.
+  <strong style="color: #41bdf5;">Compatibility:</strong> v4 imports older <code>current_temperature_entity</code>, <code>sensors</code>, and <code>layout.sensors</code> YAML into the current <code>current_value_entity</code>, <code>entities</code>, and <code>layout.entities</code> config shape. If you are staying on v3, use the <a href="https://github.com/Wheemer/simple-thermostat/tree/v3">v3 documentation</a>.
 </div>
 
 ## Installation
@@ -58,6 +58,8 @@ Or add it manually in HACS:
 
 If you installed `simple-thermostat` from another repository, uninstall the old HACS entry first. Then add this repository as the dashboard custom repository and install it again.
 
+If you are not upgrading to v4, keep using the [v3 documentation](https://github.com/Wheemer/simple-thermostat/tree/v3) for the older config surface.
+
 ### Manual install
 
 1. Download `simple-thermostat.js` from the [latest release](https://github.com/Wheemer/simple-thermostat/releases/latest).
@@ -78,8 +80,8 @@ If you installed `simple-thermostat` from another repository, uninstall the old 
 - Added domain-aware card behavior for climate, fan, humidifier, and dehumidifier entities. The card now chooses the right setpoint, current value, range, services, labels, and default controls from the selected entity domain.
 - Added fan support with percentage setpoints, fan speed/preset buttons, direction controls, oscillation controls, and on/off state controls.
 - Added humidifier and dehumidifier support with humidity setpoints, current humidity display, mode controls, and on/off state controls.
-- Added `current_value_entity` as the generic current value option while preserving `current_temperature_entity` for existing YAML.
-- Added `entities` as the preferred extra-row key while preserving `sensors` for backward compatibility.
+- Added `current_value_entity` as the generic current value option. Older `current_temperature_entity` YAML is imported into the current option.
+- Added `entities` as the extra-row key. Older `sensors` YAML is imported into the current option.
 - Added automatic current value defaults for supported domains, so climate, humidifier, and fan cards can work from the main entity without extra YAML when Home Assistant exposes the needed attributes.
 - Added `hide_setpoint` for cards that should keep mode controls visible while hiding the target value and plus/minus controls.
 - Improved header behavior with state-aware default icons, custom off-icon slash overlays, header toggle icons, and safer fault rendering.
@@ -130,7 +132,7 @@ The editor shows options that are relevant to the selected entity:
 - Extra entity layout options only when extra entities are configured.
 - Hide setpoint controls only when the selected entity has a setpoint.
 
-Advanced mode filtering, templates, custom actions, and custom CSS are still configured in YAML.
+Advanced mode filtering, extra entity rows, custom actions, and custom CSS are still configured in YAML.
 
 ## Examples
 
@@ -191,40 +193,38 @@ This hides the target value and setpoint controls while keeping supported mode c
 
 ### Main Options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `entity` | string | Climate, fan, humidifier, or dehumidifier entity id. Required. |
-| `current_value_entity` | string | Entity used for the displayed current value instead of the main entity. |
-| `current_temperature_entity` | string | Legacy but supported alias for `current_value_entity`. Prefer `current_value_entity` for new configs. |
-| `unit` | string, boolean | Override the target unit, or set `false` to hide it. |
-| `decimals` | number | Decimal places for target display. |
-| `step_size` | number | Amount changed by the target controls. |
-| `hide_setpoint` | boolean | Hide target value and setpoint controls. |
-| `fallback` | string | Text shown when no valid setpoint exists. Default `N/A`. |
-| `enhanced_visuals` | boolean | Enable v4 visual polish. Set to `false` for v3-style visual defaults while keeping v4 fixes and compatibility. Defaults to `true` and only needs to be written when disabled. |
-| `header` | object, `false` | Header configuration. |
-| `hide` | object | Hide built-in state or current value rows. |
-| `label` | object | Override built-in row labels. |
-| `layout` | object | Layout settings. |
-| `control` | array, object, `false` | Mode controls. |
-| `entities` | array, `false` | Extra entity rows. Preferred key. |
-| `sensors` | array, `false` | Legacy but supported alias for `entities`. Prefer `entities` for new configs. |
-| `setpoints` | object, `false` | Manual setpoint configuration. Usually not needed. |
-| `service` | object | Override the action used to set the target value. |
-| `styles` | string | Inline CSS scoped to this card. |
-| `tap_action` | object | Action fired from the target value. |
-| `hold_action` | object | Hold action fired from the target value. |
-| `double_tap_action` | object | Double tap action fired from the target value. |
+| Option                 | Type                   | Description                                                                                                                                                                   |
+| ---------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `entity`               | string                 | Climate, fan, humidifier, or dehumidifier entity id. Required.                                                                                                                |
+| `current_value_entity` | string                 | Entity used for the displayed current value instead of the main entity.                                                                                                       |
+| `unit`                 | string, boolean        | Override the target unit, or set `false` to hide it.                                                                                                                          |
+| `decimals`             | number                 | Decimal places for target display.                                                                                                                                            |
+| `step_size`            | number                 | Amount changed by the target controls.                                                                                                                                        |
+| `hide_setpoint`        | boolean                | Hide target value and setpoint controls.                                                                                                                                      |
+| `fallback`             | string                 | Text shown when no valid setpoint exists. Default `N/A`.                                                                                                                      |
+| `enhanced_visuals`     | boolean                | Enable v4 visual polish. Set to `false` for v3-style visual defaults while keeping v4 fixes and compatibility. Defaults to `true` and only needs to be written when disabled. |
+| `header`               | object, `false`        | Header configuration.                                                                                                                                                         |
+| `hide`                 | object                 | Hide built-in state or current value rows.                                                                                                                                    |
+| `label`                | object                 | Override built-in row labels.                                                                                                                                                 |
+| `layout`               | object                 | Layout settings.                                                                                                                                                              |
+| `control`              | array, object, `false` | Mode controls.                                                                                                                                                                |
+| `entities`             | array, `false`         | Extra entity rows.                                                                                                                                                            |
+| `setpoints`            | object, `false`        | Manual setpoint configuration. Usually not needed.                                                                                                                            |
+| `service`              | object                 | Override the action used to set the target value.                                                                                                                             |
+| `styles`               | string                 | Inline CSS scoped to this card.                                                                                                                                               |
+| `tap_action`           | object                 | Action fired from the target value.                                                                                                                                           |
+| `hold_action`          | object                 | Hold action fired from the target value.                                                                                                                                      |
+| `double_tap_action`    | object                 | Double tap action fired from the target value.                                                                                                                                |
 
 ### Domain Defaults
 
 The card chooses the right behavior from the entity domain:
 
-| Domain | Target | Current value | Default controls |
-|--------|--------|---------------|------------------|
-| `climate` | Temperature | `current_temperature` or configured current value entity | HVAC, preset, fan, swing, vane |
-| `fan` | Percentage | Percentage when available | Fan speeds, direction, oscillating, state |
-| `humidifier` | Humidity | `current_humidity` | Mode, state |
+| Domain       | Target      | Current value                                            | Default controls                          |
+| ------------ | ----------- | -------------------------------------------------------- | ----------------------------------------- |
+| `climate`    | Temperature | `current_temperature` or configured current value entity | HVAC, preset, fan, swing, vane            |
+| `fan`        | Percentage  | Percentage when available                                | Fan speeds, direction, oscillating, state |
+| `humidifier` | Humidity    | `current_humidity`                                       | Mode, state                               |
 
 Dehumidifiers use the Home Assistant `humidifier` domain.
 
@@ -264,28 +264,28 @@ header:
 
 Header options:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `name` | string, `false` | Header title. Defaults to the entity friendly name. |
-| `icon` | string, object, `false` | Header icon override. Defaults to the entity icon, then a domain/state icon. |
-| `toggle` | object | Single header toggle. |
-| `toggles` | array | Multiple header toggles. |
-| `faults` | array, `false` | Binary sensor fault icons. |
+| Option    | Type                    | Description                                                                  |
+| --------- | ----------------------- | ---------------------------------------------------------------------------- |
+| `name`    | string, `false`         | Header title. Defaults to the entity friendly name.                          |
+| `icon`    | string, object, `false` | Header icon override. Defaults to the entity icon, then a domain/state icon. |
+| `toggle`  | object                  | Single header toggle.                                                        |
+| `toggles` | array                   | Multiple header toggles.                                                     |
+| `faults`  | array, `false`          | Binary sensor fault icons.                                                   |
 
 Toggle options:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `entity` | string | Entity to toggle. |
-| `name` | string, boolean | Toggle label. Use `true` for the entity friendly name. |
-| `icon` | string | Icon shown beside or instead of the toggle label. |
+| Option   | Type            | Description                                            |
+| -------- | --------------- | ------------------------------------------------------ |
+| `entity` | string          | Entity to toggle.                                      |
+| `name`   | string, boolean | Toggle label. Use `true` for the entity friendly name. |
+| `icon`   | string          | Icon shown beside or instead of the toggle label.      |
 
 Fault options:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `entity` | string | Binary sensor entity. |
-| `icon` | string | Optional icon override. |
+| Option          | Type    | Description                           |
+| --------------- | ------- | ------------------------------------- |
+| `entity`        | string  | Binary sensor entity.                 |
+| `icon`          | string  | Optional icon override.               |
 | `hide_inactive` | boolean | Hide the icon when the sensor is off. |
 
 ## Layout
@@ -304,15 +304,14 @@ layout:
 
 Layout options:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `layout.step` | `row`, `column` | Setpoint control layout. Enhanced v4 visuals default to the horizontal minus/value/plus layout. With `enhanced_visuals: false`, unset cards use the v3-style column chevron layout. Explicit `layout.step` values are always respected. |
-| `layout.mode.names` | boolean | Show text on mode buttons. |
-| `layout.mode.icons` | boolean | Show icons on mode buttons. |
-| `layout.mode.headings` | boolean | Show mode row headings. Defaults to hidden. |
-| `layout.entities.type` | `table`, `list` | Extra entity row layout. |
-| `layout.entities.labels` | boolean | Show labels for extra entity rows. |
-| `layout.sensors.*` | object | Legacy but supported alias for `layout.entities.*`. Prefer `layout.entities.*` for new configs. |
+| Option                   | Type            | Description                                                                                                                                                                                                                             |
+| ------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `layout.step`            | `row`, `column` | Setpoint control layout. Enhanced v4 visuals default to the horizontal minus/value/plus layout. With `enhanced_visuals: false`, unset cards use the v3-style column chevron layout. Explicit `layout.step` values are always respected. |
+| `layout.mode.names`      | boolean         | Show text on mode buttons.                                                                                                                                                                                                              |
+| `layout.mode.icons`      | boolean         | Show icons on mode buttons.                                                                                                                                                                                                             |
+| `layout.mode.headings`   | boolean         | Show mode row headings. Defaults to hidden.                                                                                                                                                                                             |
+| `layout.entities.type`   | `table`, `list` | Extra entity row layout.                                                                                                                                                                                                                |
+| `layout.entities.labels` | boolean         | Show labels for extra entity rows.                                                                                                                                                                                                      |
 
 ## Tweaks
 
@@ -322,7 +321,7 @@ V4 enhanced visuals are enabled by default:
 enhanced_visuals: true
 ```
 
-Set `enhanced_visuals: false` when you want an upgraded v3 card to keep v3-style visual defaults while still using v4 fixes and compatibility:
+Set `enhanced_visuals: false` when you want a quieter, v3-style presentation while still using v4 behavior:
 
 - Active button underline.
 - Mode button hover lift and hover tint.
@@ -333,7 +332,8 @@ Set `enhanced_visuals: false` when you want an upgraded v3 card to keep v3-style
 - Custom off-icon slash overlay.
 - Loading shimmer.
 - Compact icon treatment for mode buttons.
-When this is disabled, the card uses v3-style visual defaults such as column setpoint chevrons and tighter legacy mode rows unless you explicitly configure an option such as `layout.step: row`. The visual editor should only write the `enhanced_visuals` toggle when that is the only changed setting; displayed defaults are not saved back into YAML.
+
+When this is disabled, the card uses v3-style visual defaults such as column setpoint chevrons and tighter mode rows unless you explicitly configure an option such as `layout.step: row`. The visual editor should only write the `enhanced_visuals` toggle when that is the only changed setting; displayed defaults are not saved back into YAML.
 
 ## Controls
 
@@ -367,36 +367,36 @@ control: false
 
 Supported control types:
 
-| Control | Used by | Description |
-|---------|---------|-------------|
-| `hvac` | Climate | HVAC modes such as off, heat, cool, dry, fan only. |
-| `preset` | Climate | Preset modes such as away, eco, comfort, sleep. |
-| `fan` | Climate, fan | Fan modes or fan speeds. |
-| `state` | Fan, humidifier | On and off buttons. |
-| `swing` | Climate | Swing modes. |
-| `swing_horizontal` | Climate | Horizontal swing modes. |
-| `swing_vertical` | Climate | Vertical swing modes. |
-| `vane_horizontal` | Climate | Horizontal vane modes. |
-| `vane_vertical` | Climate | Vertical vane modes. |
-| `direction` | Fan | Forward and reverse direction. |
-| `oscillating` | Fan | Oscillation on and off. |
-| `mode` | Humidifier | Humidifier or dehumidifier modes. |
+| Control            | Used by         | Description                                        |
+| ------------------ | --------------- | -------------------------------------------------- |
+| `hvac`             | Climate         | HVAC modes such as off, heat, cool, dry, fan only. |
+| `preset`           | Climate         | Preset modes such as away, eco, comfort, sleep.    |
+| `fan`              | Climate, fan    | Fan modes or fan speeds.                           |
+| `state`            | Fan, humidifier | On and off buttons.                                |
+| `swing`            | Climate         | Swing modes.                                       |
+| `swing_horizontal` | Climate         | Horizontal swing modes.                            |
+| `swing_vertical`   | Climate         | Vertical swing modes.                              |
+| `vane_horizontal`  | Climate         | Horizontal vane modes.                             |
+| `vane_vertical`    | Climate         | Vertical vane modes.                               |
+| `direction`        | Fan             | Forward and reverse direction.                     |
+| `oscillating`      | Fan             | Oscillation on and off.                            |
+| `mode`             | Humidifier      | Humidifier or dehumidifier modes.                  |
 
 Per-row options:
 
-| Option | Description |
-|--------|-------------|
-| `_name` | Override the row heading. |
-| `_heading` | Set to `true` to show the row heading. |
-| `_hide_when_off` | Hide the row when the main entity is off. |
-| `_icons` | Set to `false` to hide icons for this row. |
+| Option           | Description                                |
+| ---------------- | ------------------------------------------ |
+| `_name`          | Override the row heading.                  |
+| `_heading`       | Set to `true` to show the row heading.     |
+| `_hide_when_off` | Hide the row when the main entity is off.  |
+| `_icons`         | Set to `false` to hide icons for this row. |
 
 Per-mode options:
 
-| Option | Description |
-|--------|-------------|
-| `name` | Override a mode label. |
-| `icon` | Override a mode icon. |
+| Option    | Description                    |
+| --------- | ------------------------------ |
+| `name`    | Override a mode label.         |
+| `icon`    | Override a mode icon.          |
 | `include` | Set to `false` to hide a mode. |
 
 Quote `on` and `off` when using them as YAML keys:
@@ -404,9 +404,9 @@ Quote `on` and `off` when using them as YAML keys:
 ```yaml
 control:
   hvac:
-    "off":
+    'off':
       name: Off
-    "heat":
+    'heat':
       name: Heat
 ```
 
@@ -414,7 +414,7 @@ Mode headings are hidden by default in v4. Use `_heading: true` only where a vis
 
 ## Extra Entities
 
-Use `entities` to show extra rows in the card. The older `sensors` key is legacy but supported for existing configurations.
+Use `entities` to show extra rows in the card.
 
 ```yaml
 entities:
@@ -440,15 +440,15 @@ Supported toggle domains:
 
 Entity options:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `entity` | string | Entity id. |
-| `name` | string | Label override. |
-| `icon` | string | Icon shown instead of a text label. |
-| `attribute` | string | Read an attribute instead of state. |
-| `unit` | string | Unit suffix. |
-| `decimals` | number | Decimal places for numeric values. |
-| `type` | string | Use `relativetime` for relative time output. |
+| Option      | Type   | Description                                  |
+| ----------- | ------ | -------------------------------------------- |
+| `entity`    | string | Entity id.                                   |
+| `name`      | string | Label override.                              |
+| `icon`      | string | Icon shown instead of a text label.          |
+| `attribute` | string | Read an attribute instead of state.          |
+| `unit`      | string | Unit suffix.                                 |
+| `decimals`  | number | Decimal places for numeric values.           |
+| `type`      | string | Use `relativetime` for relative time output. |
 
 Hide extra entities:
 
@@ -465,37 +465,6 @@ hide:
 ```
 
 The `temperature` key is kept for compatibility and means the built-in current value row.
-
-## Version 3 Templated Entities
-
-Set `version: 3` to use template-based entity rows.
-
-```yaml
-type: custom:simple-thermostat
-entity: climate.living_room
-version: 3
-entities:
-  - id: humidity
-    entity: sensor.living_room_humidity
-    label: Humidity
-    template: "{{state.text}}%"
-  - id: state
-    show: false
-```
-
-Built-in rows `state` and `temperature` are added automatically unless you define rows with those ids. The `temperature` id is kept for compatibility and represents the current displayed value.
-
-Version 3 entity options:
-
-| Option | Type | Description |
-|--------|------|-------------|
-| `id` | string | Unique row id. Use `state` or `temperature` to override built-ins. |
-| `entity` | string | Template context entity. Defaults to the main entity. |
-| `label` | string, `false` | Row label. |
-| `template` | string | Template to render. |
-| `unit` | string | Unit suffix. |
-| `decimals` | number | Decimal places. |
-| `show` | boolean | Set to `false` to hide the row. |
 
 ## Setpoints
 
@@ -563,46 +532,44 @@ Supported action handling follows the same shape used by Home Assistant dashboar
 
 ## CSS Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `--st-spacing` | `4px` | Base spacing unit. |
-| `--st-font-size-xl` | `28px` | Target value on wide screens. |
-| `--st-font-size-l` | `22px` | Target value on narrow screens. |
-| `--st-font-size-m` | `var(--ha-font-size-xl, 20px)` | Target unit size. |
-| `--st-font-size-title` | `var(--ha-card-header-font-size, 24px)` | Header title size. |
-| `--st-font-size-entities` | `var(--st-font-size-sensors, var(--ha-font-size-l, 16px))` | Extra entity and mode label text. |
-| `--st-font-size-toggle-label` | `var(--ha-font-size-l, 16px)` | Header toggle label. |
-| `--st-control-icon-size` | `var(--st-font-size-xl, 32px)` | Header, state, and HVAC control icon size. |
-| `--st-font-size-preset-icon` | `var(--ha-font-size-xl, 20px)` | Preset mode icon size. |
-| `--st-font-size-compact-mode` | `var(--st-font-size-fan-mode, var(--ha-font-size-m, 14px))` | Text size for compact horizontal preset and fan speed buttons. |
-| `--st-font-size-compact-mode-icon` | `var(--st-font-size-fan-mode-icon, 20px)` | Icon size for compact horizontal preset and fan speed buttons. |
-| `--st-font-size-fan-mode` | `var(--ha-font-size-m, 14px)` | Legacy alias used as the fallback for compact horizontal mode text. |
-| `--st-font-size-fan-mode-icon` | `20px` | Legacy alias used as the fallback for compact horizontal mode icons. |
-| `--st-mode-background` | `var(--secondary-background-color)` | Inactive mode background. |
-| `--st-mode-active-background` | `var(--primary-color)` | Active mode background. |
-| `--st-mode-active-color` | `var(--text-primary-color)` | Active mode text. |
-| `--st-mode-hover-background` | mixed from inactive mode background and text color | Inactive mode hover background. |
-| `--st-mode-hover-color` | `var(--primary-text-color)` | Inactive mode hover text. |
-| `--st-mode-active-accent-color` | `rgba(245, 245, 245, 0.72)` | Active button underline and accent. |
-| `--st-mode-border-radius` | `var(--ha-card-border-radius, 4px)` | Mode button corner radius. |
-| `--st-mode-transition` | `200ms ease` | Mode button color transition. |
-| `--st-active-icon-glow-duration` | `5s` | Active heating, cooling, humidifying, and dehumidifying header icon glow cycle. |
-| `--st-active-icon-glow-min-size` | `4px` | Faintest active header icon glow radius. |
-| `--st-active-icon-glow-mid-size` | `9px` | Midpoint active header icon glow radius. |
-| `--st-active-icon-glow-max-size` | `14px` | Strongest active header icon glow radius. |
-| `--st-active-icon-glow-min-strength` | `36%` | Faintest active header icon glow opacity mix. |
-| `--st-active-icon-glow-mid-strength` | `52%` | Midpoint active header icon glow opacity mix. |
-| `--st-active-icon-glow-max-strength` | `70%` | Strongest active header icon glow opacity mix. |
-| `--auto-color` | `green` | Active auto mode. |
-| `--heat_cool-color` | `springgreen` | Active heat/cool mode. |
-| `--cool-color` | `#2b9af9` | Active cool mode. |
-| `--heat-color` | `#ff8100` | Active heat mode. |
-| `--off-color` | `#8a8a8a` | Active off mode. |
-| `--fan_only-color` | `#8a8a8a` | Active fan-only mode. |
-| `--dry-color` | `#efbd07` | Active dry mode. |
-| `--st-toggle-label-color` | `var(--primary-text-color)` | Header toggle label color. |
-| `--st-fault-inactive-color` | `var(--secondary-background-color)` | Inactive fault icon. |
-| `--st-fault-active-color` | `var(--accent-color)` | Active fault icon. |
+| Variable                             | Default                                                                                       | Description                                                                     |
+| ------------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `--st-spacing`                       | `4px`                                                                                         | Base spacing unit.                                                              |
+| `--st-font-size-xl`                  | `28px`                                                                                        | Target value on wide screens.                                                   |
+| `--st-font-size-l`                   | `22px`                                                                                        | Target value on narrow screens.                                                 |
+| `--st-font-size-m`                   | `var(--ha-font-size-xl, 20px)`                                                                | Target unit size.                                                               |
+| `--st-font-size-title`               | `var(--ha-card-header-font-size, 24px)`                                                       | Header title size.                                                              |
+| `--st-font-size-entities`            | `var(--ha-font-size-l, 16px)`                                                                 | Extra entity and mode label text.                                               |
+| `--st-font-size-toggle-label`        | `var(--ha-font-size-l, 16px)`                                                                 | Header toggle label.                                                            |
+| `--st-control-icon-size`             | `var(--st-font-size-xl, 32px)`                                                                | Header, state, and HVAC control icon size.                                      |
+| `--st-font-size-preset-icon`         | `var(--ha-font-size-xl, 20px)`                                                                | Preset mode icon size.                                                          |
+| `--st-font-size-compact-mode`        | `var(--ha-font-size-m, 14px)`                                                                 | Text size for compact horizontal preset and fan speed buttons.                  |
+| `--st-font-size-compact-mode-icon`   | `20px`                                                                                        | Icon size for compact horizontal preset and fan speed buttons.                  |
+| `--st-mode-background`               | `var(--secondary-background-color)`                                                           | Inactive mode background.                                                       |
+| `--st-mode-active-background`        | `var(--primary-color)`                                                                        | Active mode background.                                                         |
+| `--st-mode-active-color`             | `var(--text-primary-color)`                                                                   | Active mode text.                                                               |
+| `--st-mode-hover-background`         | mixed from inactive mode background and text color                                            | Inactive mode hover background.                                                 |
+| `--st-mode-hover-color`              | `var(--primary-text-color)`                                                                   | Inactive mode hover text.                                                       |
+| `--st-mode-active-accent-color`      | mixed from active mode text color                                                             | Active button underline and accent.                                             |
+| `--st-mode-border-radius`            | `var(--ha-card-border-radius, 4px)`                                                           | Mode button corner radius.                                                      |
+| `--st-mode-transition`               | `200ms ease`                                                                                  | Mode button color transition.                                                   |
+| `--st-active-icon-glow-duration`     | `5s`                                                                                          | Active heating, cooling, humidifying, and dehumidifying header icon glow cycle. |
+| `--st-active-icon-glow-min-size`     | `4px`                                                                                         | Faintest active header icon glow radius.                                        |
+| `--st-active-icon-glow-mid-size`     | `9px`                                                                                         | Midpoint active header icon glow radius.                                        |
+| `--st-active-icon-glow-max-size`     | `14px`                                                                                        | Strongest active header icon glow radius.                                       |
+| `--st-active-icon-glow-min-strength` | `36%`                                                                                         | Faintest active header icon glow opacity mix.                                   |
+| `--st-active-icon-glow-mid-strength` | `52%`                                                                                         | Midpoint active header icon glow opacity mix.                                   |
+| `--st-active-icon-glow-max-strength` | `70%`                                                                                         | Strongest active header icon glow opacity mix.                                  |
+| `--auto-color`                       | `var(--state-climate-auto-color, var(--primary-color))`                                       | Active auto mode.                                                               |
+| `--heat_cool-color`                  | `var(--state-climate-heat-cool-color, var(--primary-color))`                                  | Active heat/cool mode.                                                          |
+| `--cool-color`                       | `var(--state-climate-cool-color, var(--primary-color))`                                       | Active cool mode.                                                               |
+| `--heat-color`                       | `var(--state-climate-heat-color, var(--primary-color))`                                       | Active heat mode.                                                               |
+| `--off-color`                        | `var(--state-icon-color, var(--secondary-text-color))`                                        | Active off mode.                                                                |
+| `--fan_only-color`                   | `var(--state-climate-fan-only-color, var(--state-fan-active-color, var(--state-icon-color)))` | Active fan-only mode.                                                           |
+| `--dry-color`                        | `var(--state-climate-dry-color, var(--primary-color))`                                        | Active dry mode.                                                                |
+| `--st-toggle-label-color`            | `var(--primary-text-color)`                                                                   | Header toggle label color.                                                      |
+| `--st-fault-inactive-color`          | `var(--secondary-background-color)`                                                           | Inactive fault icon.                                                            |
+| `--st-fault-active-color`            | `var(--accent-color)`                                                                         | Active fault icon.                                                              |
 
 Per-card override with [card-mod](https://github.com/thomasloven/lovelace-card-mod):
 
@@ -615,7 +582,7 @@ card_mod:
       --st-font-size-xl: 18px;
       --st-font-size-l: 16px;
       --st-spacing: 2px;
-      --cool-color: rgba(43, 154, 249, 0.8);
+      --cool-color: var(--state-climate-cool-color);
     }
 ```
 

@@ -1,5 +1,5 @@
 import { HeaderConfig } from './header'
-import { LooseObject, ConfigEntity, TemplatedEntity } from '../types'
+import { LooseObject, ConfigEntity } from '../types'
 import { Service } from './service'
 import { Setpoints } from './setpoints'
 
@@ -61,12 +61,9 @@ type ModeControl = {
 interface CardConfig {
   entity?: string
   current_value_entity?: string
-  current_temperature_entity?: string
   header: false | HeaderConfig
   control?: false | ModeControl | string[]
-  entities?: false | Array<ConfigEntity & TemplatedEntity>
-  sensors?: false | Array<ConfigEntity & TemplatedEntity>
-  version: 2 | 3
+  entities?: false | Array<ConfigEntity>
   setpoints?: Setpoints
   decimals?: number
   step_size?: number
@@ -81,10 +78,6 @@ interface CardConfig {
       type: 'table' | 'list'
       labels: boolean
     }
-    sensors: {
-      type: 'table' | 'list'
-      labels: boolean
-    }
     step: 'row' | 'column'
   }
   unit?: boolean | string
@@ -96,10 +89,12 @@ interface CardConfig {
   hide?: {
     temperature?: boolean
     state?: boolean
+    setpoint_label?: boolean
   }
   label?: {
     temperature?: string
     state?: string
+    setpoint?: string
   }
   tap_action?: TapAction
   hold_action?: TapAction

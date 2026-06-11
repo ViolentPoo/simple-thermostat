@@ -127,7 +127,7 @@ test('vane controls only show when the selected entity exposes vane attributes',
   )
 })
 
-test('entity layout controls only show when extra entities are configured', () => {
+test('entity layout controls are visible for configuring extra entities', () => {
   const hass = {
     performAction,
     states: {
@@ -141,20 +141,6 @@ test('entity layout controls only show when extra entities are configured', () =
 
   expect(
     schemaNames(buildSchema({ entity: 'climate.living_room' } as any, hass))
-  ).not.toEqual(
-    expect.arrayContaining(['layout.entities.type', 'layout.entities.labels'])
-  )
-
-  expect(
-    schemaNames(
-      buildSchema(
-        {
-          entity: 'climate.living_room',
-          entities: [{ entity: 'sensor.temperature' }],
-        } as any,
-        hass
-      )
-    )
   ).toEqual(
     expect.arrayContaining(['layout.entities.type', 'layout.entities.labels'])
   )

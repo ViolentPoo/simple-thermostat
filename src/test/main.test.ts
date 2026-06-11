@@ -21,7 +21,6 @@ test('fan controls use fan_mode attribute as active mode', () => {
     entity: 'climate.living_room',
     header: false,
     control: ['fan'],
-    version: 3,
   })
   card.hass = {
     states: {
@@ -52,7 +51,6 @@ test('climate controls keep fan above hvac without moving swing first', () => {
     entity: 'climate.living_room',
     header: false,
     control: ['swing', 'fan', 'hvac'],
-    version: 3,
   })
   card.hass = {
     states: {
@@ -285,12 +283,12 @@ test('enhanced visuals off preserves explicitly configured row step layout', asy
     expect.stringContaining('decrease'),
     expect.stringContaining('current--value'),
     expect.stringContaining('increase'),
+    'current--label',
   ])
 })
 
-test('legacy aliases warn without warning for version 3 configs', () => {
+test('legacy config names are normalized to v4 names', () => {
   document.body.innerHTML = ''
-  const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
   const card = createCard()
 
   card.setConfig({
@@ -303,18 +301,17 @@ test('legacy aliases warn without warning for version 3 configs', () => {
     version: 3,
   } as any)
 
-  expect(warn).toHaveBeenCalledWith(
-    expect.stringContaining('"current_temperature_entity" is legacy but supported')
+  expect(card.config.current_value_entity).toBe(
+    'sensor.living_room_temperature'
   )
-  expect(warn).toHaveBeenCalledWith(
-    expect.stringContaining('"sensors" is legacy but supported')
-  )
-  expect(warn).toHaveBeenCalledWith(
-    expect.stringContaining('"layout.sensors" is legacy but supported')
-  )
-  expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('version'))
-
-  warn.mockRestore()
+  expect((card.config as any).current_temperature_entity).toBeUndefined()
+  expect(card.config.entities).toEqual([
+    { entity: 'sensor.living_room_humidity' },
+  ])
+  expect((card.config as any).sensors).toBeUndefined()
+  expect(card.config.layout?.entities).toEqual({ type: 'table', labels: true })
+  expect((card.config.layout as any)?.sensors).toBeUndefined()
+  expect((card.config as any).version).toBeUndefined()
 })
 
 test('hass setter rebuilds even when state object references are unchanged', () => {

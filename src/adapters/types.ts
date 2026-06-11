@@ -21,7 +21,7 @@ export interface EntityAdapter {
   /** Return the current measured value, for example current_temperature, current_humidity, or percentage. */
   getCurrentValue(attributes: LooseObject): number | string | null
 
-  /** Return the Squirrelly template snippet used by v3 templated entity rows. */
+  /** Return the default current-value display key for built-in entity rows. */
   getCurrentValueTemplate(): string
 
   /** Return the default service used when applying a setpoint change. */

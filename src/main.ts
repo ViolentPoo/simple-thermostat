@@ -12,11 +12,11 @@ import sortFanModes from './sortFanModes'
 import formatNumber from './formatNumber'
 import fireEvent from './fireEvent'
 import renderHeader from './components/header'
-import renderTemplated, { wrapEntities } from './components/templated'
 import renderEntities from './components/entities'
 import renderModeType from './components/modeType'
 import { appendUnit } from './unitFormat'
 import { getEntityAction } from './entityAction'
+import normalizeConfig from './config/normalize'
 
 import parseHeader, {
   getModeIcon,
@@ -28,14 +28,7 @@ import parseService, { Service } from './config/service'
 
 import { CardConfig, ModeValue, ModeControlObject, MODES } from './config/card'
 
-import {
-  ControlMode,
-  LooseObject,
-  Entity,
-  PreparedEntity,
-  HASS,
-  HVAC_MODES,
-} from './types'
+import { ControlMode, LooseObject, Entity, HASS, HVAC_MODES } from './types'
 
 interface HANode extends Element {
   hass: HASS
@@ -75,29 +68,7 @@ const CONTROL_ORDER = [
 ]
 
 function getConfiguredEntities(config: CardConfig) {
-  return config.entities ?? config.sensors ?? []
-}
-
-const warnedLegacyConfigKeys = new Set<string>()
-
-function warnLegacyConfigKey(key: string, replacement: string) {
-  if (warnedLegacyConfigKeys.has(key)) return
-  warnedLegacyConfigKeys.add(key)
-  console.warn(
-    `[simple-thermostat] "${key}" is legacy but supported. Prefer "${replacement}" for new configs.`
-  )
-}
-
-function warnLegacyConfigAliases(config: CardConfig) {
-  if (config.current_temperature_entity) {
-    warnLegacyConfigKey('current_temperature_entity', 'current_value_entity')
-  }
-  if (typeof config.sensors !== 'undefined') {
-    warnLegacyConfigKey('sensors', 'entities')
-  }
-  if (typeof config.layout?.sensors !== 'undefined') {
-    warnLegacyConfigKey('layout.sensors', 'layout.entities')
-  }
+  return config.entities ?? []
 }
 
 function shouldShowModeControl(
@@ -325,7 +296,7 @@ export default class SimpleThermostat extends LitElement {
   @state()
   entity: LooseObject
   @state()
-  entities: Array<Entity | PreparedEntity> = []
+  entities: Array<Entity> = []
   @state()
   showEntities: boolean = true
   @state()
@@ -383,11 +354,10 @@ export default class SimpleThermostat extends LitElement {
   }
 
   setConfig(config: CardConfig) {
-    warnLegacyConfigAliases(config)
-    this.config = {
+    this.config = normalizeConfig({
       decimals: DECIMALS,
       ...config,
-    }
+    })
   }
 
   disconnectedCallback() {
@@ -506,67 +476,6 @@ export default class SimpleThermostat extends LitElement {
 
     if (configuredEntities === false) {
       this.showEntities = false
-    } else if (this.config.version === 3) {
-      this.entities = []
-      const customEntities = configuredEntities.map((entity, index) => {
-        const entityId = entity?.entity ?? this.config.entity
-        let context = this.entity
-        if (entity?.entity) {
-          context = this._hass.states[entity.entity]
-        }
-        return {
-          id: entity?.id ?? String(index),
-          label: entity?.label,
-          template: entity.template,
-          show: entity?.show !== false,
-          entityId,
-          context,
-          unit: entity?.unit ?? '',
-        } as PreparedEntity
-      })
-      const ids = customEntities.map((entity) => entity.id)
-      const builtins = []
-      if (!ids.includes('state')) {
-        builtins.push({
-          id: 'state',
-          label: '{{ui.operation}}',
-          template: '{{state.text}}',
-          entityId: this.config.entity,
-          context: this.entity,
-        })
-      }
-      const currentValueId = adapter
-        .getSetpointService()
-        .service.replace('set_', '')
-      const currentValueTemplate = adapter.getCurrentValueTemplate()
-      const hasExplicitCurrentValueEntity = Boolean(
-        this.config.current_value_entity ||
-        this.config.current_temperature_entity
-      )
-      const hasDefaultCurrentValue =
-        adapter.getCurrentValue(attributes) !== null
-      if (
-        !ids.includes(currentValueId) &&
-        (hasExplicitCurrentValueEntity || hasDefaultCurrentValue)
-      ) {
-        const currentValueEntityId =
-          this.config.current_value_entity ??
-          this.config.current_temperature_entity ??
-          this.config.entity
-        const currentValueContext =
-          this.config.current_value_entity ||
-          this.config.current_temperature_entity
-            ? this._hass.states[currentValueEntityId]
-            : this.entity
-        builtins.push({
-          id: currentValueId,
-          label: '{{ui.currently}}',
-          template: currentValueTemplate,
-          entityId: currentValueEntityId,
-          context: currentValueContext,
-        })
-      }
-      this.entities = [...builtins, ...customEntities]
     } else if (configuredEntities) {
       this.entities = configuredEntities.map(
         ({ name, entity, attribute, unit = '', ...rest }) => {
@@ -639,48 +548,33 @@ export default class SimpleThermostat extends LitElement {
     const row = stepLayout === 'row'
     const entityDomain = config.entity.split('.')[0]
     const isUnavailable = ['unavailable', 'unknown'].includes(entity.state)
+    const hasSetpoints = Object.keys(this._values).length > 0
     const safeClass = (value: unknown) =>
       typeof value === 'string' ? value.replace(/[^a-z0-9_-]/gi, '') : ''
     const classes = [
       !this.header && 'no-header',
       `domain-${safeClass(entityDomain)}`,
       `state-${safeClass(entity.state)}`,
+      entityDomain === 'fan' && !hasSetpoints && 'state-only',
       this.config.enhanced_visuals === false && 'standard-visuals',
       safeClass(action),
       isUnavailable && safeClass(entity.state),
     ].filter((cx) => !!cx)
     const cardStyle = getCardStyle(entityDomain, entity.attributes)
 
-    let entitiesHtml
-    if (this.config.version === 3) {
-      entitiesHtml = this.entities
-        .filter((spec: PreparedEntity) => spec.show !== false)
-        .map((spec: PreparedEntity) => {
-          return renderTemplated({
-            ...spec,
-            variables: this.config.variables,
-            hass: this._hass,
-            config: this.config,
-            localize: this.localize,
-            openEntityPopover: this.openEntityPopover,
-          })
+    const entitiesHtml = this.showEntities
+      ? renderEntities({
+          _hide,
+          unit,
+          hass: this._hass,
+          entity: this.entity,
+          entities: this.entities,
+          config: this.config,
+          adapter,
+          localize: this.localize,
+          openEntityPopover: this.openEntityPopover,
         })
-      entitiesHtml = wrapEntities(this.config, entitiesHtml)
-    } else {
-      entitiesHtml = this.showEntities
-        ? renderEntities({
-            _hide,
-            unit,
-            hass: this._hass,
-            entity: this.entity,
-            entities: this.entities,
-            config: this.config,
-            adapter,
-            localize: this.localize,
-            openEntityPopover: this.openEntityPopover,
-          })
-        : ''
-    }
+      : ''
     return html`
       <ha-card class="${classes.join(' ')}" style=${cardStyle}>
         ${config.styles
@@ -778,14 +672,31 @@ export default class SimpleThermostat extends LitElement {
     const decreaseButton = this.renderSetpointStepper(options, 'decrease')
     const valueButton = this.renderSetpointValue(options)
     const increaseButton = this.renderSetpointStepper(options, 'increase')
+    const label = this.renderSetpointLabel(options)
 
     return html`
       <div class="current-wrapper ${stepLayout}">
         ${row
           ? html`${decreaseButton}${valueButton}${increaseButton}`
           : html`${increaseButton}${valueButton}${decreaseButton}`}
+        ${label}
       </div>
     `
+  }
+
+  renderSetpointLabel({ field }: SetpointRenderOptions) {
+    if (this.config.hide?.setpoint_label === true) return nothing
+
+    const configuredLabel = this.config.label?.setpoint
+    const label =
+      configuredLabel ??
+      this._hass.localize?.(
+        `ui.card.${getAdapter(this.config.entity).getLocalizationDomain()}.target`
+      ) ??
+      this._hass.localize?.('ui.card.climate.target_temperature') ??
+      this.localize(field, 'state_attributes.climate.')
+
+    return html`<div class="current--label">${label}</div>`
   }
 
   renderSetpointStepper(

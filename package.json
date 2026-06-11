@@ -14,8 +14,7 @@
   "dependencies": {
     "@mdi/js": "^7.4.47",
     "debounce-fn": "^6.0.0",
-    "lit": "^3.0.0",
-    "squirrelly": "^9.1.0"
+    "lit": "^3.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.2",
