@@ -66,8 +66,38 @@ test('uses entity icon for label-only header toggle color classes', async () => 
 
   const toggle = container.querySelector('.header__toggle')
   const label = container.querySelector('.toggle-label')
-  expect(toggle?.classList.contains('toggle-radiator')).toBe(true)
-  expect(label?.classList.contains('toggle-radiator')).toBe(true)
+  expect(toggle?.classList.contains('toggle-heat')).toBe(true)
+  expect(label?.classList.contains('toggle-heat')).toBe(true)
   expect(label?.textContent).toContain('Heater')
   expect(label?.querySelector('ha-icon')).toBeNull()
+})
+
+test('header icon includes humidifier action class', async () => {
+  const container = document.createElement('div')
+  const result = renderHeader({
+    header: {
+      name: 'Dehumidifier',
+      icon: 'mdi:air-humidifier',
+      slashOffIcon: false,
+      faults: [],
+      toggles: [],
+    },
+    entity: {
+      entity_id: 'humidifier.basement_dehumidifier',
+      state: 'on',
+      attributes: {
+        action: 'drying',
+        device_class: 'dehumidifier',
+      },
+    },
+    openEntityPopover: () => undefined,
+    toggleEntityChanged: () => undefined,
+  })
+
+  render(result, container)
+  await Promise.resolve()
+
+  const icon = container.querySelector('.header__icon')
+  expect(icon?.classList.contains('on')).toBe(true)
+  expect(icon?.classList.contains('drying')).toBe(true)
 })

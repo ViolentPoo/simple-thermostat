@@ -2,6 +2,7 @@ import * as Sqrl from 'squirrelly'
 import { html } from 'lit'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import formatNumber from '../formatNumber'
+import { getEntityStateText } from '../entityAction'
 
 const renderIcon = (icon) => `<ha-icon icon="${icon}"></ha-icon>`
 
@@ -24,8 +25,8 @@ Sqrl.filters.define('debug', (data) => {
 })
 
 export function wrapEntities(config, content) {
-  const { type, labels: showLabels } =
-    config?.layout?.entities ?? config?.layout?.sensors ?? {
+  const { type, labels: showLabels } = config?.layout?.entities ??
+    config?.layout?.sensors ?? {
       type: 'table',
       labels: true,
     }
@@ -33,7 +34,8 @@ export function wrapEntities(config, content) {
   const classes = [
     showLabels ? 'with-labels' : 'without-labels',
     type === 'list' ? 'as-list' : 'as-table',
-    content.filter((it) => it !== null && typeof it !== 'undefined').length === 1
+    content.filter((it) => it !== null && typeof it !== 'undefined').length ===
+    1
       ? 'single-row'
       : '',
   ]
@@ -59,7 +61,14 @@ export default function renderTemplated({
   const uiPrefix = ['climate', 'fan', 'humidifier'].includes(domain)
     ? `ui.card.${domain}.`
     : 'ui.card.climate.'
-  const uiKeys = ['currently', 'operation', 'fan_mode', 'swing_mode', 'preset_mode', 'humidity']
+  const uiKeys = [
+    'currently',
+    'operation',
+    'fan_mode',
+    'swing_mode',
+    'preset_mode',
+    'humidity',
+  ]
   const localizeUi = (key: string) => {
     const fullKey = `${uiPrefix}${key}`
     const translated = hass.localize?.(fullKey)
@@ -74,7 +83,7 @@ export default function renderTemplated({
     ...attributes,
     state: {
       raw: state,
-      text: localize(state, `component.${domain}.state._.`),
+      text: getEntityStateText(context, hass, localize),
     },
     ui: translations,
     v: variables,

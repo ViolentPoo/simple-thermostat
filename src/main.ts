@@ -16,6 +16,7 @@ import renderTemplated, { wrapEntities } from './components/templated'
 import renderEntities from './components/entities'
 import renderModeType from './components/modeType'
 import { appendUnit } from './unitFormat'
+import { getEntityAction } from './entityAction'
 
 import parseHeader, {
   getModeIcon,
@@ -628,9 +629,7 @@ export default class SimpleThermostat extends LitElement {
     }
 
     const adapter = getAdapter(config.entity)
-    const {
-      attributes: { hvac_action: action },
-    } = entity
+    const action = getEntityAction(entity)
     const { min: minValue, max: maxValue } = adapter.getRange(entity.attributes)
     const unit = this.getUnit()
     const stepLayout =
@@ -692,6 +691,7 @@ export default class SimpleThermostat extends LitElement {
         ${warnings}
         ${renderHeader({
           header: this.header,
+          hass: this._hass,
           toggleEntityChanged: this.toggleEntityChanged,
           entity: this.entity,
           openEntityPopover: this.openEntityPopover,

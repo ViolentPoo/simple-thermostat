@@ -1,10 +1,12 @@
 import { html, nothing } from 'lit'
-import { LooseObject } from '../types'
 import { HeaderData } from '../config/header'
+import { getEntityAction } from '../entityAction'
+import { getToggleKind, getToggleKindClass } from '../toggleKind'
 
 type HeaderOptions = {
   header: false | HeaderData
-  entity: LooseObject
+  entity: any
+  hass?
   openEntityPopover
   toggleEntityChanged
 }
@@ -13,13 +15,14 @@ export default function renderHeader({
   header,
   toggleEntityChanged,
   entity,
+  hass,
   openEntityPopover,
 }: HeaderOptions) {
   if (header === false) {
     return nothing
   }
 
-  const action = entity.attributes.hvac_action || entity.state
+  const action = getEntityAction(entity) || entity.state
   let icon = header.icon
   if (typeof header.icon === 'object') {
     icon = icon?.[action] ?? false
@@ -31,21 +34,34 @@ export default function renderHeader({
   return html`
     <header>
       <div class="header__main clickable" @click=${() => openEntityPopover()}>
-        ${renderIcon(icon, entity.state, slashOffIcon)} ${renderName(name)}
+        ${renderIcon(icon, entity.state, action, slashOffIcon)}
+        ${renderName(name)}
       </div>
       ${renderFaults(header.faults, openEntityPopover)}
-      ${renderToggles(header.toggles, openEntityPopover, toggleEntityChanged)}
+      ${renderToggles(
+        header.toggles,
+        openEntityPopover,
+        toggleEntityChanged,
+        hass
+      )}
     </header>
   `
 }
 
-function renderIcon(icon, state, slashOffIcon = false) {
+function renderIcon(icon, state, action, slashOffIcon = false) {
+  const actionClass = action && action !== state ? ` ${action}` : ''
+
   return icon
     ? html`
         <span
-          class="header__icon-wrap ${state} ${slashOffIcon ? 'slash-off' : ''}"
+          class="header__icon-wrap ${state}${actionClass} ${slashOffIcon
+            ? 'slash-off'
+            : ''}"
         >
-          <ha-icon class="header__icon ${state}" .icon=${icon}></ha-icon>
+          <ha-icon
+            class="header__icon ${state}${actionClass}"
+            .icon=${icon}
+          ></ha-icon>
         </span>
       `
     : nothing
@@ -76,7 +92,7 @@ function renderFaults(faults, openEntityPopover) {
   return html` <div class="faults">${faultHtml}</div>`
 }
 
-function renderToggles(toggles, openEntityPopover, toggleEntityChanged) {
+function renderToggles(toggles, openEntityPopover, toggleEntityChanged, hass) {
   if (!toggles?.length) return nothing
 
   return html`
@@ -90,20 +106,23 @@ function renderToggles(toggles, openEntityPopover, toggleEntityChanged) {
           typeof toggle.icon === 'string'
             ? toggle.icon
             : toggle.entity?.attributes?.icon
-        const toggleKind =
-          typeof styleIcon === 'string'
-            ? styleIcon.replace(/^mdi:/, '').replace(/[^a-z0-9_-]/gi, '')
-            : ''
+        const toggleKind = getToggleKind({
+          icon: styleIcon,
+          label: toggle.label,
+          entity: toggle.entity,
+          hass,
+        })
+        const toggleKindClass = getToggleKindClass(toggleKind)
         return html`
           <div
             class="header__toggle ${toggleState || ''} ${toggleDomain
               ? `domain-${toggleDomain}`
-              : ''} ${toggleKind ? `toggle-${toggleKind}` : ''}"
+              : ''} ${toggleKindClass}"
           >
             <span
               class="clickable toggle-label ${toggleState || ''} ${toggleDomain
                 ? `domain-${toggleDomain}`
-                : ''} ${toggleKind ? `toggle-${toggleKind}` : ''}"
+                : ''} ${toggleKindClass}"
               title=${toggle.label || toggle.entity?.attributes?.friendly_name}
               @click=${() => openEntityPopover(entityId)}
               >${toggle.icon !== false

@@ -2,6 +2,7 @@ import { html, nothing } from 'lit'
 import formatNumber from '../formatNumber'
 import { appendUnit } from '../unitFormat'
 import { LooseObject } from '../types'
+import { getToggleKind, getToggleKindClass } from '../toggleKind'
 
 const TOGGLE_DOMAINS = [
   'automation',
@@ -45,10 +46,6 @@ function toggleEntity(hass, entityId: string, checked: boolean) {
 
 function safeClass(value: unknown) {
   return String(value ?? '').replace(/[^a-z0-9_-]/gi, '')
-}
-
-function iconClass(icon?: string) {
-  return icon ? `toggle-${safeClass(icon.replace(/^mdi:/, ''))}` : ''
 }
 
 export default function renderInfoItem({
@@ -100,7 +97,15 @@ export default function renderInfoItem({
       isToggleEntity && 'toggle-entity',
       entityDomain && `domain-${safeClass(entityDomain)}`,
       entityState && `state-${safeClass(entityState)}`,
-      isToggleEntity && iconClass(icon || state.attributes?.icon),
+      isToggleEntity &&
+        getToggleKindClass(
+          getToggleKind({
+            icon: icon || state.attributes?.icon,
+            label: heading || state.attributes?.friendly_name,
+            entity: state,
+            hass,
+          })
+        ),
     ]
       .filter(Boolean)
       .join(' ')
@@ -188,7 +193,18 @@ export default function renderInfoItem({
     isToggleEntity && 'toggle-entity',
     entityDomain && `domain-${safeClass(entityDomain)}`,
     entityState && `state-${safeClass(entityState)}`,
-    isToggleEntity && iconClass(icon || state?.attributes?.icon),
+    isToggleEntity &&
+      getToggleKindClass(
+        getToggleKind({
+          icon: icon || state?.attributes?.icon,
+          label:
+            typeof heading === 'string'
+              ? heading
+              : state?.attributes?.friendly_name,
+          entity: state,
+          hass,
+        })
+      ),
   ]
     .filter(Boolean)
     .join(' ')

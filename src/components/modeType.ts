@@ -45,7 +45,11 @@ export default function renderModeType({
     localizePrefix = `component.climate.state._.`
   } else if (type === 'vane_horizontal' || type === 'vane_vertical') {
     localizePrefix = ''
-  } else if (type === 'direction' || type === 'oscillating' || type === 'mode') {
+  } else if (
+    type === 'direction' ||
+    type === 'oscillating' ||
+    type === 'mode'
+  ) {
     localizePrefix = ''
   }
 
@@ -133,7 +137,10 @@ export default function renderModeType({
   }
   const title = name === false ? false : name || defaultTitle
   const getControlTooltip = () => {
-    if (type === 'fan' || (type === 'preset' && adapter.getLocalizationDomain() === 'fan')) {
+    if (
+      type === 'fan' ||
+      (type === 'preset' && adapter.getLocalizationDomain() === 'fan')
+    ) {
       return 'Fan speed'
     }
     if (type === 'swing') return 'Swing mode'
@@ -169,43 +176,51 @@ export default function renderModeType({
       'vane_horizontal',
       'vane_vertical',
     ].includes(type)
+  const dense =
+    list.length > 4 ||
+    (type === 'hvac' && list.length > 3) ||
+    (type === 'fan' && list.length > 3)
   const safeClass = (value: unknown) =>
     String(value).replace(/[^a-z0-9_-]/gi, '')
 
   return html`
     <div
-      class="modes ${type} ${isFanPreset ? 'fan-preset' : ''} ${showHeading ? 'heading' : ''} ${compact ? 'compact' : ''} ${sparseMainControls ? 'sparse' : ''}"
+      class="modes ${type} ${isFanPreset ? 'fan-preset' : ''} ${showHeading
+        ? 'heading'
+        : ''} ${compact ? 'compact' : ''} ${dense
+        ? 'dense'
+        : ''} ${sparseMainControls ? 'sparse' : ''}"
       role="group"
       aria-label=${title || type}
     >
       ${showHeading ? html` <div class="mode-title">${title}</div> ` : ''}
-      ${list.map(
-        ({ value, icon, name }) => {
-          const modeClass = safeClass(value)
-          const displayName = maybeRenderName(name, value)
-          const tooltip = displayName ? nothing : controlTooltip || nothing
-          return html`
-            <div
-              class="mode-item ${modeClass} ${value === mode ? 'active' : ''}"
-              role="button"
-              tabindex="0"
-              aria-pressed=${value === mode ? 'true' : 'false'}
-              aria-label=${name || value}
-              title=${tooltip}
-              @click=${() => setMode(type, value)}
-              @keydown=${(e: KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  setMode(type, value)
-                }
-              }}
-            >
-              ${maybeRenderIcon(icon)}
-              ${displayName ? html`<span class="mode-label">${displayName}</span>` : null}
-            </div>
-          `
-        }
-      )}
+      ${list.map(({ value, icon, name }) => {
+        const modeClass = safeClass(value)
+        const displayName = maybeRenderName(name, value)
+        const tooltip = displayName ? nothing : controlTooltip || nothing
+        return html`
+          <div
+            class="mode-item ${modeClass} ${value === mode ? 'active' : ''}"
+            role="button"
+            tabindex="0"
+            aria-pressed=${value === mode ? 'true' : 'false'}
+            aria-label=${name || value}
+            title=${tooltip}
+            @click=${() => setMode(type, value)}
+            @keydown=${(e: KeyboardEvent) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setMode(type, value)
+              }
+            }}
+          >
+            ${maybeRenderIcon(icon)}
+            ${displayName
+              ? html`<span class="mode-label">${displayName}</span>`
+              : null}
+          </div>
+        `
+      })}
     </div>
   `
 }

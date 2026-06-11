@@ -229,18 +229,36 @@ ha-card.loading {
 .toggle-label.toggle-fire,
 .header__toggle.toggle-radiator,
 .toggle-label.toggle-radiator,
+.header__toggle.toggle-heat,
+.toggle-label.toggle-heat,
 .header__toggle.toggle-heat-wave,
 .toggle-label.toggle-heat-wave,
 .header__toggle.toggle-heating-coil,
-.toggle-label.toggle-heating-coil {
+.toggle-label.toggle-heating-coil,
+.header__toggle.toggle-water-boiler,
+.toggle-label.toggle-water-boiler {
   --st-toggle-color: var(--heat-color);
+}
+.header__toggle.toggle-snowflake,
+.toggle-label.toggle-snowflake,
+.header__toggle.toggle-air-conditioner,
+.toggle-label.toggle-air-conditioner,
+.header__toggle.toggle-cool,
+.toggle-label.toggle-cool {
+  --st-toggle-color: var(--cool-color);
 }
 .header__toggle.toggle-fan,
 .toggle-label.toggle-fan {
   --st-toggle-color: var(--cool-color);
 }
+.header__toggle.toggle-lightbulb,
+.toggle-label.toggle-lightbulb {
+  --st-toggle-color: var(--state-light-active-color, #fdd835);
+}
 .header__toggle.toggle-water-percent,
-.toggle-label.toggle-water-percent {
+.toggle-label.toggle-water-percent,
+.header__toggle.toggle-dry,
+.toggle-label.toggle-dry {
   --st-toggle-color: var(--primary-color);
 }
 
@@ -388,7 +406,8 @@ ha-card.domain-fan:not(.state-off) .header__icon {
   animation: st-fan-spin var(--st-fan-spin-duration, 2.4s) linear infinite;
 }
 ha-card.humidifying .header__icon,
-ha-card.dehumidifying .header__icon {
+ha-card.dehumidifying .header__icon,
+ha-card.drying .header__icon {
   --st-active-icon-glow-color: var(--primary-color);
   animation: st-active-icon-glow var(--st-active-icon-glow-duration) ease-in-out
     infinite;
@@ -921,7 +940,8 @@ ha-card.domain-fan {
   --st-value-update-color: var(--on-color);
 }
 ha-card.humidifying,
-ha-card.dehumidifying {
+ha-card.dehumidifying,
+ha-card.drying {
   --st-value-update-color: var(--primary-color);
 }
 
@@ -1068,6 +1088,58 @@ ha-card.dehumidifying {
   align-items: center;
   min-height: var(--st-compact-mode-icon-size, 20px);
 }
+
+ha-card:not(.standard-visuals) .modes.dense {
+  gap: 4px;
+}
+
+ha-card:not(.standard-visuals) .modes.dense .mode-item {
+  gap: 5px;
+  min-height: 34px;
+  padding: 5px 8px;
+}
+
+ha-card:not(.standard-visuals) .modes.dense .mode-icon {
+  --iron-icon-width: var(--st-dense-mode-icon-size, 22px);
+  --iron-icon-height: var(--st-dense-mode-icon-size, 22px);
+  --mdc-icon-size: var(--st-dense-mode-icon-size, 22px);
+  width: var(--st-dense-mode-icon-size, 22px);
+  height: var(--st-dense-mode-icon-size, 22px);
+  position: static;
+  top: auto;
+}
+
+ha-card:not(.standard-visuals) .modes.dense .mode-label {
+  min-height: 0;
+  line-height: 1.1;
+}
+
+ha-card:not(.standard-visuals) .modes.hvac.dense .mode-item,
+ha-card:not(.standard-visuals) .modes.fan.dense .mode-item,
+ha-card:not(.standard-visuals) .modes.fan-preset.dense .mode-item {
+  flex-direction: row;
+}
+
+ha-card:not(.standard-visuals) .modes.preset.dense .mode-item {
+  padding-inline: 4px;
+}
+
+ha-card:not(.standard-visuals) .modes.hvac.dense .mode-label,
+ha-card:not(.standard-visuals) .modes.fan.dense .mode-label,
+ha-card:not(.standard-visuals) .modes.fan-preset.dense .mode-label {
+  display: flex;
+  align-items: center;
+}
+
+@container (max-width: 560px) {
+  ha-card:not(.standard-visuals) .modes.hvac.dense .mode-item,
+  ha-card:not(.standard-visuals) .modes.fan.dense .mode-item,
+  ha-card:not(.standard-visuals) .modes.fan-preset.dense .mode-item {
+    flex-direction: row;
+    min-width: min(100%, var(--st-mode-min-width, 72px));
+  }
+}
+
 .header__toggle ha-switch {
   padding: 0;
 }

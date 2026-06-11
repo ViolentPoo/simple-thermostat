@@ -1,4 +1,5 @@
 import { HASS, LooseObject } from '../types'
+import { getEntityAction } from '../entityAction'
 
 export interface HAState {
   state: string | number
@@ -214,12 +215,12 @@ function getDefaultHeaderIcon(entity: HAState): Icon {
   return (
     entity.attributes.icon ??
     DOMAIN_STATE_ICONS[entityDomain]?.[entity.state] ??
-    (entity.attributes.hvac_action ? STATE_ICONS : MODE_ICONS)
+    (getEntityAction(entity) ? STATE_ICONS : MODE_ICONS)
   )
 }
 
 function getLegacyHeaderIcon(entity: HAState): Icon {
-  return entity.attributes.hvac_action ? STATE_ICONS : MODE_ICONS
+  return getEntityAction(entity) ? STATE_ICONS : MODE_ICONS
 }
 
 function shouldSlashOffIcon(entity: HAState, icon: Icon) {
@@ -231,7 +232,9 @@ function shouldSlashOffIcon(entity: HAState, icon: Icon) {
       ? STATE_ICONS.off
       : DOMAIN_STATE_ICONS[entityDomain]?.off
 
-  return Boolean(domainOffIcon) && icon !== domainOffIcon && !icon.endsWith('-off')
+  return (
+    Boolean(domainOffIcon) && icon !== domainOffIcon && !icon.endsWith('-off')
+  )
 }
 
 function parseFaults(config: Array<Fault>, hass: HASS) {

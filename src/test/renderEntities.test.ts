@@ -1,6 +1,8 @@
 import { render } from 'lit'
 import renderEntities from '../components/entities'
 import { climateAdapter } from '../adapters/climate'
+import { humidifierAdapter } from '../adapters/humidifier'
+import { fanAdapter } from '../adapters/fan'
 
 function freshContainer() {
   const container = document.createElement('div')
@@ -37,6 +39,98 @@ test('state row shows hvac action without repeating hvac mode', () => {
   const text = container.textContent
   expect(text).toContain('Heating')
   expect(text).not.toContain('Heating (Heat)')
+})
+
+test('humidifier state row shows active drying action', () => {
+  const result = renderEntities({
+    _hide: { temperature: true, state: false },
+    entity: {
+      entity_id: 'humidifier.basement_dehumidifier',
+      state: 'on',
+      attributes: {
+        action: 'drying',
+        device_class: 'dehumidifier',
+        current_humidity: 64,
+      },
+    },
+    unit: '%',
+    hass: {
+      formatEntityState: () => 'On',
+      formatEntityAttributeValue: () => 'Drying',
+    },
+    entities: [],
+    config: { entity: 'humidifier.basement_dehumidifier' },
+    localize: (value: string) => value,
+    openEntityPopover: () => undefined,
+    adapter: humidifierAdapter,
+  })
+
+  const container = freshContainer()
+  render(result, container)
+
+  const text = container.textContent
+  expect(text).toContain('Drying')
+  expect(text).not.toContain('On')
+})
+
+test('fan state row prefers preset mode over on state', () => {
+  const result = renderEntities({
+    _hide: { temperature: true, state: false },
+    entity: {
+      entity_id: 'fan.living_room',
+      state: 'on',
+      attributes: {
+        preset_mode: 'auto',
+        percentage: 42,
+      },
+    },
+    unit: false,
+    hass: {
+      formatEntityState: () => 'On',
+      formatEntityAttributeValue: () => 'Auto',
+    },
+    entities: [],
+    config: { entity: 'fan.living_room' },
+    localize: (value: string) => value,
+    openEntityPopover: () => undefined,
+    adapter: fanAdapter,
+  })
+
+  const container = freshContainer()
+  render(result, container)
+
+  const text = container.textContent
+  expect(text).toContain('Auto')
+  expect(text).not.toContain('On')
+})
+
+test('fan state row falls back to percentage speed', () => {
+  const result = renderEntities({
+    _hide: { temperature: true, state: false },
+    entity: {
+      entity_id: 'fan.living_room',
+      state: 'on',
+      attributes: {
+        percentage: 42,
+      },
+    },
+    unit: false,
+    hass: {
+      formatEntityState: () => 'On',
+    },
+    entities: [],
+    config: { entity: 'fan.living_room' },
+    localize: (value: string) => value,
+    openEntityPopover: () => undefined,
+    adapter: fanAdapter,
+  })
+
+  const container = freshContainer()
+  render(result, container)
+
+  const text = container.textContent
+  expect(text).toContain('42%')
+  expect(text).not.toContain('On')
 })
 
 test('built-in currently and state rows open their entities', () => {

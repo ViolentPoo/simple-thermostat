@@ -2,6 +2,7 @@ import formatNumber from '../formatNumber'
 import renderInfoItem from './infoItem'
 import { wrapEntities } from './templated'
 import { appendUnit } from '../unitFormat'
+import { getEntityStateText } from '../entityAction'
 
 export default function renderEntities({
   _hide,
@@ -14,11 +15,6 @@ export default function renderEntities({
   openEntityPopover,
   adapter,
 }) {
-  const {
-    state,
-    attributes: { hvac_action: action },
-  } = entity
-
   const currentValueEntityId =
     config.current_value_entity ?? config.current_temperature_entity
   const currentValueEntity = currentValueEntityId
@@ -30,31 +26,27 @@ export default function renderEntities({
 
   const showLabels =
     (config?.layout?.entities ?? config?.layout?.sensors)?.labels ?? true
-  let stateString =
-    typeof hass.formatEntityState === 'function'
-      ? hass.formatEntityState(entity)
-      : localize(state, `component.${adapter.getLocalizationDomain()}.state._.`)
-  if (action) {
-    const actionString =
-      typeof hass.formatEntityAttributeValue === 'function'
-        ? hass.formatEntityAttributeValue(entity, 'hvac_action')
-        : localize(action, 'state_attributes.climate.hvac_action.')
-    stateString = actionString
-  }
+  const stateString = getEntityStateText(entity, hass, localize)
   const entityHtml = [
     renderInfoItem({
-      hide: _hide.temperature || current === null || typeof current === 'undefined',
-      state: appendUnit(formatNumber(current, {
-        ...config,
-        locale: hass.locale,
-      }), unit),
+      hide:
+        _hide.temperature || current === null || typeof current === 'undefined',
+      state: appendUnit(
+        formatNumber(current, {
+          ...config,
+          locale: hass.locale,
+        }),
+        unit
+      ),
       hass,
       openEntityPopover,
       details: {
         heading: showLabels
-          ? config?.label?.temperature ?? localize('ui.card.climate.currently')
+          ? (config?.label?.temperature ??
+            localize('ui.card.climate.currently'))
           : false,
-        tooltip: currentValueEntity?.attributes?.friendly_name ?? currentValueEntityId,
+        tooltip:
+          currentValueEntity?.attributes?.friendly_name ?? currentValueEntityId,
         entity: currentValueEntityId ?? config.entity,
       },
     }),
@@ -65,8 +57,8 @@ export default function renderEntities({
       openEntityPopover,
       details: {
         heading: showLabels
-          ? config?.label?.state ??
-            localize('ui.panel.lovelace.editor.card.generic.state')
+          ? (config?.label?.state ??
+            localize('ui.panel.lovelace.editor.card.generic.state'))
           : false,
         entity: config.entity,
       },
