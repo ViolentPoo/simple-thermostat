@@ -548,14 +548,17 @@ export default class SimpleThermostat extends LitElement {
     const row = stepLayout === 'row'
     const entityDomain = config.entity.split('.')[0]
     const isUnavailable = ['unavailable', 'unknown'].includes(entity.state)
-    const hasSetpoints = Object.keys(this._values).length > 0
+    const stateOnlyFan =
+      entityDomain === 'fan' &&
+      this.modes.length > 0 &&
+      this.modes.every((mode) => mode.type === MODES.STATE)
     const safeClass = (value: unknown) =>
       typeof value === 'string' ? value.replace(/[^a-z0-9_-]/gi, '') : ''
     const classes = [
       !this.header && 'no-header',
       `domain-${safeClass(entityDomain)}`,
       `state-${safeClass(entity.state)}`,
-      entityDomain === 'fan' && !hasSetpoints && 'state-only',
+      stateOnlyFan && 'state-only',
       this.config.enhanced_visuals === false && 'standard-visuals',
       safeClass(action),
       isUnavailable && safeClass(entity.state),
