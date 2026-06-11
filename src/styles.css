@@ -882,6 +882,23 @@ ha-card:not(.standard-visuals)
   --ha-switch-checked-thumb-border-color-hover: var(
     --st-switch-hover-button-color
   );
+  --switch-checked-button-color: var(--st-switch-button-color);
+  --switch-checked-track-color: var(--st-switch-track-color);
+  --switch-checked-hover-button-color: var(--st-switch-hover-button-color);
+  --switch-checked-hover-track-color: var(--st-switch-hover-track-color);
+  --switch-checked-focus-button-color: var(--st-switch-button-color);
+  --switch-checked-focus-track-color: var(--st-switch-track-color);
+  --switch-checked-pressed-button-color: var(--st-switch-button-color);
+  --switch-checked-pressed-track-color: var(--st-switch-track-color);
+  --mdc-theme-secondary: var(--st-switch-button-color);
+  --mdc-switch-selected-handle-color: var(--st-switch-button-color);
+  --mdc-switch-selected-hover-handle-color: var(--st-switch-hover-button-color);
+  --mdc-switch-selected-focus-handle-color: var(--st-switch-button-color);
+  --mdc-switch-selected-pressed-handle-color: var(--st-switch-button-color);
+  --mdc-switch-selected-track-color: var(--st-switch-track-color);
+  --mdc-switch-selected-hover-track-color: var(--st-switch-hover-track-color);
+  --mdc-switch-selected-focus-track-color: var(--st-switch-track-color);
+  --mdc-switch-selected-pressed-track-color: var(--st-switch-track-color);
 }
 
 @media (hover: hover) {
