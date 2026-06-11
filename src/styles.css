@@ -29,6 +29,7 @@
 }
 ha-card {
   display: grid;
+  align-content: start;
   container-type: inline-size;
   row-gap: calc(var(--st-spacing, var(--st-default-spacing)) * 4);
   -webkit-font-smoothing: var(--ha-font-smoothing, antialiased);
