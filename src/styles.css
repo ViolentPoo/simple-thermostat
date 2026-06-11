@@ -44,7 +44,7 @@ ha-card {
   --heat-color: var(--state-climate-heat-color, var(--primary-color));
   --manual-color: var(--state-icon-color, var(--secondary-text-color));
   --on-color: var(--primary-color);
-  --off-color: var(--state-icon-color, var(--secondary-text-color));
+  --off-color: var(--disabled-text-color, var(--secondary-text-color));
   --fan_only-color: var(
     --state-climate-fan-only-color,
     var(--state-fan-active-color, var(--manual-color))
