@@ -1052,29 +1052,24 @@ ha-card.drying {
     min-width: min(100%, var(--st-hvac-mode-min-width, 120px));
   }
 }
-ha-card.domain-climate.control-heavy .modes.hvac,
-ha-card.domain-climate.control-heavy .modes.fan {
-  flex-wrap: nowrap;
-}
-
-ha-card.domain-climate.control-heavy .modes.hvac .mode-item,
-ha-card.domain-climate.control-heavy .modes.fan .mode-item {
-  min-width: 0;
-}
-
-ha-card.domain-climate .modes.fan.dense {
+.modes.hvac.dense,
+.modes.fan.dense {
   display: grid;
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;
 }
 
-ha-card.domain-climate .modes.fan.dense .mode-item {
-  flex-direction: column;
-  gap: 0;
+.modes.hvac.dense .mode-item,
+.modes.fan.dense .mode-item {
   min-width: 0;
 }
 
-ha-card.domain-climate .modes.fan.dense .mode-icon {
+.modes.fan.dense .mode-item {
+  flex-direction: column;
+  gap: 0;
+}
+
+.modes.fan.dense .mode-icon {
   --iron-icon-width: var(--st-preset-icon-size);
   --iron-icon-height: var(--st-preset-icon-size);
   --mdc-icon-size: var(--st-preset-icon-size);
@@ -1084,16 +1079,9 @@ ha-card.domain-climate .modes.fan.dense .mode-icon {
   height: var(--st-preset-icon-size);
 }
 
-ha-card.domain-climate .modes.fan.dense .mode-label {
+.modes.fan.dense .mode-label {
   display: block;
   min-height: 0;
-}
-
-@container (max-width: 699px) {
-  ha-card.domain-climate.control-heavy .modes.hvac,
-  ha-card.domain-climate.control-heavy .modes.fan {
-    flex-wrap: wrap;
-  }
 }
 .mode-icon {
   --iron-icon-width: var(--st-control-icon-size);
