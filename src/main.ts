@@ -398,7 +398,7 @@ export default class SimpleThermostat extends LitElement {
   }
 
   set hass(hass: HASS) {
-    if (!this.config.entity) {
+    if (!this.config?.entity) {
       return
     }
 
@@ -517,6 +517,10 @@ export default class SimpleThermostat extends LitElement {
   }
 
   render({ _hide, _values, _updatingValues, config, entity } = this) {
+    if (!config) {
+      return html`<ha-card class="loading"></ha-card>`
+    }
+
     const warnings = []
     if (this.stepSize < 1 && this.config.decimals === 0) {
       warnings.push(html`

@@ -15,6 +15,26 @@ function createCard() {
   return document.createElement(tagName) as SimpleThermostat
 }
 
+test('does not throw if Home Assistant is assigned before config', () => {
+  const card = createCard()
+
+  expect(() => {
+    card.hass = {
+      states: {},
+    }
+  }).not.toThrow()
+})
+
+test('renders loading shell before config is assigned', async () => {
+  document.body.innerHTML = ''
+  const card = createCard()
+  document.body.appendChild(card)
+
+  await card.updateComplete
+
+  expect(card.shadowRoot?.querySelector('ha-card.loading')).not.toBe(null)
+})
+
 test('fan controls use fan_mode attribute as active mode', () => {
   const card = createCard()
   card.setConfig({
