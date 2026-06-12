@@ -1067,11 +1067,16 @@ ha-card.drying {
   min-width: 0;
 }
 
+.modes.hvac.dense .mode-item {
+  min-height: calc(var(--st-preset-icon-size) + 8px);
+}
+
 .modes.fan.dense .mode-item {
   flex-direction: column;
   gap: 0;
 }
 
+.modes.hvac.dense .mode-icon,
 .modes.fan.dense .mode-icon {
   --iron-icon-width: var(--st-preset-icon-size);
   --iron-icon-height: var(--st-preset-icon-size);
