@@ -646,37 +646,6 @@ ha-card.cooling .header__icon {
   gap: var(--st-spacing, var(--st-default-spacing));
   padding: 0 var(--st-spacing, var(--st-default-spacing));
 }
-ha-card.domain-fan.state-only {
-  row-gap: var(--st-spacing, var(--st-default-spacing));
-  padding-bottom: var(--st-spacing, var(--st-default-spacing));
-  --st-control-icon-size: var(--st-state-only-control-icon-size, 28px);
-}
-ha-card.domain-fan.state-only header {
-  padding-top: calc(var(--st-spacing, var(--st-default-spacing)) * 3);
-  padding-bottom: 0;
-}
-ha-card.domain-fan.state-only .body {
-  display: none;
-}
-ha-card.domain-fan.state-only .entities {
-  padding-block: 0;
-  justify-self: center;
-}
-ha-card.domain-fan.state-only .controls {
-  padding-top: 0;
-  gap: 2px;
-}
-ha-card.domain-fan.state-only .modes.state .mode-item {
-  min-height: 32px;
-  padding-block: 3px;
-}
-ha-card.domain-fan.state-only .modes.state .mode-icon {
-  --iron-icon-width: var(--st-state-only-mode-icon-size, 22px);
-  --iron-icon-height: var(--st-state-only-mode-icon-size, 22px);
-  --mdc-icon-size: var(--st-state-only-mode-icon-size, 22px);
-  width: var(--st-state-only-mode-icon-size, 22px);
-  height: var(--st-state-only-mode-icon-size, 22px);
-}
 .modes {
   display: flex;
   flex-wrap: wrap;
@@ -1169,66 +1138,6 @@ ha-card.drying {
   display: flex;
   align-items: center;
   min-height: var(--st-compact-mode-icon-size, 20px);
-}
-
-ha-card:not(.standard-visuals) .modes.dense {
-  gap: 3px;
-}
-
-ha-card:not(.standard-visuals) .modes.dense .mode-item {
-  gap: 4px;
-  min-height: 30px;
-  padding: 4px 6px;
-}
-
-ha-card:not(.standard-visuals) .modes.dense .mode-icon {
-  --iron-icon-width: var(--st-dense-mode-icon-size, 18px);
-  --iron-icon-height: var(--st-dense-mode-icon-size, 18px);
-  --mdc-icon-size: var(--st-dense-mode-icon-size, 18px);
-  width: var(--st-dense-mode-icon-size, 18px);
-  height: var(--st-dense-mode-icon-size, 18px);
-  position: static;
-  top: auto;
-}
-
-ha-card:not(.standard-visuals) .modes.dense .mode-label {
-  min-height: 0;
-  line-height: 1.1;
-}
-
-ha-card:not(.standard-visuals) .modes.hvac.dense .mode-item,
-ha-card:not(.standard-visuals) .modes.preset.dense .mode-item,
-ha-card:not(.standard-visuals) .modes.fan.dense .mode-item,
-ha-card:not(.standard-visuals) .modes.fan-preset.dense .mode-item {
-  flex-direction: row;
-  font-size: var(--st-dense-mode-font-size, var(--ha-font-size-s, 12px));
-}
-
-ha-card:not(.standard-visuals) .modes.preset.dense .mode-item {
-  min-width: min(100%, var(--st-dense-preset-mode-min-width, 92px));
-  padding-inline: 6px;
-}
-
-ha-card:not(.standard-visuals) .modes.preset.dense .mode-label {
-  display: flex;
-  align-items: center;
-  min-height: 0;
-}
-
-ha-card:not(.standard-visuals) .modes.hvac.dense .mode-label,
-ha-card:not(.standard-visuals) .modes.fan.dense .mode-label,
-ha-card:not(.standard-visuals) .modes.fan-preset.dense .mode-label {
-  display: flex;
-  align-items: center;
-}
-
-@container (max-width: 560px) {
-  ha-card:not(.standard-visuals) .modes.hvac.dense .mode-item,
-  ha-card:not(.standard-visuals) .modes.fan.dense .mode-item,
-  ha-card:not(.standard-visuals) .modes.fan-preset.dense .mode-item {
-    flex-direction: row;
-    min-width: min(100%, var(--st-mode-min-width, 72px));
-  }
 }
 
 .header__toggle ha-switch {
