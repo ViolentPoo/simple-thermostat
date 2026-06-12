@@ -8,6 +8,7 @@ import isEqual from './isEqual'
 import styles from './styles.css'
 import sortHvacModes from './sortHvacModes'
 import sortFanModes from './sortFanModes'
+import getFanModeIcon from './fanModeIcon'
 
 import formatNumber from './formatNumber'
 import fireEvent from './fireEvent'
@@ -127,7 +128,12 @@ function getModeList(
             : {}
       return {
         ...values,
-        icon: values.icon ?? getModeIcon(modeKey),
+        icon:
+          values.icon ??
+          (type === MODES.FAN
+            ? getFanModeIcon(modeKey, modeOptions)
+            : undefined) ??
+          getModeIcon(modeKey),
         value: modeKey,
         name:
           values.name === false
