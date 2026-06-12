@@ -74,6 +74,13 @@ If you are not upgrading to v4, keep using the [v3 documentation](https://github
 
 ## Changelog
 
+### v4.0.0-rc.3
+
+- Preserved the last valid rendered entity when Home Assistant briefly sends an update without the configured entity, matching the older card lifecycle behavior more closely.
+- Tightened single-row entity spacing so simple fan cards do not leave as much empty space around the state row.
+- Generalized dense mode button sizing so dense control rows use the same compact button height and icon sizing.
+- Added regression coverage for config-before-entity rendering and transient missing entity updates.
+
 ### v4.0.0
 
 - Changed the minimum supported Home Assistant version to 2024.8+.
