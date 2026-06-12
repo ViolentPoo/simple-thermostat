@@ -647,23 +647,6 @@ ha-card.cooling .header__icon {
   padding: 0 var(--st-spacing, var(--st-default-spacing));
 }
 
-ha-card.control-heavy {
-  row-gap: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
-  padding-bottom: var(--st-spacing, var(--st-default-spacing));
-}
-
-ha-card.control-heavy header {
-  padding-top: calc(var(--st-spacing, var(--st-default-spacing)) * 3);
-}
-
-ha-card.control-heavy .entities {
-  padding-block: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
-}
-
-ha-card.control-heavy .current--label {
-  display: none;
-}
-
 .modes {
   display: flex;
   flex-wrap: wrap;
@@ -1067,6 +1050,15 @@ ha-card.drying {
     flex-direction: row;
     gap: 6px;
     min-width: min(100%, var(--st-hvac-mode-min-width, 120px));
+  }
+}
+@container (min-width: 700px) {
+  ha-card.domain-climate.control-heavy .modes.hvac {
+    flex-wrap: nowrap;
+  }
+
+  ha-card.domain-climate.control-heavy .modes.hvac .mode-item {
+    min-width: 0;
   }
 }
 .mode-icon {
