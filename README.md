@@ -74,12 +74,32 @@ If you are not upgrading to v4, keep using the [v3 documentation](https://github
 
 ## Changelog
 
-| Version | Changes |
-| --- | --- |
-| `v4.0.0-rc.3` | Preserved last valid render during transient missing entity updates.<br>Tightened single-row entity spacing.<br>Standardized dense mode button sizing.<br>Added lifecycle regression tests. |
-| `v4.0.0-rc.2` | Improved `enhanced_visuals: false` v3-style defaults.<br>Improved state text for climate, fan, humidifier, and dehumidifier cards.<br>Refined header and entity toggle colors.<br>Increased active icon animation visibility.<br>Cleaned up dense climate mode layouts.<br>Added contextual fan speed icons.<br>Linked v3 documentation. |
-| `v4.0.0-rc.1` | Added domain-aware climate, fan, humidifier, and dehumidifier support.<br>Added fan percentage setpoints and mode controls.<br>Added humidifier and dehumidifier humidity controls.<br>Added v4 enhanced visuals.<br>Added Home Assistant 2024.8+ action support.<br>Kept legacy config aliases supported. |
-| `v4.0.0` | Requires Home Assistant 2024.8+.<br>Added climate, fan, humidifier, and dehumidifier domain adapters.<br>Added generic `current_value_entity` and `entities` options.<br>Added automatic current value defaults and `hide_setpoint`.<br>Added state-aware headers, richer mode controls, horizontal setpoint controls, target value actions, and entity-aware editor options.<br>Added `enhanced_visuals` and documented CSS variables.<br>Updated service calls, custom element registration, HACS packaging, and GitHub Actions builds. |
+<table border="1" cellspacing="0" cellpadding="6">
+  <thead>
+    <tr>
+      <th nowrap>Version</th>
+      <th>Changes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td nowrap><code>v4.0.0-rc.3</code></td>
+      <td>Preserved last valid render during transient missing entity updates.<br>Tightened single-row entity spacing.<br>Standardized dense mode button sizing.<br>Added lifecycle regression tests.</td>
+    </tr>
+    <tr>
+      <td nowrap><code>v4.0.0-rc.2</code></td>
+      <td>Improved <code>enhanced_visuals: false</code> v3-style defaults.<br>Improved state text for climate, fan, humidifier, and dehumidifier cards.<br>Refined header and entity toggle colors.<br>Increased active icon animation visibility.<br>Cleaned up dense climate mode layouts.<br>Added contextual fan speed icons.<br>Linked v3 documentation.</td>
+    </tr>
+    <tr>
+      <td nowrap><code>v4.0.0-rc.1</code></td>
+      <td>Added domain-aware climate, fan, humidifier, and dehumidifier support.<br>Added fan percentage setpoints and mode controls.<br>Added humidifier and dehumidifier humidity controls.<br>Added v4 enhanced visuals.<br>Added Home Assistant 2024.8+ action support.<br>Kept legacy config aliases supported.</td>
+    </tr>
+    <tr>
+      <td nowrap><code>v4.0.0</code></td>
+      <td>Requires Home Assistant 2024.8+.<br>Added climate, fan, humidifier, and dehumidifier domain adapters.<br>Added generic <code>current_value_entity</code> and <code>entities</code> options.<br>Added automatic current value defaults and <code>hide_setpoint</code>.<br>Added state-aware headers, richer mode controls, horizontal setpoint controls, target value actions, and entity-aware editor options.<br>Added <code>enhanced_visuals</code> and documented CSS variables.<br>Updated service calls, custom element registration, HACS packaging, and GitHub Actions builds.</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Basic Usage
 
