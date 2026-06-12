@@ -1062,6 +1062,16 @@ ha-card.domain-climate.control-heavy .modes.fan .mode-item {
   min-width: 0;
 }
 
+ha-card.domain-climate .modes.fan.dense {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+
+ha-card.domain-climate .modes.fan.dense .mode-item {
+  min-width: 0;
+}
+
 @container (max-width: 699px) {
   ha-card.domain-climate.control-heavy .modes.hvac,
   ha-card.domain-climate.control-heavy .modes.fan {
