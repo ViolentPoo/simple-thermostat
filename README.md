@@ -109,13 +109,21 @@ If you are not upgrading to v4, keep using the [v3 documentation](https://github
     <tr><td>Added Home Assistant 2024.8+ action support.</td></tr>
     <tr><td>Kept legacy config aliases supported.</td></tr>
     <tr>
-      <td rowspan="7" nowrap><strong>v4.0.0</strong></td>
+      <td rowspan="15" nowrap><strong>v4.0.0</strong></td>
       <td>Requires Home Assistant 2024.8+.</td>
     </tr>
-    <tr><td>Added climate, fan, humidifier, and dehumidifier domain adapters.</td></tr>
+    <tr><td>Added climate, fan, humidifier, and dehumidifier domain-aware behavior.</td></tr>
+    <tr><td>Added fan percentage setpoints, speed/preset modes, direction, oscillation, and state controls.</td></tr>
+    <tr><td>Added humidifier and dehumidifier humidity setpoints, current humidity, modes, and state controls.</td></tr>
     <tr><td>Added generic <code>current_value_entity</code> and <code>entities</code> options.</td></tr>
-    <tr><td>Added automatic current value defaults and <code>hide_setpoint</code>.</td></tr>
-    <tr><td>Added state-aware headers, richer mode controls, horizontal setpoint controls, target value actions, and entity-aware editor options.</td></tr>
+    <tr><td>Imported legacy <code>current_temperature_entity</code>, <code>sensors</code>, and <code>layout.sensors</code> config names.</td></tr>
+    <tr><td>Kept <code>version: 3</code> templated entity rows supported.</td></tr>
+    <tr><td>Added automatic current value defaults for supported domains.</td></tr>
+    <tr><td>Added <code>hide_setpoint</code>.</td></tr>
+    <tr><td>Added state-aware headers, header toggles, off-icon slash overlays, and fault icons.</td></tr>
+    <tr><td>Added richer mode controls, mode icons, compact tooltips, and hidden headings by default.</td></tr>
+    <tr><td>Added horizontal setpoint controls and target value tap, hold, and double tap actions.</td></tr>
+    <tr><td>Added entity-aware visual editor options.</td></tr>
     <tr><td>Added <code>enhanced_visuals</code> and documented CSS variables.</td></tr>
     <tr><td>Updated service calls, custom element registration, HACS packaging, and GitHub Actions builds.</td></tr>
   </tbody>
