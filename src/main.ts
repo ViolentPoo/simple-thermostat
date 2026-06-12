@@ -552,6 +552,11 @@ export default class SimpleThermostat extends LitElement {
       entityDomain === 'fan' &&
       this.modes.length > 0 &&
       this.modes.every((mode) => mode.type === MODES.STATE)
+    const modeOptionCount = this.modes.reduce(
+      (count, mode) => count + mode.list.length,
+      0
+    )
+    const controlHeavy = this.modes.length >= 3 && modeOptionCount >= 14
     const safeClass = (value: unknown) =>
       typeof value === 'string' ? value.replace(/[^a-z0-9_-]/gi, '') : ''
     const classes = [
@@ -559,6 +564,7 @@ export default class SimpleThermostat extends LitElement {
       `domain-${safeClass(entityDomain)}`,
       `state-${safeClass(entity.state)}`,
       stateOnlyFan && 'state-only',
+      controlHeavy && 'control-heavy',
       this.config.enhanced_visuals === false && 'standard-visuals',
       safeClass(action),
       isUnavailable && safeClass(entity.state),
