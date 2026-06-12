@@ -1052,15 +1052,20 @@ ha-card.drying {
     min-width: min(100%, var(--st-hvac-mode-min-width, 120px));
   }
 }
-@container (min-width: 700px) {
+ha-card.domain-climate.control-heavy .modes.hvac,
+ha-card.domain-climate.control-heavy .modes.fan {
+  flex-wrap: nowrap;
+}
+
+ha-card.domain-climate.control-heavy .modes.hvac .mode-item,
+ha-card.domain-climate.control-heavy .modes.fan .mode-item {
+  min-width: 0;
+}
+
+@container (max-width: 699px) {
   ha-card.domain-climate.control-heavy .modes.hvac,
   ha-card.domain-climate.control-heavy .modes.fan {
-    flex-wrap: nowrap;
-  }
-
-  ha-card.domain-climate.control-heavy .modes.hvac .mode-item,
-  ha-card.domain-climate.control-heavy .modes.fan .mode-item {
-    min-width: 0;
+    flex-wrap: wrap;
   }
 }
 .mode-icon {
