@@ -81,6 +81,25 @@ If you are not upgrading to v4, keep using the [v3 documentation](https://github
 - Generalized dense mode button sizing so dense control rows use the same compact button height and icon sizing.
 - Added regression coverage for config-before-entity rendering and transient missing entity updates.
 
+### v4.0.0-rc.2
+
+- Tightened the `enhanced_visuals: false` fallback so upgraded cards can stay closer to the v3 visual defaults without saving unrelated displayed defaults back into YAML.
+- Improved climate, fan, humidifier, and dehumidifier state text so supported entities show their active action, preset, speed, percentage, humidity, or idle/off state more naturally.
+- Refined header and entity toggle coloring to follow Home Assistant theme colors more closely while keeping off toggles visually neutral.
+- Improved active icon animation intensity for heating, cooling, drying, humidifying, dehumidifying, and fan states.
+- Cleaned up dense climate cards, including AC preset, fan, and HVAC row layout.
+- Added contextual fan speed icons so five-speed devices can show Silent/Low/Medium/High/Full as 1/2/3/4/5, while simple three-speed fans still show Low/Medium/High as 1/2/3.
+- Linked the v3 documentation for users staying on the v3 branch.
+
+### v4.0.0-rc.1
+
+- Added the first v4 release candidate with domain-aware behavior for climate, fan, humidifier, and dehumidifier entities.
+- Added fan support with percentage setpoints, fan speed/preset buttons, direction controls, oscillation controls, and on/off state controls.
+- Added humidifier and dehumidifier support with humidity setpoints, current humidity display, mode controls, and on/off state controls.
+- Added v4 enhanced visuals, with `enhanced_visuals: false` available for quieter v3-style visual defaults.
+- Added support for current Home Assistant frontend actions and Home Assistant 2024.8+.
+- Kept legacy config aliases supported, including `current_temperature_entity`, `sensors`, `layout.sensors`, and `version: 3` templated entity rows.
+
 ### v4.0.0
 
 - Changed the minimum supported Home Assistant version to 2024.8+.
