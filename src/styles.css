@@ -285,6 +285,9 @@ ha-card.loading {
   padding-block: calc(var(--st-spacing, var(--st-default-spacing)) * 4);
   font-size: var(--st-font-size-entities, var(--ha-font-size-l, 16px));
 }
+.entities.single-row {
+  padding-block: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
 .entities.as-list {
   grid-auto-flow: column;
   grid-template-columns: min-content;
