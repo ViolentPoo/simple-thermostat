@@ -35,6 +35,56 @@ test('renders loading shell before config is assigned', async () => {
   expect(card.shadowRoot?.querySelector('ha-card.loading')).not.toBe(null)
 })
 
+test('keeps last rendered entity during transient missing hass updates', async () => {
+  document.body.innerHTML = ''
+  const card = createCard()
+  document.body.appendChild(card)
+  card.setConfig({
+    entity: 'climate.living_room',
+    header: false,
+    control: false,
+  } as any)
+  card.hass = {
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: {
+          temperature: 20,
+          current_temperature: 19,
+          min_temp: 7,
+          max_temp: 30,
+        },
+      },
+    },
+    config: {
+      unit_system: {
+        temperature: '°C',
+      },
+    },
+    localize: (key: string) => key,
+  }
+
+  await card.updateComplete
+  const previousEntity = card.entity
+
+  card.hass = {
+    states: {},
+    config: {
+      unit_system: {
+        temperature: '°C',
+      },
+    },
+    localize: (key: string) => key,
+  }
+
+  await card.updateComplete
+
+  expect(card.entity).toBe(previousEntity)
+  expect(card.shadowRoot?.textContent).not.toContain('Entity not available')
+  expect(card.shadowRoot?.textContent).toContain('19.0')
+})
+
 test('fan controls use fan_mode attribute as active mode', () => {
   const card = createCard()
   card.setConfig({

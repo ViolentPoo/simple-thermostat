@@ -406,15 +406,12 @@ export default class SimpleThermostat extends LitElement {
       return
     }
 
-    this._hass = hass
     const entity = hass.states[this.config.entity]
     if (!entity) {
-      if (this.entity !== undefined) {
-        this.entity = undefined
-      }
       return
     }
 
+    this._hass = hass
     if (this.entity !== entity) {
       this.entity = entity
     }
