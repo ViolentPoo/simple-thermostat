@@ -1069,7 +1069,24 @@ ha-card.domain-climate .modes.fan.dense {
 }
 
 ha-card.domain-climate .modes.fan.dense .mode-item {
+  flex-direction: column;
+  gap: 0;
   min-width: 0;
+}
+
+ha-card.domain-climate .modes.fan.dense .mode-icon {
+  --iron-icon-width: var(--st-preset-icon-size);
+  --iron-icon-height: var(--st-preset-icon-size);
+  --mdc-icon-size: var(--st-preset-icon-size);
+  position: static;
+  top: auto;
+  width: var(--st-preset-icon-size);
+  height: var(--st-preset-icon-size);
+}
+
+ha-card.domain-climate .modes.fan.dense .mode-label {
+  display: block;
+  min-height: 0;
 }
 
 @container (max-width: 699px) {

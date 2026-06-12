@@ -1,6 +1,17 @@
 import { ControlModeOption } from './types'
 
-const FAN_MODE_ORDER = ['auto', 'low', 'mid', 'medium', 'high', 'max', 'turbo']
+const FAN_MODE_ORDER = [
+  'auto',
+  'silent',
+  'quiet',
+  'low',
+  'mid',
+  'medium',
+  'high',
+  'max',
+  'turbo',
+  'full',
+]
 
 export default function sortFanModes(
   list: Array<ControlModeOption>
