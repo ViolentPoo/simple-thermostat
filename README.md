@@ -76,52 +76,47 @@ If you are not upgrading to v4, keep using the [v3 documentation](https://github
 
 ### v4.0.0-rc.3
 
-- Preserved the last valid rendered entity when Home Assistant briefly sends an update without the configured entity, matching the older card lifecycle behavior more closely.
-- Tightened single-row entity spacing so simple fan cards do not leave as much empty space around the state row.
-- Generalized dense mode button sizing so dense control rows use the same compact button height and icon sizing.
-- Added regression coverage for config-before-entity rendering and transient missing entity updates.
+- Preserved last valid render during transient missing entity updates.
+- Tightened single-row entity spacing.
+- Standardized dense mode button sizing.
+- Added lifecycle regression tests.
 
 ### v4.0.0-rc.2
 
-- Tightened the `enhanced_visuals: false` fallback so upgraded cards can stay closer to the v3 visual defaults without saving unrelated displayed defaults back into YAML.
-- Improved climate, fan, humidifier, and dehumidifier state text so supported entities show their active action, preset, speed, percentage, humidity, or idle/off state more naturally.
-- Refined header and entity toggle coloring to follow Home Assistant theme colors more closely while keeping off toggles visually neutral.
-- Improved active icon animation intensity for heating, cooling, drying, humidifying, dehumidifying, and fan states.
-- Cleaned up dense climate cards, including AC preset, fan, and HVAC row layout.
-- Added contextual fan speed icons so five-speed devices can show Silent/Low/Medium/High/Full as 1/2/3/4/5, while simple three-speed fans still show Low/Medium/High as 1/2/3.
-- Linked the v3 documentation for users staying on the v3 branch.
+- Improved `enhanced_visuals: false` v3-style defaults.
+- Improved state text for climate, fan, humidifier, and dehumidifier cards.
+- Refined header and entity toggle colors.
+- Increased active icon animation visibility.
+- Cleaned up dense climate mode layouts.
+- Added contextual fan speed icons.
+- Linked v3 documentation.
 
 ### v4.0.0-rc.1
 
-- Added the first v4 release candidate with domain-aware behavior for climate, fan, humidifier, and dehumidifier entities.
-- Added fan support with percentage setpoints, fan speed/preset buttons, direction controls, oscillation controls, and on/off state controls.
-- Added humidifier and dehumidifier support with humidity setpoints, current humidity display, mode controls, and on/off state controls.
-- Added v4 enhanced visuals, with `enhanced_visuals: false` available for quieter v3-style visual defaults.
-- Added support for current Home Assistant frontend actions and Home Assistant 2024.8+.
-- Kept legacy config aliases supported, including `current_temperature_entity`, `sensors`, `layout.sensors`, and `version: 3` templated entity rows.
+- Added domain-aware climate, fan, humidifier, and dehumidifier support.
+- Added fan percentage setpoints and mode controls.
+- Added humidifier and dehumidifier humidity controls.
+- Added v4 enhanced visuals.
+- Added Home Assistant 2024.8+ action support.
+- Kept legacy config aliases supported.
 
 ### v4.0.0
 
-- Changed the minimum supported Home Assistant version to 2024.8+.
-- Added domain-aware card behavior for climate, fan, humidifier, and dehumidifier entities. The card now chooses the right setpoint, current value, range, services, labels, and default controls from the selected entity domain.
-- Added fan support with percentage setpoints, fan speed/preset buttons, direction controls, oscillation controls, and on/off state controls.
-- Added humidifier and dehumidifier support with humidity setpoints, current humidity display, mode controls, and on/off state controls.
-- Added `current_value_entity` as the generic current value option. Older `current_temperature_entity` YAML is imported into the current option.
-- Added `entities` as the extra-row key. Older `sensors` YAML is imported into the current option.
-- Added automatic current value defaults for supported domains, so climate, humidifier, and fan cards can work from the main entity without extra YAML when Home Assistant exposes the needed attributes.
-- Added `hide_setpoint` for cards that should keep mode controls visible while hiding the target value and plus/minus controls.
-- Improved header behavior with state-aware default icons, custom off-icon slash overlays, header toggle icons, and safer fault rendering.
-- Improved header toggle coloring so label-only toggles can still use the target entity icon to pick the correct active color.
-- Added richer mode controls with better ordering, default mode icons, custom fan speed icons, tooltips for compact controls with hidden labels, hidden mode headings by default, and support for fan, preset, swing, vane, direction, oscillation, humidifier mode, HVAC, and state rows.
-- Added a cleaner horizontal setpoint layout using minus/value/plus controls by default.
-- Added Home Assistant-style actions for the target value, including tap, hold, and double tap actions.
-- Added an improved visual editor that only shows options relevant to the selected entity and supported features.
-- Added an `enhanced_visuals` tweak that keeps the new v4 visual polish on by default, while letting upgraded v3 cards opt back into v3-style visual defaults without needing to write every legacy layout option in YAML.
-- Added documented CSS variables for colors, icon sizes, typography, mode buttons, active accents, and animation intensity.
-- Updated controls and service calls to use Home Assistant's current `hass.performAction` API with legacy fallback.
-- Updated custom element registration to avoid mutating an already registered card class in long-lived Home Assistant tabs.
-- Updated release packaging so the HACS bundle is built as `simple-thermostat.js` at the repository root, generated `dist/` output is no longer tracked, and GitHub Actions builds from source. Thanks to [@nateww](https://github.com/nateww) for the cleanup request.
-- Updated the build, release, dependency, and test workflow around npm and GitHub Actions.
+- Requires Home Assistant 2024.8+.
+- Added climate, fan, humidifier, and dehumidifier domain adapters.
+- Added generic `current_value_entity` and `entities` options.
+- Added automatic current value defaults.
+- Added `hide_setpoint`.
+- Added state-aware headers, header toggles, and fault icons.
+- Added richer mode controls and mode icons.
+- Added horizontal setpoint controls.
+- Added target value tap, hold, and double tap actions.
+- Added entity-aware visual editor options.
+- Added `enhanced_visuals`.
+- Added documented CSS variables.
+- Updated service calls to `hass.performAction`.
+- Updated custom element registration.
+- Updated HACS release packaging and GitHub Actions builds.
 
 ## Basic Usage
 
