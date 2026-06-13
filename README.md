@@ -127,6 +127,13 @@ Use the [YAML reference](YAML_REFERENCE.md) for:
   </thead>
   <tbody>
     <tr>
+      <td rowspan="4" nowrap><strong>v4.0.0-rc.4</strong></td>
+      <td>Hardened card lifecycle when Home Assistant provides state before config.</td>
+    </tr>
+    <tr><td>Kept optional extra entity rows from breaking the card during transient missing states.</td></tr>
+    <tr><td>Mapped <code>auto_comfort</code> preset variants to the comfort icon.</td></tr>
+    <tr><td>Added lifecycle and icon regression tests.</td></tr>
+    <tr>
       <td rowspan="4" nowrap><strong>v4.0.0-rc.3</strong></td>
       <td>Preserved last valid render during transient missing entity updates.</td>
     </tr>
