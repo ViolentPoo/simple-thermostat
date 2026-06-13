@@ -365,7 +365,7 @@ export default class SimpleThermostat extends LitElement {
       ...config,
     })
     if (this._hass?.states) {
-      this.hass = this._hass
+      this.updateFromHass(this._hass)
     }
   }
 
@@ -406,7 +406,10 @@ export default class SimpleThermostat extends LitElement {
     }
 
     this._hass = hass
+    this.updateFromHass(hass)
+  }
 
+  updateFromHass(hass: HASS) {
     if (!this.config?.entity) {
       return
     }
