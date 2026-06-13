@@ -364,6 +364,9 @@ export default class SimpleThermostat extends LitElement {
       decimals: DECIMALS,
       ...config,
     })
+    if (this._hass?.states) {
+      this.hass = this._hass
+    }
   }
 
   disconnectedCallback() {
@@ -398,11 +401,13 @@ export default class SimpleThermostat extends LitElement {
   }
 
   set hass(hass: HASS) {
-    if (!this.config?.entity) {
+    if (!hass?.states) {
       return
     }
 
-    if (!hass?.states) {
+    this._hass = hass
+
+    if (!this.config?.entity) {
       return
     }
 
@@ -411,7 +416,6 @@ export default class SimpleThermostat extends LitElement {
       return
     }
 
-    this._hass = hass
     if (this.entity !== entity) {
       this.entity = entity
     }
@@ -488,9 +492,9 @@ export default class SimpleThermostat extends LitElement {
             state = hass.states[entity]
             names.push(state?.attributes?.friendly_name)
             if (attribute) {
-              state = state.attributes[attribute]
+              state = state?.attributes?.[attribute]
             }
-          } else if (attribute && attribute in this.entity.attributes) {
+          } else if (attribute && attribute in (this.entity.attributes ?? {})) {
             state = this.entity.attributes[attribute]
             names.push(attribute)
           }

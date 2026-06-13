@@ -25,6 +25,43 @@ test('does not throw if Home Assistant is assigned before config', () => {
   }).not.toThrow()
 })
 
+test('renders entity if Home Assistant is assigned before config', async () => {
+  document.body.innerHTML = ''
+  const card = createCard()
+  document.body.appendChild(card)
+
+  card.hass = {
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: {
+          temperature: 20,
+          current_temperature: 19,
+          min_temp: 7,
+          max_temp: 30,
+        },
+      },
+    },
+    config: {
+      unit_system: {
+        temperature: '°C',
+      },
+    },
+    localize: (key: string) => key,
+  }
+  card.setConfig({
+    entity: 'climate.living_room',
+    header: false,
+    control: false,
+  } as any)
+
+  await card.updateComplete
+
+  expect(card.entity?.entity_id).toBe('climate.living_room')
+  expect(card.shadowRoot?.textContent).toContain('19.0')
+})
+
 test('renders loading shell before config is assigned', async () => {
   document.body.innerHTML = ''
   const card = createCard()
@@ -83,6 +120,45 @@ test('keeps last rendered entity during transient missing hass updates', async (
   expect(card.entity).toBe(previousEntity)
   expect(card.shadowRoot?.textContent).not.toContain('Entity not available')
   expect(card.shadowRoot?.textContent).toContain('19.0')
+})
+
+test('does not throw when configured extra entity is transiently missing', async () => {
+  const card = createCard()
+  card.setConfig({
+    entity: 'climate.living_room',
+    header: false,
+    control: false,
+    entities: [
+      {
+        entity: 'sensor.pid_heat',
+        attribute: 'output',
+        name: 'PID',
+      },
+    ],
+  } as any)
+
+  expect(() => {
+    card.hass = {
+      states: {
+        'climate.living_room': {
+          entity_id: 'climate.living_room',
+          state: 'heat',
+          attributes: {
+            temperature: 20,
+            current_temperature: 19,
+            min_temp: 7,
+            max_temp: 30,
+          },
+        },
+      },
+      config: {
+        unit_system: {
+          temperature: '°C',
+        },
+      },
+      localize: (key: string) => key,
+    }
+  }).not.toThrow()
 })
 
 test('fan controls use fan_mode attribute as active mode', () => {
