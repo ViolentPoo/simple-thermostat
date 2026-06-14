@@ -546,9 +546,15 @@ export default class SimpleThermostat extends LitElement {
         ></ha-card>`
       }
       return html`
-        <ha-alert alert-type="error">
-          Entity not available: ${config.entity}
-        </ha-alert>
+        <ha-card
+          class="missing-entity ${config.enhanced_visuals === false
+            ? 'standard-visuals'
+            : ''}"
+        >
+          <ha-alert alert-type="error">
+            Entity not available: ${config.entity}
+          </ha-alert>
+        </ha-card>
       `
     }
 

@@ -137,6 +137,34 @@ test('keeps last rendered entity during transient missing hass updates', async (
   expect(card.shadowRoot?.textContent).toContain('19.0')
 })
 
+test('renders entity-missing errors inside a card shell', async () => {
+  document.body.innerHTML = ''
+  const card = createCard()
+  document.body.appendChild(card)
+  card.setConfig({
+    entity: 'climate.missing',
+  } as any)
+  card.hass = {
+    states: {},
+    config: {
+      unit_system: {
+        temperature: '°C',
+      },
+    },
+    localize: (key: string) => key,
+  }
+
+  await card.updateComplete
+
+  expect(card.shadowRoot?.querySelector('ha-card.missing-entity')).not.toBe(
+    null
+  )
+  expect(card.shadowRoot?.querySelector('ha-card ha-alert')).not.toBe(null)
+  expect(card.shadowRoot?.textContent).toContain(
+    'Entity not available: climate.missing'
+  )
+})
+
 test('does not throw when configured extra entity is transiently missing', async () => {
   const card = createCard()
   card.setConfig({
