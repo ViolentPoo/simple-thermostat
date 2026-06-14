@@ -296,9 +296,9 @@ export default class SimpleThermostat extends LitElement {
   @state()
   modes: Array<ControlMode> = []
   _hass: HASS = {
-    states: {},
     performAction: () => undefined,
   }
+  _hasHass = false
   @state()
   entity: LooseObject
   @state()
@@ -364,7 +364,7 @@ export default class SimpleThermostat extends LitElement {
       decimals: DECIMALS,
       ...config,
     })
-    if (this._hass?.states) {
+    if (this._hasHass && this._hass?.states) {
       this.updateFromHass(this._hass)
     }
   }
@@ -406,6 +406,7 @@ export default class SimpleThermostat extends LitElement {
     }
 
     this._hass = hass
+    this._hasHass = true
     this.updateFromHass(hass)
   }
 
@@ -517,7 +518,7 @@ export default class SimpleThermostat extends LitElement {
 
   localize = (label: string, prefix = '') => {
     const key = `${prefix}${label}`
-    return this._hass.localize(key) || label
+    return this._hass.localize?.(key) || label
   }
 
   render({ _hide, _values, _updatingValues, config, entity } = this) {
@@ -537,7 +538,7 @@ export default class SimpleThermostat extends LitElement {
     }
 
     if (!entity) {
-      if (!this._hass?.states) {
+      if (!this._hasHass || !this._hass?.states) {
         return html`<ha-card
           class="loading ${config.enhanced_visuals === false
             ? 'standard-visuals'

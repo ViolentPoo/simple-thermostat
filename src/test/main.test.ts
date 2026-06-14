@@ -72,6 +72,21 @@ test('renders loading shell before config is assigned', async () => {
   expect(card.shadowRoot?.querySelector('ha-card.loading')).not.toBe(null)
 })
 
+test('renders loading shell after config before Home Assistant is assigned', async () => {
+  document.body.innerHTML = ''
+  const card = createCard()
+  document.body.appendChild(card)
+
+  card.setConfig({
+    entity: 'climate.living_room',
+  } as any)
+
+  await card.updateComplete
+
+  expect(card.shadowRoot?.querySelector('ha-card.loading')).not.toBe(null)
+  expect(card.shadowRoot?.textContent).not.toContain('Entity not available')
+})
+
 test('keeps last rendered entity during transient missing hass updates', async () => {
   document.body.innerHTML = ''
   const card = createCard()
@@ -159,6 +174,127 @@ test('does not throw when configured extra entity is transiently missing', async
       localize: (key: string) => key,
     }
   }).not.toThrow()
+})
+
+test('renders main heat card shape with header toggle and extra entities', async () => {
+  document.body.innerHTML = ''
+  const card = createCard()
+  document.body.appendChild(card)
+  card.setConfig({
+    entity: 'climate.thermostat',
+    step_size: 0.1,
+    hide: {
+      state: true,
+      temperature: true,
+    },
+    header: {
+      toggle: {
+        entity: 'switch.furnace_heat',
+        name: 'Furnace',
+      },
+    },
+    entities: [
+      {
+        entity: 'sensor.average_temperature_group',
+        icon: 'mdi:thermometer',
+      },
+      {
+        entity: 'sensor.average_humidity_group',
+        icon: 'mdi:water-percent',
+      },
+      {
+        entity: 'fan.furnacerelay_l4',
+        icon: 'mdi:fan',
+      },
+      {
+        entity: 'sensor.pid_output',
+        icon: 'mdi:calculator-variant-outline',
+      },
+    ],
+    layout: {
+      entities: {
+        labels: true,
+      },
+    },
+    label: {},
+  } as any)
+
+  expect(() => {
+    card.hass = {
+      states: {
+        'climate.thermostat': {
+          entity_id: 'climate.thermostat',
+          state: 'heat',
+          attributes: {
+            friendly_name: 'Thermostat',
+            hvac_modes: ['heat', 'off'],
+            preset_modes: [
+              'none',
+              'away',
+              'eco',
+              'boost',
+              'comfort',
+              'home',
+              'sleep',
+              'activity',
+            ],
+            current_temperature: 20.6,
+            temperature: 20.6,
+            min_temp: 7,
+            max_temp: 35,
+            target_temp_step: 0.1,
+            preset_mode: 'eco',
+          },
+        },
+        'switch.furnace_heat': {
+          entity_id: 'switch.furnace_heat',
+          state: 'on',
+          attributes: {
+            friendly_name: 'Furnace Heat',
+            icon: 'mdi:fire',
+          },
+        },
+        'sensor.average_temperature_group': {
+          entity_id: 'sensor.average_temperature_group',
+          state: '20.6',
+          attributes: { friendly_name: 'Average Temperature Group' },
+        },
+        'sensor.average_humidity_group': {
+          entity_id: 'sensor.average_humidity_group',
+          state: '50.5',
+          attributes: { friendly_name: 'Average Humidity Group' },
+        },
+        'fan.furnacerelay_l4': {
+          entity_id: 'fan.furnacerelay_l4',
+          state: 'off',
+          attributes: { friendly_name: 'CircFan' },
+        },
+        'sensor.pid_output': {
+          entity_id: 'sensor.pid_output',
+          state: '4.0',
+          attributes: {
+            friendly_name: 'PID Output',
+            unit_of_measurement: '%',
+          },
+        },
+      },
+      config: {
+        unit_system: {
+          temperature: '°C',
+        },
+      },
+      localize: (key: string) => key,
+      formatEntityName: (entity: any) => entity.attributes.friendly_name,
+      formatEntityState: (entity: any) => entity.state,
+    }
+  }).not.toThrow()
+
+  await card.updateComplete
+
+  expect(card.shadowRoot?.querySelector('ha-card')).not.toBe(null)
+  expect(card.shadowRoot?.textContent).toContain('Thermostat')
+  expect(card.shadowRoot?.textContent).toContain('Furnace')
+  expect(card.shadowRoot?.textContent).toContain('4.0')
 })
 
 test('fan controls use fan_mode attribute as active mode', () => {
