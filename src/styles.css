@@ -29,7 +29,6 @@
 }
 ha-card {
   display: grid;
-  container-type: inline-size;
   row-gap: calc(var(--st-spacing, var(--st-default-spacing)) * 4);
   -webkit-font-smoothing: var(--ha-font-smoothing, antialiased);
   font-size: var(--ha-font-size-m, 14px);
@@ -1040,7 +1039,7 @@ ha-card.drying {
   padding-block: var(--st-spacing, var(--st-default-spacing));
 }
 
-@container (max-width: 560px) {
+@media (max-width: 560px) {
   .modes.hvac .mode-item,
   .modes.state .mode-item {
     flex-direction: column;
