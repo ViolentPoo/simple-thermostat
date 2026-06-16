@@ -1070,6 +1070,12 @@ ha-card.drying {
   gap: 0;
 }
 
+.modes.hvac.dense .mode-item {
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
 .modes.dense .mode-icon {
   --iron-icon-width: var(--st-preset-icon-size);
   --iron-icon-height: var(--st-preset-icon-size);
