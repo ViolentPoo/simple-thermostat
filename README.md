@@ -128,6 +128,19 @@ Use the [YAML reference](YAML_REFERENCE.md) for:
   </thead>
   <tbody>
     <tr>
+      <td rowspan="4" nowrap><strong>v4.0.0-rc.6</strong></td>
+      <td>Polished the visual editor into a clearer setup flow.</td>
+    </tr>
+    <tr><td>Added simple extra entity row editing for entity, name, and icon.</td></tr>
+    <tr><td>Moved precision, fallback, custom labels, actions, and mode display options into Advanced.</td></tr>
+    <tr><td>Updated editor-first README guidance.</td></tr>
+    <tr>
+      <td rowspan="3" nowrap><strong>v4.0.0-rc.5</strong></td>
+      <td>Aligned card lifecycle behavior more closely with v3.</td>
+    </tr>
+    <tr><td>Removed extra loading and missing-entity wrapper behavior.</td></tr>
+    <tr><td>Added detach and reattach lifecycle regression coverage.</td></tr>
+    <tr>
       <td rowspan="4" nowrap><strong>v4.0.0-rc.4</strong></td>
       <td>Hardened card lifecycle when Home Assistant provides state before config.</td>
     </tr>
