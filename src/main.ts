@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit'
-import { state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import debounce from 'debounce-fn'
 import { name as CARD_NAME } from '../package.json'
 
@@ -287,32 +287,31 @@ export default class SimpleThermostat extends LitElement {
     return styles
   }
 
-  @state()
+  @property()
   config: CardConfig
-  @state()
+  @property()
   header: false | HeaderData
-  @state()
+  @property()
   service: Service
-  @state()
+  @property()
   modes: Array<ControlMode> = []
-  _hass: HASS = {
-    performAction: () => undefined,
-  }
-  _hasHass = false
-  @state()
+  _hass: HASS = {}
+  @property()
   entity: LooseObject
-  @state()
+  @property()
   entities: Array<Entity> = []
-  @state()
+  @property()
   showEntities: boolean = true
-  @state()
+  @property()
   name: string | false = ''
   stepSize = STEP_SIZE
-  @state()
+  @property({
+    type: Object,
+  })
   _values: Values = {}
-  @state()
+  @property()
   _updatingValues: boolean = false
-  @state()
+  @property()
   _hide = DEFAULT_HIDE
   _updatingValuesTimeout: ReturnType<typeof setTimeout> | null = null
   _holdTimer: ReturnType<typeof setTimeout> | null = null
@@ -364,26 +363,6 @@ export default class SimpleThermostat extends LitElement {
       decimals: DECIMALS,
       ...config,
     })
-    if (this._hasHass && this._hass?.states) {
-      this.updateFromHass(this._hass)
-    }
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback()
-    this._debouncedSetTemperature.cancel()
-    if (this._updatingValuesTimeout) {
-      clearTimeout(this._updatingValuesTimeout)
-      this._updatingValuesTimeout = null
-    }
-    if (this._holdTimer) {
-      clearTimeout(this._holdTimer)
-      this._holdTimer = null
-    }
-    if (this._clickTimer) {
-      clearTimeout(this._clickTimer)
-      this._clickTimer = null
-    }
   }
 
   updated() {
@@ -401,17 +380,11 @@ export default class SimpleThermostat extends LitElement {
   }
 
   set hass(hass: HASS) {
-    if (!hass?.states) {
+    if (!this.config?.entity) {
       return
     }
 
-    this._hass = hass
-    this._hasHass = true
-    this.updateFromHass(hass)
-  }
-
-  updateFromHass(hass: HASS) {
-    if (!this.config?.entity) {
+    if (!hass?.states) {
       return
     }
 
@@ -419,6 +392,13 @@ export default class SimpleThermostat extends LitElement {
     if (!entity) {
       return
     }
+
+    this._hass = hass
+    this.updateFromHass(hass)
+  }
+
+  updateFromHass(hass: HASS) {
+    const entity = hass.states[this.config.entity]
 
     if (this.entity !== entity) {
       this.entity = entity
@@ -523,7 +503,7 @@ export default class SimpleThermostat extends LitElement {
 
   render({ _hide, _values, _updatingValues, config, entity } = this) {
     if (!config) {
-      return html`<ha-card class="loading"></ha-card>`
+      return nothing
     }
 
     const warnings = []
@@ -538,23 +518,8 @@ export default class SimpleThermostat extends LitElement {
     }
 
     if (!entity) {
-      if (!this._hasHass || !this._hass?.states) {
-        return html`<ha-card
-          class="loading ${config.enhanced_visuals === false
-            ? 'standard-visuals'
-            : ''}"
-        ></ha-card>`
-      }
       return html`
-        <ha-card
-          class="missing-entity ${config.enhanced_visuals === false
-            ? 'standard-visuals'
-            : ''}"
-        >
-          <ha-alert alert-type="error">
-            Entity not available: ${config.entity}
-          </ha-alert>
-        </ha-card>
+        <hui-warning> Entity not available: ${config.entity} </hui-warning>
       `
     }
 

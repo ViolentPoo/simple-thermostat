@@ -25,7 +25,7 @@ test('does not throw if Home Assistant is assigned before config', () => {
   }).not.toThrow()
 })
 
-test('renders entity if Home Assistant is assigned before config', async () => {
+test('ignores Home Assistant assignment before config until the next update', async () => {
   document.body.innerHTML = ''
   const card = createCard()
   document.body.appendChild(card)
@@ -58,21 +58,47 @@ test('renders entity if Home Assistant is assigned before config', async () => {
 
   await card.updateComplete
 
+  expect(card.entity).toBeUndefined()
+
+  card.hass = {
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: {
+          temperature: 20,
+          current_temperature: 19,
+          min_temp: 7,
+          max_temp: 30,
+        },
+      },
+    },
+    config: {
+      unit_system: {
+        temperature: '°C',
+      },
+    },
+    localize: (key: string) => key,
+  }
+
+  await card.updateComplete
+
   expect(card.entity?.entity_id).toBe('climate.living_room')
   expect(card.shadowRoot?.textContent).toContain('19.0')
 })
 
-test('renders loading shell before config is assigned', async () => {
+test('renders nothing before config is assigned', async () => {
   document.body.innerHTML = ''
   const card = createCard()
   document.body.appendChild(card)
 
   await card.updateComplete
 
-  expect(card.shadowRoot?.querySelector('ha-card.loading')).not.toBe(null)
+  expect(card.shadowRoot?.querySelector('ha-card')).toBe(null)
+  expect(card.shadowRoot?.textContent).toBe('')
 })
 
-test('renders loading shell after config before Home Assistant is assigned', async () => {
+test('renders entity missing warning after config before Home Assistant is assigned', async () => {
   document.body.innerHTML = ''
   const card = createCard()
   document.body.appendChild(card)
@@ -83,8 +109,10 @@ test('renders loading shell after config before Home Assistant is assigned', asy
 
   await card.updateComplete
 
-  expect(card.shadowRoot?.querySelector('ha-card.loading')).not.toBe(null)
-  expect(card.shadowRoot?.textContent).not.toContain('Entity not available')
+  expect(card.shadowRoot?.querySelector('ha-card')).toBe(null)
+  expect(card.shadowRoot?.textContent).toContain(
+    'Entity not available: climate.living_room'
+  )
 })
 
 test('keeps last rendered entity during transient missing hass updates', async () => {
@@ -137,7 +165,50 @@ test('keeps last rendered entity during transient missing hass updates', async (
   expect(card.shadowRoot?.textContent).toContain('19.0')
 })
 
-test('renders entity-missing errors inside a card shell', async () => {
+test('keeps rendered state across temporary Lovelace detach and reattach', async () => {
+  document.body.innerHTML = ''
+  const card = createCard()
+  document.body.appendChild(card)
+  card.setConfig({
+    entity: 'climate.living_room',
+    header: false,
+    control: false,
+  } as any)
+  card.hass = {
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: {
+          temperature: 20,
+          current_temperature: 19,
+          min_temp: 7,
+          max_temp: 30,
+        },
+      },
+    },
+    config: {
+      unit_system: {
+        temperature: '°C',
+      },
+    },
+    localize: (key: string) => key,
+  }
+
+  await card.updateComplete
+  expect(card.shadowRoot?.textContent).toContain('19.0')
+
+  card.remove()
+  document.body.appendChild(card)
+
+  await card.updateComplete
+
+  expect(card.entity?.entity_id).toBe('climate.living_room')
+  expect(card.shadowRoot?.querySelector('ha-card')).not.toBe(null)
+  expect(card.shadowRoot?.textContent).toContain('19.0')
+})
+
+test('renders entity-missing warning without adding a card shell', async () => {
   document.body.innerHTML = ''
   const card = createCard()
   document.body.appendChild(card)
@@ -156,10 +227,8 @@ test('renders entity-missing errors inside a card shell', async () => {
 
   await card.updateComplete
 
-  expect(card.shadowRoot?.querySelector('ha-card.missing-entity')).not.toBe(
-    null
-  )
-  expect(card.shadowRoot?.querySelector('ha-card ha-alert')).not.toBe(null)
+  expect(card.shadowRoot?.querySelector('ha-card')).toBe(null)
+  expect(card.shadowRoot?.querySelector('hui-warning')).not.toBe(null)
   expect(card.shadowRoot?.textContent).toContain(
     'Entity not available: climate.missing'
   )
