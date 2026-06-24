@@ -11,6 +11,19 @@ function schemaNames(schema: Array<Record<string, any>>): Array<string> {
     .filter(Boolean)
 }
 
+function sectionTitles(schema: Array<Record<string, any>>): Array<string> {
+  return schema.map((item) => item.title).filter(Boolean)
+}
+
+function findSection(
+  schema: Array<Record<string, any>>,
+  title: string
+): Record<string, any> {
+  const section = schema.find((item) => item.title === title)
+  if (!section) throw new Error(`Missing schema section: ${title}`)
+  return section
+}
+
 test('fan editor does not show current value entity picker', () => {
   const names = schemaNames(
     buildSchema({ entity: 'fan.range_hood' } as any, {
@@ -50,6 +63,71 @@ test('visual editor exposes only simple card-owned action selectors', () => {
     ])
   )
   expect(names).not.toContain('styles')
+})
+
+test('visual editor keeps common setup before advanced options', () => {
+  const schema = buildSchema({ entity: 'climate.living_room' } as any, {
+    performAction,
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: { hvac_modes: ['off', 'heat'], temperature: 20 },
+      },
+    },
+  })
+
+  expect(sectionTitles(schema)).toEqual([
+    'Card header',
+    'Controls',
+    'Target',
+    'Extra entity rows',
+    'Appearance',
+    'Advanced',
+  ])
+})
+
+test('advanced fields are grouped away from the common appearance workflow', () => {
+  const schema = buildSchema({ entity: 'climate.living_room' } as any, {
+    performAction,
+    states: {
+      'climate.living_room': {
+        entity_id: 'climate.living_room',
+        state: 'heat',
+        attributes: { hvac_modes: ['off', 'heat'], temperature: 20 },
+      },
+    },
+  })
+  const appearanceNames = schemaNames([findSection(schema, 'Appearance')])
+  const advancedNames = schemaNames([findSection(schema, 'Advanced')])
+
+  expect(appearanceNames).toEqual(
+    expect.arrayContaining([
+      'enhanced_visuals',
+      'hide.temperature',
+      'hide.state',
+    ])
+  )
+  expect(appearanceNames).not.toEqual(
+    expect.arrayContaining(['decimals', 'unit', 'fallback'])
+  )
+  expect(advancedNames).toEqual(
+    expect.arrayContaining([
+      'current_value_entity',
+      'decimals',
+      'unit',
+      'fallback',
+      'label.temperature',
+      'label.state',
+      'label.setpoint',
+      'layout.mode.names',
+      'layout.mode.icons',
+      'layout.mode.headings',
+      'tap_action.action',
+      'hold_action.action',
+      'double_tap_action.action',
+    ])
+  )
 })
 
 test('fan editor only shows controls supported by the selected fan', () => {
@@ -127,7 +205,7 @@ test('vane controls only show when the selected entity exposes vane attributes',
   )
 })
 
-test('entity layout controls are visible for configuring extra entities', () => {
+test('extra entity row layout controls are prominent in their own section', () => {
   const hass = {
     performAction,
     states: {
@@ -139,9 +217,10 @@ test('entity layout controls are visible for configuring extra entities', () => 
     },
   }
 
-  expect(
-    schemaNames(buildSchema({ entity: 'climate.living_room' } as any, hass))
-  ).toEqual(
+  const schema = buildSchema({ entity: 'climate.living_room' } as any, hass)
+
+  expect(sectionTitles(schema)).toContain('Extra entity rows')
+  expect(schemaNames([findSection(schema, 'Extra entity rows')])).toEqual(
     expect.arrayContaining(['layout.entities.type', 'layout.entities.labels'])
   )
 })
@@ -210,6 +289,51 @@ test('enhanced visuals toggle stays off from a partial form update', () => {
   expect(updated.entity).toBe('climate.living_room')
   expect(updated.header).toEqual({ name: 'Living Room' })
   expect(updated.layout?.step).toBe('row')
+})
+
+test('extra entity row editor adds and updates common row fields', () => {
+  if (!customElements.get('simple-thermostat-editor-test')) {
+    customElements.define(
+      'simple-thermostat-editor-test',
+      SimpleThermostatEditor
+    )
+  }
+  const editor = new SimpleThermostatEditor()
+  const configChanged = jest.fn()
+  editor.addEventListener('config-changed', configChanged)
+  editor.setConfig({ entity: 'climate.living_room' } as any)
+
+  editor._addEntityRow()
+  editor._updateEntityRow(0, 'entity', 'sensor.living_room_humidity')
+  editor._updateEntityRow(0, 'name', 'Humidity')
+  editor._updateEntityRow(0, 'icon', 'mdi:water-percent')
+
+  expect(editor.config.entities).toEqual([
+    {
+      entity: 'sensor.living_room_humidity',
+      name: 'Humidity',
+      icon: 'mdi:water-percent',
+    },
+  ])
+  expect(configChanged).toHaveBeenCalled()
+})
+
+test('extra entity row editor removes the config when the last row is removed', () => {
+  if (!customElements.get('simple-thermostat-editor-test')) {
+    customElements.define(
+      'simple-thermostat-editor-test',
+      SimpleThermostatEditor
+    )
+  }
+  const editor = new SimpleThermostatEditor()
+  editor.setConfig({
+    entity: 'climate.living_room',
+    entities: [{ entity: 'sensor.living_room_humidity' }],
+  } as any)
+
+  editor._removeEntityRow(0)
+
+  expect(editor.config.entities).toBeUndefined()
 })
 
 test('editor updates its local form data when enhanced visuals changes', () => {

@@ -74,21 +74,22 @@ If you are not upgrading to v4, keep using the [v3 documentation](https://github
 
 ## Add A Card
 
-Use the Home Assistant visual editor for normal setup. In v4, the card reads the selected entity and shows the options that apply to that device, so most cards no longer need YAML.
+Use the Home Assistant visual editor for normal setup. In v4, the card reads the selected entity and shows the options that apply to that device, so most cards can be configured without opening YAML.
 
 1. Open a dashboard and choose **Edit dashboard**.
 2. Select **Add card**.
 3. Search for **Simple Thermostat**.
 4. Pick your climate, fan, humidifier, or dehumidifier entity.
-5. Adjust the controls, header toggles, extra entities, and display options in the editor.
+5. Adjust the controls, header toggles, extra entity rows, target controls, and appearance in the editor.
 
 The editor handles the common v4 setup:
 
 - Entity and current value selection.
 - Climate, fan, humidifier, and dehumidifier controls.
 - Header toggles and toggle icons.
-- Extra entity rows and layout.
+- Extra entity rows, names, icons, and row layout.
 - Setpoint visibility and v4 enhanced visuals.
+- Advanced labels, precision, action type, and mode display options.
 
 ## Domain Defaults
 
@@ -109,7 +110,7 @@ YAML is still supported for advanced customization, migration, and manual dashbo
 Use the [YAML reference](YAML_REFERENCE.md) for:
 
 - advanced mode filtering,
-- custom extra entity templates,
+- extra entity attributes, units, decimals, relative time, and templates,
 - manual setpoint definitions,
 - service overrides,
 - target value tap, hold, and double tap actions,
