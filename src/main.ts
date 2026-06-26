@@ -363,6 +363,10 @@ export default class SimpleThermostat extends LitElement {
       decimals: DECIMALS,
       ...config,
     })
+
+    if (this._hass?.states?.[this.config.entity]) {
+      this.updateFromHass(this._hass)
+    }
   }
 
   updated() {
@@ -380,6 +384,8 @@ export default class SimpleThermostat extends LitElement {
   }
 
   set hass(hass: HASS) {
+    this._hass = hass
+
     if (!this.config?.entity) {
       return
     }
@@ -393,7 +399,6 @@ export default class SimpleThermostat extends LitElement {
       return
     }
 
-    this._hass = hass
     this.updateFromHass(hass)
   }
 

@@ -25,7 +25,7 @@ test('does not throw if Home Assistant is assigned before config', () => {
   }).not.toThrow()
 })
 
-test('ignores Home Assistant assignment before config until the next update', async () => {
+test('hydrates from Home Assistant assignment that arrived before config', async () => {
   document.body.innerHTML = ''
   const card = createCard()
   document.body.appendChild(card)
@@ -55,31 +55,6 @@ test('ignores Home Assistant assignment before config until the next update', as
     header: false,
     control: false,
   } as any)
-
-  await card.updateComplete
-
-  expect(card.entity).toBeUndefined()
-
-  card.hass = {
-    states: {
-      'climate.living_room': {
-        entity_id: 'climate.living_room',
-        state: 'heat',
-        attributes: {
-          temperature: 20,
-          current_temperature: 19,
-          min_temp: 7,
-          max_temp: 30,
-        },
-      },
-    },
-    config: {
-      unit_system: {
-        temperature: '°C',
-      },
-    },
-    localize: (key: string) => key,
-  }
 
   await card.updateComplete
 
