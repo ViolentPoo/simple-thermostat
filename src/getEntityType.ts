@@ -1,14 +1,9 @@
-export const DUAL = 'dual'
-export const SINGLE = 'single'
+export default function getEntityType(attributes, state) {
+  const mode = state ?? attributes?.hvac_mode
 
-export default function getEntityType(attributes) {
-  const mode = attributes?.hvac_mode
+  const isDualMode =
+    mode === 'heat_cool' ||
+    mode === 'auto'
 
-  const isDualMode = mode === 'heat_cool' || mode === 'auto'
-
-  if (isDualMode) {
-    return DUAL
-  }
-
-  return SINGLE
+  return isDualMode ? DUAL : SINGLE
 }
