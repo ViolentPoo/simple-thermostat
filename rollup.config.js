@@ -6,7 +6,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import postCSS from 'rollup-plugin-postcss'
 import postCSSLit from 'rollup-plugin-postcss-lit'
 import postCSSPresetEnv from 'postcss-preset-env'
-import inject from 'rollup-plugin-inject-process-env'
+import inject from '@rollup/plugin-inject'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 const BUILD_TARGET = process.env.BUILD_TARGET
@@ -16,9 +16,22 @@ const shared = (DEBUG) => [
     browser: true,
     preferBuiltins: false
   }),
+
   commonjs(),
+
+  // Node polyfills FIRST (important for crypto, buffer, process)
   nodePolyfills(),
+
+  // Explicit global injection for CI + browser compatibility
+  inject({
+    global: ['globalThis', 'globalThis'],
+    process: 'process',
+    Buffer: ['buffer', 'Buffer'],
+    crypto: 'crypto'
+  }),
+
   json(),
+
   inject(
     {
       DEBUG,
@@ -32,7 +45,9 @@ const shared = (DEBUG) => [
     },
     { exclude: '**/*.css' }
   ),
+
   typescript(),
+
   postCSS({
     plugins: [
       postCSSPresetEnv({
@@ -46,6 +61,7 @@ const shared = (DEBUG) => [
     inject: true,
     extract: false,
   }),
+
   postCSSLit(),
 ]
 
