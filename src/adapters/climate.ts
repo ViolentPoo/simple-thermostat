@@ -1,5 +1,5 @@
 import { LooseObject } from '../types'
-import getEntityType, { DUAL } from '../getEntityType'
+import getEntityType, { DUAL, SINGLE } from '../getEntityType'
 import { EntityAdapter, Range, SetpointService } from './types'
 
 export const climateAdapter: EntityAdapter = {
