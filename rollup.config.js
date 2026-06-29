@@ -19,32 +19,28 @@ const shared = (DEBUG) => [
 
   commonjs(),
 
-  // Node polyfills FIRST (important for crypto, buffer, process)
+  // Polyfills for Node globals (crypto, buffer, process)
   nodePolyfills(),
 
-  // Explicit global injection for CI + browser compatibility
+  // Single unified inject (fixes CI + removes duplication issues)
   inject({
     global: ['globalThis', 'globalThis'],
     process: 'process',
     Buffer: ['buffer', 'Buffer'],
-    crypto: 'crypto'
+    crypto: 'crypto',
+
+    // build-time constants
+    DEBUG,
+    BUILD_TIME: new Date().toLocaleString('en-CA', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
   }),
 
   json(),
-
-  inject(
-    {
-      DEBUG,
-      BUILD_TIME: new Date().toLocaleString('en-CA', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    },
-    { exclude: '**/*.css' }
-  ),
 
   typescript(),
 
