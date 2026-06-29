@@ -7,14 +7,17 @@ import postCSS from 'rollup-plugin-postcss'
 import postCSSLit from 'rollup-plugin-postcss-lit'
 import postCSSPresetEnv from 'postcss-preset-env'
 import inject from 'rollup-plugin-inject-process-env'
+import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 const BUILD_TARGET = process.env.BUILD_TARGET
 
 const shared = (DEBUG) => [
   resolve({
     browser: true,
+    preferBuiltins: false
   }),
   commonjs(),
+  nodePolyfills(),
   json(),
   inject(
     {
