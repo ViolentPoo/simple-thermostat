@@ -13,11 +13,14 @@
   ],
   "dependencies": {
     "@mdi/js": "^7.4.47",
+    "crypto-browserify": "^3.3.0",
     "debounce-fn": "^6.0.0",
-    "lit": "^3.0.0"
+    "lit": "^3.0.0",
+    "rollup-plugin-node-polyfills": "^0.2.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.2",
+    "@rollup/plugin-inject": "^5.0.5",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
