@@ -6,10 +6,13 @@ export const climateAdapter: EntityAdapter = {
   getSetpoints(attributes: LooseObject): Record<string, any> {
     if (getEntityType(attributes) === DUAL) {
       return {
-        target_temp_low: attributes.target_temp_low,
-        target_temp_high: attributes.target_temp_high,
+        target_temp_low:
+          attributes.target_temp_low ?? attributes.target_temperature_low,
+        target_temp_high:
+          attributes.target_temp_high ?? attributes.target_temperature_high,
       }
     }
+
     return {
       temperature: attributes.temperature,
     }
