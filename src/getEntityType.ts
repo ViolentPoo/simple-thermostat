@@ -1,9 +1,19 @@
-export default function getEntityType(attributes, state) {
-  const hvacModes = attributes?.hvac_modes || []
+export default function getEntityType(attributes) {
+  const hasDualSetpoints =
+    attributes?.target_temp_low != null &&
+    attributes?.target_temp_high != null
 
-  const isDualMode =
-    hvacModes.includes('heat_cool') ||
-    hvacModes.includes('auto')
+  const mode = attributes?.hvac_mode
 
-  return isDualMode ? DUAL : SINGLE
+  const isExplicitSingleMode =
+    mode === 'heat' ||
+    mode === 'cool'
+
+  // only force SINGLE when explicitly single-mode
+  if (isExplicitSingleMode) {
+    return SINGLE
+  }
+
+  // otherwise rely on capability
+  return hasDualSetpoints ? DUAL : SINGLE
 }
