@@ -16,13 +16,18 @@ export default function parseSetpoints(
     return {}
   }
 
+  // Always use adapter as the base source of truth
+  const base = adapter.getSetpoints(attributes)
+
   if (setpoints) {
     return Object.entries(setpoints).reduce((result, [name, sp]) => {
       if (sp?.hide) return result
-      result[name] = attributes?.[name]
+
+      // Prefer adapter values, fallback to raw attributes only if needed
+      result[name] = base?.[name] ?? attributes?.[name]
       return result
     }, {} as Record<string, any>)
   }
 
-  return adapter.getSetpoints(attributes)
+  return base
 }
