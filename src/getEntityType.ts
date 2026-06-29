@@ -1,9 +1,9 @@
 export default function getEntityType(attributes, state) {
-  const mode = state ?? attributes?.hvac_mode
+  const hvacModes = attributes?.hvac_modes || []
 
   const isDualMode =
-    mode === 'heat_cool' ||
-    mode === 'auto'
+    hvacModes.includes('heat_cool') ||
+    hvacModes.includes('auto')
 
   return isDualMode ? DUAL : SINGLE
 }
