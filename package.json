@@ -42,7 +42,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "cross-env NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider rollup -c"
+    "build": "cross-env NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider rollup -c",
     "build:prod": "cross-env NODE_ENV=production BUILD_TARGET=prod rollup -c",
     "build:debug": "cross-env BUILD_TARGET=debug rollup -c",
     "render:readme": "node scripts/render-readme-preview.mjs",
