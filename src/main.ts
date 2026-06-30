@@ -7,7 +7,7 @@ import styles from './styles.css'
 import formatNumber from './formatNumber'
 import { appendUnit } from './unitFormat'
 import parseSetpoints from './config/setpoints'
-import { CardConfig, ControlMode, LooseObject, HASS } from './types'
+import { CardConfig, LooseObject, HASS } from './types'
 
 const DEBOUNCE_TIMEOUT = 500
 const DECIMALS = 1
@@ -43,29 +43,39 @@ export default class SimpleThermostat extends LitElement {
     this.entity = entity
 
     const hvacMode = entity.state
+    const attributes = entity.attributes
 
-    let values: Record<string, any>
+    let values: Record<string, any> = {}
 
     /**
-     * 🔥 SINGLE SOURCE OF TRUTH RULE:
-     * heat_cool MUST bypass ALL adapters and parsers
+     * 🔥 SINGLE SOURCE OF TRUTH RULE
+     * heat_cool is fully raw and requires both setpoints
      */
     if (hvacMode === 'heat_cool') {
+      const low = attributes?.target_temp_low
+      const high = attributes?.target_temp_high
+
+      // 🔥 HARD GUARD: prevent N/A / partial state
+      if (low == null || high == null) {
+        this._values = {}
+        return
+      }
+
       values = {
-        target_temp_low: entity.attributes.target_temp_low,
-        target_temp_high: entity.attributes.target_temp_high,
+        target_temp_low: low,
+        target_temp_high: high,
       }
     } else {
       const adapter = getAdapter(this.config.entity)
 
-      const attributes = {
-        ...entity.attributes,
+      const enrichedAttributes = {
+        ...attributes,
         hvac_mode: hvacMode,
       }
 
       values = parseSetpoints(
         this.config?.setpoints ?? null,
-        attributes,
+        enrichedAttributes,
         adapter
       )
     }
@@ -111,7 +121,9 @@ export default class SimpleThermostat extends LitElement {
   }
 
   render() {
-    if (!this.entity) return nothing
+    if (!this.entity || Object.keys(this._values).length === 0) {
+      return nothing
+    }
 
     return html`
       ${this.renderSetpoints(this._values)}
