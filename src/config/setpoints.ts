@@ -23,44 +23,58 @@ export default function parseSetpoints(
     return {}
   }
 
-  // Always use adapter as the base source of truth
+  // Always use adapter as base structure
   const base = adapter.getSetpoints(attributes)
+  const mode = attributes?.hvac_mode
 
-  // 🔥 FIX: prevent unintended dual-setpoint rendering when user did not configure setpoints
   const hasExplicitSetpoints = setpoints && Object.keys(setpoints).length > 0
 
+  // 🔥 FORCE MODE-BASED BEHAVIOR (NO temperature fallback anywhere)
   if (!hasExplicitSetpoints) {
-    const temperature =
-      base.temperature ??
-      base.target_temp_high ??
-      base.target_temp_low ??
-      attributes?.temperature ?? null
+    let result: Record<string, any> = {}
 
-    const singleValues = temperature !== null && temperature !== undefined
-      ? { temperature }
-      : {}
+    if (mode === 'heat') {
+      result = {
+        target_temp_low: attributes?.target_temp_low ?? base?.target_temp_low,
+      }
+    } else if (mode === 'cool') {
+      result = {
+        target_temp_high: attributes?.target_temp_high ?? base?.target_temp_high,
+      }
+    } else if (mode === 'heat_cool') {
+      result = {
+        target_temp_low: attributes?.target_temp_low ?? base?.target_temp_low,
+        target_temp_high: attributes?.target_temp_high ?? base?.target_temp_high,
+      }
+    } else {
+      result = base?.temperature
+        ? { temperature: base.temperature }
+        : {}
+    }
 
     console.log('[simple-thermostat debug]', {
-      source: 'parseSetpoints (forced single mode)',
+      source: 'parseSetpoints (mode-based, no temperature fallback)',
+      mode,
       attributes,
       adapterSetpoints: base,
-      parsedValues: singleValues,
+      parsedValues: result,
     })
 
-    return singleValues
+    return result
   }
 
+  // Explicit user-defined setpoints (unchanged behavior but no temperature fallback)
   if (setpoints) {
     const parsedValues = Object.entries(setpoints).reduce((result, [name, sp]) => {
       if (sp?.hide) return result
 
-      // Prefer adapter values, fallback to raw attributes only if needed
+      // Prefer target_temp_* or adapter values ONLY
       result[name] = base?.[name] ?? attributes?.[name]
       return result
     }, {} as Record<string, any>)
 
     console.log('[simple-thermostat debug]', {
-      source: 'parseSetpoints',
+      source: 'parseSetpoints (explicit mode)',
       setpoints,
       attributes,
       adapterSetpoints: base,
@@ -71,7 +85,7 @@ export default function parseSetpoints(
   }
 
   console.log('[simple-thermostat debug]', {
-    source: 'parseSetpoints',
+    source: 'parseSetpoints (fallback base)',
     setpoints,
     attributes,
     adapterSetpoints: base,
