@@ -95,10 +95,28 @@ export default class SimpleThermostat extends LitElement {
   }
 
   renderSetpoints({ values }: { values: Record<string, any> }) {
-    return Object.entries(values).map(([field, value]) =>
-      this.renderSetpoint(field, value)
-    )
+  const mode = this.entity?.state
+
+  // 🔥 FORCE proper dual rendering in heat_cool
+  if (mode === 'heat_cool') {
+    const low = values.target_temp_low
+    const high = values.target_temp_high
+
+    return html`
+      ${low !== undefined
+        ? this.renderSetpoint('target_temp_low', low)
+        : nothing}
+      ${high !== undefined
+        ? this.renderSetpoint('target_temp_high', high)
+        : nothing}
+    `
   }
+
+  // default behavior (heat / cool / others)
+  return Object.entries(values)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([field, value]) => this.renderSetpoint(field, value))
+}
 
   renderSetpoint(field: string, value: any) {
     const displayValue =
