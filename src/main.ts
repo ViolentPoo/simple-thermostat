@@ -20,12 +20,12 @@ export default class SimpleThermostat extends LitElement {
   @property() config: CardConfig
   @property() entity: LooseObject
   @property({ type: Object }) _values: Record<string, any> = {}
-  @property() modes: Array<ControlMode> = []
 
   _hass: HASS = {}
 
   _debouncedSet = debounce((values: object) => {
     const { domain, service, data = {} } = this.service
+
     this._hass.callService(domain, service, {
       entity_id: this.config.entity,
       ...data,
@@ -42,29 +42,32 @@ export default class SimpleThermostat extends LitElement {
   updateFromHass(entity: any) {
     this.entity = entity
 
-    const adapter = getAdapter(this.config.entity)
     const hvacMode = entity.state
 
-    const attributes = {
-      ...entity.attributes,
-      hvac_mode: hvacMode,
-    }
-
-    let values = parseSetpoints(
-      this.config?.setpoints ?? null,
-      attributes,
-      adapter
-    )
+    let values: Record<string, any>
 
     /**
-     * 🔥 CRITICAL FIX:
-     * heat_cool must always use raw HA dual setpoints
+     * 🔥 SINGLE SOURCE OF TRUTH RULE:
+     * heat_cool MUST bypass ALL adapters and parsers
      */
     if (hvacMode === 'heat_cool') {
       values = {
         target_temp_low: entity.attributes.target_temp_low,
         target_temp_high: entity.attributes.target_temp_high,
       }
+    } else {
+      const adapter = getAdapter(this.config.entity)
+
+      const attributes = {
+        ...entity.attributes,
+        hvac_mode: hvacMode,
+      }
+
+      values = parseSetpoints(
+        this.config?.setpoints ?? null,
+        attributes,
+        adapter
+      )
     }
 
     this._values = values
