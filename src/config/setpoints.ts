@@ -26,6 +26,30 @@ export default function parseSetpoints(
   // Always use adapter as the base source of truth
   const base = adapter.getSetpoints(attributes)
 
+  // 🔥 FIX: prevent unintended dual-setpoint rendering when user did not configure setpoints
+  const hasExplicitSetpoints = setpoints && Object.keys(setpoints).length > 0
+
+  if (!hasExplicitSetpoints) {
+    const temperature =
+      base.temperature ??
+      base.target_temp_high ??
+      base.target_temp_low ??
+      attributes?.temperature ?? null
+
+    const singleValues = temperature !== null && temperature !== undefined
+      ? { temperature }
+      : {}
+
+    console.log('[simple-thermostat debug]', {
+      source: 'parseSetpoints (forced single mode)',
+      attributes,
+      adapterSetpoints: base,
+      parsedValues: singleValues,
+    })
+
+    return singleValues
+  }
+
   if (setpoints) {
     const parsedValues = Object.entries(setpoints).reduce((result, [name, sp]) => {
       if (sp?.hide) return result
