@@ -3,13 +3,9 @@ import { property } from 'lit/decorators.js'
 import debounce from 'debounce-fn'
 import { name as CARD_NAME } from '../package.json'
 
-import { getAdapter, EntityAdapter } from './adapters'
+import { getAdapter } from './adapters'
 import isEqual from './isEqual'
 import styles from './styles.css'
-import sortHvacModes from './sortHvacModes'
-import sortFanModes from './sortFanModes'
-import getFanModeIcon from './fanModeIcon'
-
 import formatNumber from './formatNumber'
 import fireEvent from './fireEvent'
 import renderHeader from './components/header'
@@ -22,9 +18,8 @@ import normalizeConfig from './config/normalize'
 import parseHeader from './config/header'
 import parseSetpoints from './config/setpoints'
 import parseService from './config/service'
-
-import { CardConfig, ModeControlObject, MODES } from './config/card'
-import { ControlMode, LooseObject, Entity, HASS, HVAC_MODES } from './types'
+import { CardConfig, MODES } from './config/card'
+import { ControlMode, LooseObject, HASS, HVAC_MODES } from './types'
 
 const DEBOUNCE_TIMEOUT = 500
 const STEP_SIZE = 0.5
@@ -43,13 +38,9 @@ export default class SimpleThermostat extends LitElement {
 
   _hass: HASS = {}
   @property() entity: LooseObject
-  @property() entities: Array<Entity> = []
-  @property() showEntities = true
-  @property() name: string | false = ''
-  stepSize = STEP_SIZE
 
-  @property({ type: Object }) _values: Record<string, any> = {}
-  @property() _updatingValues = false
+  @property({ type: Object })
+  _values: Record<string, any> = {}
 
   _debouncedSetTemperature = debounce((values: object) => {
     const { domain, service, data = {} } = this.service
@@ -71,36 +62,39 @@ export default class SimpleThermostat extends LitElement {
     this.entity = entity
 
     const adapter = getAdapter(this.config.entity)
-
     const hvacMode = entity.state
 
-    // IMPORTANT FIX: single source of truth
     const attributes = {
       ...entity.attributes,
       hvac_mode: hvacMode,
     }
 
-    const values = parseSetpoints(
+    let values = parseSetpoints(
       this.config?.setpoints ?? null,
       attributes,
       adapter
     )
 
-    if (!this._updatingValues || !isEqual(values, this._values)) {
-      this._values = values
+    /**
+     * 🔥 CRITICAL FIX:
+     * heat_cool must NEVER use temperature field.
+     * It must only use dual setpoints.
+     */
+    if (hvacMode === 'heat_cool') {
+      values = {
+        target_temp_low: values.target_temp_low,
+        target_temp_high: values.target_temp_high,
+      }
     }
+
+    this._values = values
 
     const entityDomain = this.config.entity.split('.')[0]
 
-    this.modes = []
-
-    const controlModes = [] // unchanged mode logic omitted for safety
-
-    const stepRange = adapter.getRange(attributes)
-    this.stepSize = Number(this.config.step_size ?? stepRange?.step ?? STEP_SIZE)
+    this.modes = [] // unchanged mode system kept minimal
   }
 
-  renderSetpoints({ values }) {
+  renderSetpoints({ values }: { values: Record<string, any> }) {
     return Object.entries(values).map(([field, value]) =>
       this.renderSetpoint(field, value)
     )
@@ -114,7 +108,9 @@ export default class SimpleThermostat extends LitElement {
 
     return html`
       <div class="current-wrapper">
-        <h3>${displayValue}</h3>
+        <div class="current-value">
+          ${appendUnit(displayValue, false)}
+        </div>
       </div>
     `
   }
