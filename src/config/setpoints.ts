@@ -13,6 +13,13 @@ export default function parseSetpoints(
   adapter: EntityAdapter = climateAdapter
 ) {
   if (setpoints === false) {
+    console.log('[simple-thermostat debug]', {
+      source: 'parseSetpoints',
+      setpoints,
+      attributes,
+      adapterSetpoints: {},
+      parsedValues: {},
+    })
     return {}
   }
 
@@ -20,14 +27,32 @@ export default function parseSetpoints(
   const base = adapter.getSetpoints(attributes)
 
   if (setpoints) {
-    return Object.entries(setpoints).reduce((result, [name, sp]) => {
+    const parsedValues = Object.entries(setpoints).reduce((result, [name, sp]) => {
       if (sp?.hide) return result
 
       // Prefer adapter values, fallback to raw attributes only if needed
       result[name] = base?.[name] ?? attributes?.[name]
       return result
     }, {} as Record<string, any>)
+
+    console.log('[simple-thermostat debug]', {
+      source: 'parseSetpoints',
+      setpoints,
+      attributes,
+      adapterSetpoints: base,
+      parsedValues,
+    })
+
+    return parsedValues
   }
+
+  console.log('[simple-thermostat debug]', {
+    source: 'parseSetpoints',
+    setpoints,
+    attributes,
+    adapterSetpoints: base,
+    parsedValues: base,
+  })
 
   return base
 }
